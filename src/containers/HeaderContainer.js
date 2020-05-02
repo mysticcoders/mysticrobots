@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Link } from "react-router-dom"
+import { useHistory } from "react-router-dom"
 
 import { Navbar } from "rbx"
 
@@ -8,32 +8,26 @@ import { Navbar } from "rbx"
 
 export const HeaderContainer = () => {
 
+    const history = useHistory()
+
     return (
         <Navbar>
             <Navbar.Brand>
-                <Navbar.Item>
-                    <Link to={`/`}>
-                        <h1>Mystic Robots</h1>
-                    </Link>
+                <Navbar.Item onClick={() => history.push('/')}>
+                    <h1>Mystic Robots</h1>
                 </Navbar.Item>
                 <Navbar.Burger />
             </Navbar.Brand>
             <Navbar.Menu>
                 <Navbar.Segment align="start">
-                <Navbar.Item>
-                    <Link to={`/`}>
-                        Daily Challenge
-                    </Link>
+                <Navbar.Item onClick={() => history.push('/')}>
+                    Daily Challenge
                 </Navbar.Item>
-                <Navbar.Item>
-                    <Link to={`/`}>
+                <Navbar.Item onClick={() => history.push('/')}>
                         High Scores
-                    </Link>
                 </Navbar.Item>
-                <Navbar.Item>
-                    <Link to={`/about`}>
-                        About
-                    </Link>
+                <Navbar.Item onClick={() => history.push('/about')}>
+                    About
                 </Navbar.Item>
                 </Navbar.Segment>
             </Navbar.Menu>
