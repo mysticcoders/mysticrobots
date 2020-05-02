@@ -3,6 +3,7 @@ import React from 'react'
 import { Section } from "rbx";
 
 import { HeaderContainer } from '../containers/HeaderContainer'
+import { GameBoard } from '../containers/GameBoard'
 
 export const DashboardPage = () => {
   return (
@@ -10,8 +11,8 @@ export const DashboardPage = () => {
  
           <HeaderContainer />
 
-            <Section>
-                <h1>Dashboard</h1>
+            <Section style={{paddingTop: '0'}}>
+                <GameBoard />
             </Section>
       </div>
 
