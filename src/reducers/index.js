@@ -3,9 +3,9 @@
 import { combineReducers } from 'redux'
 import { connectRouter } from 'connected-react-router'
 
-// import services from '../ducks/services'
+import boards from '../ducks/boards'
 
 export default (history) => combineReducers({
   router: connectRouter(history),
-//   services,
+  boards,
 })

@@ -1,38 +1,15 @@
 import React from 'react'
 
-export const WALL = {
-    NONE: null,
-    NORTH_WEST: 'NORTH_WEST',
-    SOUTH_WEST: 'SOUTH_WEST',
-    NORTH_EAST: 'NORTH_EAST',
-    SOUTH_EAST: 'SOUTH_EAST',
-    NORTH: 'NORTH',
-    EAST: 'EAST',
-    SOUTH: 'SOUTH',
-    WEST: 'WEST',
-    ALL: 'ALL'
-}
-
-export const ROBOT = {
-    NONE: null,
-    RED: 'RED',
-    BLUE: 'BLUE',
-    GREEN: 'GREEN',
-    YELLOW: 'YELLOW'
-}
-
-export const GOAL = {
-    NONE: null,
-    RED: 'RED',
-    BLUE: 'BLUE',
-    GREEN: 'GREEN',
-    YELLOW: 'YELLOW'
-}
+import { WALL, ROBOT, GOAL } from '../constants'
 
 /**
  * Will contain the Retro Rockets gameboard
  */
 export const GamePiece = ({ gridCell }) => {
+
+    if(!gridCell) {
+        return null
+    }
 
     const Robot = () => (
         <div style={{ width: '25px', height: '25px', margin: '5px', background: gridCell.robot.toLowerCase(), borderRadius: '50%' }}>&nbsp;</div>
@@ -46,22 +23,22 @@ export const GamePiece = ({ gridCell }) => {
 
     let wallBorder = "1px"
 
-    if(gridCell.wall) {
-        if(gridCell.wall === WALL.NORTH_WEST) {
+    if(gridCell.walls) {
+        if(gridCell.walls === WALL.NORTH_WEST) {
             wallBorder = "5px 1px 1px 5px"
-        } else if(gridCell.wall === WALL.NORTH_EAST) {
+        } else if(gridCell.walls === WALL.NORTH_EAST) {
             wallBorder = "5px 5px 1px 1px"
-        } else if(gridCell.wall === WALL.SOUTH_WEST) {
+        } else if(gridCell.walls === WALL.SOUTH_WEST) {
             wallBorder = "1px 1px 5px 5px"
-        } else if(gridCell.wall === WALL.SOUTH_EAST) {
+        } else if(gridCell.walls === WALL.SOUTH_EAST) {
             wallBorder = "1px 5px 5px 1px"
-        } else if(gridCell.wall === WALL.NORTH) {
+        } else if(gridCell.walls === WALL.NORTH) {
             wallBorder = "5px 1px 1px 1px"
-        } else if(gridCell.wall === WALL.EAST) {
+        } else if(gridCell.walls === WALL.EAST) {
             wallBorder = "1px 5px 1px 1px"
-        } else if(gridCell.wall === WALL.SOUTH) {
+        } else if(gridCell.walls === WALL.SOUTH) {
             wallBorder = "1px 1px 5px 1px"
-        } else if(gridCell.wall === WALL.WEST) {
+        } else if(gridCell.walls === WALL.WEST) {
             wallBorder = "1px 1px 1px 5px"
         } else {
             wallBorder = "5px 5px 5px 5px"
