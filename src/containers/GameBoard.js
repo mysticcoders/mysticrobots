@@ -21,6 +21,21 @@ export const GameBoard = () => {
 
     const grid = useSelector(state => state.boards.grid)
 
+    const selectedRobotPath = useSelector(state => state.boards.selectedRobotPath)
+
+
+    const isInRobotPath = (x, y) => {
+        if(!selectedRobotPath) return false
+
+        const allPaths = [].concat(selectedRobotPath.left, selectedRobotPath.right, selectedRobotPath.up, selectedRobotPath.down)
+        const coords = allPaths.reduce((obj, item) => {
+            obj.push(`${item.x},${item.y}`)
+            return obj
+        }, [])
+        
+        return (coords.indexOf(`${x},${y}`) !== -1)
+    }
+
     useEffect(() => {
         if(grid && Object.keys(grid).length > 0) {
 
@@ -51,7 +66,7 @@ export const GameBoard = () => {
             <Level key={y} style={{margin: 0}}>
                 <Level.Item>
                 { row.map((cell, x) => (
-                    <GamePiece key={`${x}-${y}`} gridCell={displayGrid[x][y]} />
+                    <GamePiece key={`${x}-${y}`} gridCell={displayGrid[x][y]} isInRobotPath={isInRobotPath(x, y)} />
                 ))}
                 </Level.Item>                
             </Level>

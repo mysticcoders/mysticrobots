@@ -34,8 +34,8 @@ export const GameContainer = () => {
                 <GameBoard />
             </Column>
             <Column>
-                <Level style={{ backgroundColor: 'black', padding: '0.75rem'}}>
-                    <Level.Item align="left">
+                <Column.Group multiline style={{ backgroundColor: 'black', padding: '0.25rem', paddingBottom: '0'}}>
+                    <Column align="left">
                         { history.map((entry, idx) => (
                             <React.Fragment key={idx}>
                             { entry.direction === 'UP' && (
@@ -52,8 +52,8 @@ export const GameContainer = () => {
                             )}
                             </React.Fragment>
                         ))}
-                    </Level.Item>
-                </Level>
+                    </Column>
+                </Column.Group>
 
                 <Level>
                     <Level.Item align="left">

@@ -8,7 +8,7 @@ import { WALL, ROBOT } from '../constants'
 /**
  * Will contain the Retro Rockets gameboard
  */
-export const GamePiece = ({ gridCell }) => {
+export const GamePiece = ({ gridCell, isInRobotPath = false }) => {
 
     const dispatch = useDispatch()
     
@@ -79,6 +79,19 @@ export const GamePiece = ({ gridCell }) => {
         } else if(gridCell.robot === ROBOT.GREEN) {
             pieceStyle.backgroundColor = "rgba(0, 255, 0, 0.2)"
         } else if(gridCell.robot === ROBOT.YELLOW) {
+            pieceStyle.backgroundColor = "rgba(255, 255, 0, 0.2)"
+        }
+    }
+
+    if(isInRobotPath) {
+
+        if(selectedRobot === ROBOT.BLUE) {
+            pieceStyle.backgroundColor = "rgba(0, 0, 255, 0.2)"
+        } else if(selectedRobot === ROBOT.RED) {
+            pieceStyle.backgroundColor = "rgba(255, 0, 0, 0.2)"            
+        } else if(selectedRobot === ROBOT.GREEN) {
+            pieceStyle.backgroundColor = "rgba(0, 255, 0, 0.2)"
+        } else if(selectedRobot === ROBOT.YELLOW) {
             pieceStyle.backgroundColor = "rgba(255, 255, 0, 0.2)"
         }
     }
