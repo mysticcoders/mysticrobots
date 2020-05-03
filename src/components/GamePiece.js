@@ -1,11 +1,18 @@
 import React from 'react'
 
-import { WALL, ROBOT, GOAL } from '../constants'
+import { useDispatch, useSelector } from 'react-redux'
+import { actions } from '../ducks/boards'
+
+import { WALL, ROBOT } from '../constants'
 
 /**
  * Will contain the Retro Rockets gameboard
  */
 export const GamePiece = ({ gridCell }) => {
+
+    const dispatch = useDispatch()
+    
+    const selectedRobot = useSelector(state => state.boards.selectedRobot)
 
     if(!gridCell) {
         return null
@@ -48,6 +55,9 @@ export const GamePiece = ({ gridCell }) => {
     const handleClick = () => {
         if(gridCell.robot) {
             console.log(gridCell)
+            dispatch(actions.selectRobot(gridCell.robot))
+        } else if(gridCell.walls) {
+            console.log(gridCell)
         }
     }
 
@@ -59,6 +69,20 @@ export const GamePiece = ({ gridCell }) => {
         borderColor: "#000", 
         backgroundColor: backgroundColor
     }
+
+    if(gridCell.robot && gridCell.robot === selectedRobot) {
+
+        if(gridCell.robot === ROBOT.BLUE) {
+            pieceStyle.backgroundColor = "rgba(0, 0, 255, 0.2)"
+        } else if(gridCell.robot === ROBOT.RED) {
+            pieceStyle.backgroundColor = "rgba(255, 0, 0, 0.2)"            
+        } else if(gridCell.robot === ROBOT.GREEN) {
+            pieceStyle.backgroundColor = "rgba(0, 255, 0, 0.2)"
+        } else if(gridCell.robot === ROBOT.YELLOW) {
+            pieceStyle.backgroundColor = "rgba(255, 255, 0, 0.2)"
+        }
+    }
+
 
     if(gridCell.robot) {
         pieceStyle.cursor = 'pointer'

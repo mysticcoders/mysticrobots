@@ -11,6 +11,7 @@ import { WALL, ROBOT, GOAL } from '../constants'
 export const types = {
 
     SETUP_BOARD: 'SETUP_BOARD',
+
     SETUP_BOARD_SUCCESS: 'SETUP_BOARD_SUCCESS',
     SETUP_BOARD_ERROR: 'SETUP_BOARD_ERROR',
 
@@ -23,6 +24,9 @@ export const types = {
     MOVE_ERROR: 'MOVE_ERROR',
 
     SET_ROBOT: 'SET_ROBOT',
+    SELECT_ROBOT: 'SELECT_ROBOT',
+
+    SELECT_NEXT_ROBOT: 'SELECT_NEXT_ROBOT',
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -38,6 +42,10 @@ export const actions = {
     moveRight: createAction(types.MOVE_RIGHT),
 
     setRobot: createAction(types.SET_ROBOT),
+
+    selectRobot: createAction(types.SELECT_ROBOT),
+
+    selectNextRobot: createAction(types.SELECT_NEXT_ROBOT),
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -47,14 +55,17 @@ export const actions = {
 export const initialState = {
     grid: {},
     robots: {},
+    history: [],
+    selectedRobot: ROBOT.BLUE,
+    robotTabOrder: [ROBOT.BLUE, ROBOT.GREEN, ROBOT.YELLOW, ROBOT.RED],
 }
 
 export default function (state = initialState, action) {
   switch (action.type) {
     case types.MOVE_SUCCESS:
 
-        console.dir(state.grid[`${action.payload.oldX},${action.payload.oldY}`].walls)
-        console.dir(state.grid[`${action.payload.newX},${action.payload.newY}`].walls)
+        // console.dir(state.grid[`${action.payload.oldX},${action.payload.oldY}`].walls)
+        // console.dir(state.grid[`${action.payload.newX},${action.payload.newY}`].walls)
         return {
             ...state,
             grid: {
@@ -81,7 +92,8 @@ export default function (state = initialState, action) {
                     y: action.payload.newY,
                     robot: action.payload.robot,
                 }                
-            }
+            },
+            history: state.history.concat({ direction: action.payload.direction, robot: action.payload.robot})
         }
     case types.SET_ROBOT:
         return {
@@ -95,10 +107,22 @@ export default function (state = initialState, action) {
                 }
             }
         }
+    case types.SELECT_ROBOT:
+        return {
+            ...state,
+            selectedRobot: action.payload
+        }
     case types.SETUP_BOARD_SUCCESS:
         return {
             ...state,
             grid: action.payload
+        }
+    case types.SELECT_NEXT_ROBOT:
+        
+        console.dir(state.robotTabOrder)
+        console.dir(state.selectedRobot)
+        return {
+            ...state
         }
     default:
       return state
@@ -115,6 +139,7 @@ const setGoal = (grid, x, y, goal) => grid[`${x},${y}`] = {...grid[`${x},${y}`],
 // /////////////////////////////////////////////////////////////////////////////
 // Sagas
 // /////////////////////////////////////////////////////////////////////////////
+
 export function* setupBoard() {
     const grid = {}
 
@@ -192,141 +217,338 @@ export function* setupBoard() {
 }
 
 export const getGrid = state => state.boards.grid
+export const getSelectedRobot = state => state.boards.robots[state.boards.selectedRobot]
 
 const X_MIN = 0
 const Y_MIN = 0
 const X_MAX = 15
 const Y_MAX = 15
 
-export function* moveUp({payload}) {
-    const grid = yield select(getGrid)
-    const {robot, x, y} = payload
+const illuminateThePath = (grid, selectedRobot) => {
+    const {x, y} = selectedRobot
 
-    const selectedCell = grid[`${x},${y}`]
-    if(selectedCell.robot === robot && y > Y_MIN) {
-        let new_y = y
+    // const robotCell = grid[`${x},${y}`]
 
-        let hit = false
-        while(!hit) {
-            --new_y
+    let up = []
+    let down = []
+    let left = []
+    let right = []
 
-            const newCell = grid[`${x},${new_y}`]
-            if(
-                    newCell.wall === WALL.NORTH || 
-                    newCell.wall === WALL.SOUTH || 
-                    newCell.wall === WALL.NORTH_EAST || 
-                    newCell.wall === WALL.NORTH_WEST || 
-                    newCell.wall === WALL.SOUTH_EAST || 
-                    newCell.wall === WALL.SOUTH_WEST || 
-                    newCell.robot || new_y === Y_MIN) {
+    // UP
+    if(y > Y_MIN) {
+        let done = false
+        let newY = y
 
-                ++new_y
-                hit = true
-
+        console.log("Processing UP")
+        while(newY >= 0) {
+            // console.log(`newY: ${newY}`)
+            const newCell = grid[`${x},${newY}`]
+            
+            console.log(newCell)
+            if(!done && (newCell.walls === WALL.NORTH || newCell.walls === WALL.NORTH_WEST || newCell.walls === WALL.NORTH_EAST)) {
+                up.push({x, y: newY})
+                done = true
             }
-        }
+            
+            if(!done && y !== newY && newCell.robot) {
+                up = up.slice(1)
+                done = true
+            }
 
-        yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: x, newY: new_y, robot: robot}})
+            if((!done && y !== newY) && (newCell.walls === WALL.SOUTH || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.SOUTH_WEST)) {
+                console.log(up)
+                console.log(`up.length: ${up.length}`)
+                up = up.slice(1)  // we hit a wall prior
+                console.log(up)
+                done = true
+            }
+
+            if(!done) {
+                up.push({x, y: newY})
+            }
+            --newY
+        }
+    }
+
+    // DOWN
+    if(y < Y_MAX) {
+        let done = false
+        let newY = y
+
+        console.log("Processing DOWN")
+        while(newY <= Y_MAX) {
+            const newCell = grid[`${x},${newY}`]
+
+            console.log(newCell)
+            if((!done && y !== newY) && (newCell.walls === WALL.NORTH || newCell.walls === WALL.NORTH_EAST || newCell.walls === WALL.NORTH_WEST)) {
+                console.log(down)
+                console.log(`down.length: ${down.length}`)
+                down = down.slice(down.length - 1)  // we hit a wall prior
+                done = true
+                console.log(down)
+            } 
+
+            if(!done && y !== newY && newCell.robot) {
+                down = down.slice(down.length - 1)
+                done = true
+            }
+
+            if(!done && newY === y && (newCell.walls === WALL.SOUTH || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.SOUTH_WEST)) {
+                done = true
+            }
+
+            if(!done && (newCell.walls === WALL.SOUTH || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.SOUTH_WEST)) {
+                down.push({x, y: newY})
+                done = true
+            }
+
+            if(!done) {
+                down.push({x, y: newY})
+            }
+
+            ++newY            
+        }
+    }
+
+    // TODO need to go through LEFT and RIGHT because the mechanics aren't accurate yet
+    // LEFT
+    if(x > X_MIN) {
+        let done = false
+        let newX = x
+
+        console.log("Processing LEFT")
+        while(newX >= 0) {
+            const newCell = grid[`${newX},${y}`]
+            
+            console.log(newCell)
+            if(!done && (newCell.walls === WALL.WEST || newCell.walls === WALL.NORTH_WEST || newCell.walls === WALL.NORTH_EAST)) {
+                left.push({x: newX, y})
+                done = true
+            }
+            
+            if(!done && x !== newX && newCell.robot) {
+                left = left.slice(1)
+                done = true
+            }
+
+            if((!done && x !== newX) && (newCell.walls === WALL.EAST || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.SOUTH_WEST)) {
+                console.log(left)
+                console.log(`left.length: ${left.length}`)
+                left = left.slice(1)  // we hit a wall prior
+                console.log(left)
+                done = true
+            }
+
+            if(!done) {
+                left.push({x: newX, y})
+            }
+            --newX
+        }
+    }
+
+    // RIGHT
+    if(x < X_MAX) {
+        let done = false
+        let newX = x
+
+        console.log("Processing RIGHT")
+        while(newX <= X_MAX) {
+            const newCell = grid[`${newX},${y}`]
+
+            console.log(newCell)
+            if((!done && x !== newX) && (newCell.walls === WALL.WEST || newCell.walls === WALL.NORTH_EAST || newCell.walls === WALL.NORTH_WEST)) {
+                console.log(right)
+                console.log(`right.length: ${right.length}`)
+                right = right.slice(right.length - 1)  // we hit a wall prior
+                done = true
+                console.log(right)
+            } 
+
+            if(!done && x !== newX && newCell.robot) {
+                right = right.slice(right.length - 1)
+                done = true
+            }
+
+            if(!done && newX === x && (newCell.walls === WALL.EAST || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.SOUTH_WEST)) {
+                done = true
+            }
+
+            if(!done && (newCell.walls === WALL.EAST || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.SOUTH_WEST)) {
+                right.push({x: newX, y})
+                done = true
+            }
+
+            if(!done) {
+                right.push({x: newX, y})
+            }
+
+            ++newX            
+        }
+    }    
+
+    console.log(`UP ${up.map(obj => `(${obj.x}, ${obj.y})`)}`)
+    console.log(`DOWN ${down.map(obj => `(${obj.x}, ${obj.y})`)}`)
+    console.log(`LEFT ${left.map(obj => `(${obj.x}, ${obj.y})`)}`)
+    console.log(`RIGHT ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
+
+    return {
+        up,
+        down,
+        left,
+        right,
     }
 }
 
-export function* moveDown({payload}) {
+export function* moveUp() {
     const grid = yield select(getGrid)
-    const {robot, x, y} = payload
+    const selectedRobot = yield select(getSelectedRobot)
 
-    const selectedCell = grid[`${x},${y}`]
-    if(selectedCell.robot === robot && y < Y_MAX) {
-        let new_y = y
+    const {robot, x, y} = selectedRobot
 
-        let hit = false
-        while(!hit) {
-            ++new_y
+    const { up } = illuminateThePath(grid, selectedRobot)
 
-            const newCell = grid[`${x},${new_y}`]
-            if(     
-                newCell.wall === WALL.SOUTH || 
-                newCell.wall === WALL.SOUTH_EAST || 
-                newCell.wall === WALL.SOUTH_WEST || 
-                newCell.wall === WALL.NORTH || 
-                newCell.wall === WALL.NORTH_EAST || 
-                newCell.wall === WALL.NORTH_WEST || 
-                newCell.robot || 
-                new_y === Y_MAX) {
+    if(up && up.length > 0) {
+        const moveCoord = up[up.length-1]
+        console.log(`(${moveCoord.x}, ${moveCoord.y})`)
 
-                    --new_y
-                    hit = true
-            }
-        }
-
-        yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: x, newY: new_y, robot: robot}})
-    }    
+        yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: moveCoord.x, newY: moveCoord.y, robot: robot, direction: 'UP'}})
+    }
 }
 
-export function* moveLeft({payload}) {
+export function* moveDown() {
     const grid = yield select(getGrid)
-    const {robot, x, y} = payload
+    const selectedRobot = yield select(getSelectedRobot)
 
-    const selectedCell = grid[`${x},${y}`]
+    const {robot, x, y} = selectedRobot
+    const { down } = illuminateThePath(grid, selectedRobot)
 
-    if(selectedCell.robot === robot && x > X_MIN) {
-        let new_x = x
+    if(down && down.length > 0) {
+        const moveCoord = down[down.length-1]
+        console.log(`(${moveCoord.x}, ${moveCoord.y})`)
 
-        let hit = false
-        while(!hit) {
-            --new_x
+        yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: moveCoord.x, newY: moveCoord.y, robot: robot, direction: 'DOWN'}})        
+    }  
+}
 
-            const newCell = grid[`${new_x},${y}`]
-            if(
-                newCell.wall === WALL.WEST || 
-                newCell.wall === WALL.EAST || 
-                newCell.wall === WALL.NORTH_WEST || 
-                newCell.wall === WALL.NORTH_EAST || 
-                newCell.wall === WALL.SOUTH_WEST || 
-                newCell.wall === WALL.SOUTH_EAST || 
-                newCell.robot || 
-                new_x === X_MIN) {
+export function* moveLeft() {
+    const grid = yield select(getGrid)
+    const selectedRobot = yield select(getSelectedRobot)
+
+    const {robot, x, y} = selectedRobot
+    const { left } = illuminateThePath(grid, selectedRobot)
+
+    if(left && left.length > 0) {
+        console.log(left)
+        const moveCoord = left[left.length-1]
+        console.log(`(${moveCoord.x}, ${moveCoord.y})`)
+
+        yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: moveCoord.x, newY: moveCoord.y, robot: robot, direction: 'LEFT'}})        
+    }  
+
+    // const selectedCell = grid[`${x},${y}`]
+
+    // if(selectedCell.robot === robot && x > X_MIN) {
+    //     let new_x = x
+
+    //     let initial = true
+    //     let hit = false
+    //     while(!hit) {
+
+    //         const newCell = grid[`${new_x},${y}`]
+
+    //         console.dir(newCell)
+
+    //         if(newCell.walls === WALL.WEST || 
+    //             newCell.walls === WALL.NORTH_WEST || 
+    //             newCell.walls === WALL.SOUTH_WEST ||
+    //             (newCell.robot && new_x !== x)) {
+
+    //             hit = true
+    //         } else if(
+    //             newCell.walls === WALL.EAST || 
+    //             newCell.walls === WALL.NORTH_EAST || 
+    //             newCell.walls === WALL.SOUTH_EAST || 
+    //             new_x === X_MIN) {
                 
-                    ++new_x
-                    hit = true                
-            }
-        }
+    //                 if(new_x !== x) {
+    //                     ++new_x
+    //                 }
+    //                 hit = true
+    //         } else if ( new_x === X_MIN ) {
+    //             hit = true
+    //         }
 
-        yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: new_x, newY: y, robot: robot}})
-    }    
+    //         if(!hit) {
+    //             --new_x
+    //             initial = false
+    //         }
+
+    //     }
+
+    //     if(!initial) {
+    //         yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: new_x, newY: y, robot: robot, direction: 'LEFT'}})
+    //     }
+    // }    
 
 }
 
-export function* moveRight({payload}) {
+export function* moveRight() {
     const grid = yield select(getGrid)
-    const {robot, x, y} = payload
+    const selectedRobot = yield select(getSelectedRobot)
 
-    const selectedCell = grid[`${x},${y}`]
+    const {robot, x, y} = selectedRobot
+    const { right } = illuminateThePath(grid, selectedRobot)
 
-    if(selectedCell.robot === robot && x < X_MAX) {
-        let new_x = x
+    if(right && right.length > 0) {
+        const moveCoord = right[right.length-1]
+        console.log(`(${moveCoord.x}, ${moveCoord.y})`)
 
-        let hit = false
-        while(!hit) {
-            ++new_x
+        yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: moveCoord.x, newY: moveCoord.y, robot: robot, direction: 'RIGHT'}})        
+    }  
 
-            const newCell = grid[`${new_x},${y}`]
-            if(
-                newCell.wall === WALL.EAST || 
-                newCell.wall === WALL.WEST || 
-                newCell.wall === WALL.NORTH_EAST || 
-                newCell.wall === WALL.SOUTH_EAST || 
-                newCell.wall === WALL.NORTH_WEST || 
-                newCell.wall === WALL.SOUTH_WEST || 
-                newCell.robot || 
-                new_x === X_MAX) {
+    // illuminateThePath(grid, selectedRobot)
 
-                    --new_x
-                    hit = true
-            }
-        }
+    // const {robot, x, y} = selectedRobot
 
-        yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: new_x, newY: y, robot: robot}})
-    }
+    // const selectedCell = grid[`${x},${y}`]
+
+    // if(selectedCell.robot === robot && x < X_MAX) {
+    //     let new_x = x
+
+    //     let hit = false
+    //     while(!hit) {
+
+    //         const newCell = grid[`${new_x},${y}`]
+
+    //         if(newCell.walls === WALL.EAST || 
+    //             newCell.walls === WALL.NORTH_EAST || 
+    //             newCell.walls === WALL.SOUTH_EAST || 
+    //             (newCell.robot && new_x !== x)) {
+
+    //                 hit = true
+
+    //         } else if(
+    //             newCell.walls === WALL.WEST || 
+    //             newCell.walls === WALL.NORTH_WEST || 
+    //             newCell.walls === WALL.SOUTH_WEST
+    //         ) {
+
+    //             if(new_x !== x) {
+    //                 --new_x
+    //             }
+    //             hit = true
+
+    //         } else if(new_x === X_MAX) {
+
+    //             hit = true
+
+    //         }
+
+    //         if(!hit) ++new_x
+    //     }
+
+    //     yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: new_x, newY: y, robot: robot, direction: 'RIGHT'}})
+    // }
 }
 
 export const sagas = [
