@@ -7,10 +7,12 @@ import { GameBoard } from '../containers/GameBoard'
 
 import { actions } from '../ducks/boards'
 
-import { Column, Level, Button, Icon } from 'rbx'
+import { Column, Level, Button, Icon, Notification } from 'rbx'
 
 import { FaArrowUp, FaArrowDown, FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import { FaArrowAltCircleUp, FaArrowAltCircleDown, FaArrowAltCircleLeft, FaArrowAltCircleRight } from 'react-icons/fa'
+
+import { ROBOT, Status } from '../constants'
 
 /**
  * Will contain the Retro Rockets gameboard
@@ -20,20 +22,53 @@ export const GameContainer = () => {
     const dispatch = useDispatch()
 
     const history = useSelector(state => state.boards.history)
+    const status = useSelector(state => state.boards.status)
 
-    useHotkeys('tab', () => dispatch(actions.selectNextRobot()))
-    useHotkeys('up', () => dispatch(actions.moveUp()))
-    useHotkeys('down', () => dispatch(actions.moveDown()))
-    useHotkeys('left', () => dispatch(actions.moveLeft()))
-    useHotkeys('right', () => dispatch(actions.moveRight()))
+
+    const move = (direction) => {
+        console.log(status)
+        if(status !== Status.WIN) {
+            if(direction === 'UP') {
+                dispatch(actions.moveUp())
+            } else if(direction === 'DOWN') {
+                dispatch(actions.moveDown())
+            } else if(direction === 'LEFT') {
+                dispatch(actions.moveLeft())
+            } else if(direction === 'RIGHT') {
+                dispatch(actions.moveRight())
+            }
+        }
+    }
+
+    const selectRobot = (robot) => {
+        console.log(status)
+        if(status !== Status.WIN) {
+            dispatch(actions.selectRobot(robot))
+        }
+    }
+
+    useHotkeys('1', () => selectRobot(ROBOT.RED))
+    useHotkeys('2', () => selectRobot(ROBOT.GREEN))
+    useHotkeys('3', () => selectRobot(ROBOT.BLUE))
+    useHotkeys('4', () => selectRobot(ROBOT.YELLOW))
+
+    useHotkeys('up', () => move('UP'))
+    useHotkeys('down', () => move('DOWN'))
+    useHotkeys('left', () => move('LEFT'))
+    useHotkeys('right', () => move('RIGHT'))
 
     return (
         <Column.Group>
-        
+
             <Column>
                 <GameBoard />
             </Column>
             <Column>
+                {status === 'WIN' &&
+                    <Notification color="success">
+                        Congratulations! You solved the grid in {history.length} moves! <Button onClick={()=>{dispatch(actions.refreshBoard())}}>Refresh</Button>
+                    </Notification>
+                }
                 <Column.Group multiline style={{ backgroundColor: 'black', padding: '0.25rem', paddingBottom: '0'}}>
                     <Column align="left">
                         { history.map((entry, idx) => (

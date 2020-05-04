@@ -24,10 +24,6 @@ export const GamePiece = ({ gridCell, isInRobotPath = false }) => {
     
     let backgroundColor = 'rgba(226, 206, 170, 1)'
 
-    if(gridCell.goal) {
-        backgroundColor = gridCell.goal.toLowerCase()
-    }
-
     let wallBorder = "1px"
 
     if(gridCell.walls) {
@@ -96,6 +92,9 @@ export const GamePiece = ({ gridCell, isInRobotPath = false }) => {
         }
     }
 
+    if(gridCell.goal) {
+        pieceStyle.backgroundColor = gridCell.goal.toLowerCase()
+    }
 
     if(gridCell.robot) {
         pieceStyle.cursor = 'pointer'

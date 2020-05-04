@@ -2,7 +2,7 @@ import { call, put, select, takeEvery } from 'redux-saga/effects'
 
 import { createAction } from '@reduxjs/toolkit'
 
-import { WALL, ROBOT, GOAL } from '../constants'
+import { WALL, ROBOT, GOAL, Status } from '../constants'
 
 // /////////////////////////////////////////////////////////////////////////////
 // Action Types
@@ -11,6 +11,8 @@ import { WALL, ROBOT, GOAL } from '../constants'
 export const types = {
 
     SETUP_BOARD: 'SETUP_BOARD',
+    CLEAR_BOARD: 'CLEAR_BOARD',
+    REFRESH_BOARD: 'REFRESH_BOARD',
 
     SETUP_BOARD_SUCCESS: 'SETUP_BOARD_SUCCESS',
     SETUP_BOARD_ERROR: 'SETUP_BOARD_ERROR',
@@ -29,6 +31,7 @@ export const types = {
     SELECT_NEXT_ROBOT: 'SELECT_NEXT_ROBOT',
 
     UPDATE_ROBOT_PATH: 'UPDATE_ROBOT_PATH',
+    SET_STATUS: 'SET_STATUS',
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -37,6 +40,7 @@ export const types = {
 
 export const actions = {
     setupBoard: createAction(types.SETUP_BOARD),
+    refreshBoard: createAction(types.REFRESH_BOARD),
 
     moveUp: createAction(types.MOVE_UP),
     moveDown: createAction(types.MOVE_DOWN),
@@ -50,6 +54,8 @@ export const actions = {
     selectNextRobot: createAction(types.SELECT_NEXT_ROBOT),
 
     setSelectedRobotPath: createAction(types.UPDATE_ROBOT_PATH),
+
+    setStatus: createAction(types.SET_STATUS),
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -57,6 +63,7 @@ export const actions = {
 // /////////////////////////////////////////////////////////////////////////////
 
 export const initialState = {
+    status: Status.PLAYING,
     grid: {},
     robots: {},
     history: [],
@@ -67,6 +74,10 @@ export const initialState = {
 
 export default function (state = initialState, action) {
   switch (action.type) {
+    case types.CLEAR_BOARD:
+        return {
+            ...initialState,
+        }
     case types.MOVE_SUCCESS:
 
         // console.dir(state.grid[`${action.payload.oldX},${action.payload.oldY}`].walls)
@@ -139,6 +150,11 @@ export default function (state = initialState, action) {
                 right: action.payload.right,
             }
         }
+    case types.SET_STATUS:
+        return {
+            ...state,
+            status: action.payload,
+        }
     default:
       return state
   }
@@ -155,6 +171,9 @@ const setGoal = (grid, x, y, goal) => grid[`${x},${y}`] = {...grid[`${x},${y}`],
 // Sagas
 // /////////////////////////////////////////////////////////////////////////////
 
+/**
+ * Convert this to set up the board using Redux actions instead
+ */
 export function* setupBoard() {
     const grid = {}
 
@@ -229,8 +248,14 @@ export function* setupBoard() {
     yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.GREEN, x: 14, y: 9}})
 
     yield put({ type: types.SETUP_BOARD_SUCCESS, payload: grid})
-    yield put({ type: types.SELECT_ROBOT, payload: ROBOT.BLUE })
+    yield put({ type: types.SELECT_ROBOT, payload: ROBOT.RED })
 
+}
+
+export function* refreshBoard() {
+    yield put({type: types.CLEAR_BOARD})
+    yield call(setupBoard)
+    yield put({type: types.SET_STATUS, payload: Status.PLAYING})
 }
 
 export const getGrid = state => state.boards.grid
@@ -276,17 +301,17 @@ const illuminateThePath = (grid, selectedRobot) => {
             // console.log(`newY: ${newY}`)
             const newCell = grid[`${x},${newY}`]
             
+            if(!done && y !== newY && newCell.robot) {
+                up = up.slice(1)
+                done = true
+            }
+
             // console.log(newCell)
             if(!done && (newCell.walls === WALL.NORTH || newCell.walls === WALL.NORTH_WEST || newCell.walls === WALL.NORTH_EAST)) {
                 up.push({x, y: newY})
                 done = true
             }
             
-            if(!done && y !== newY && newCell.robot) {
-                up = up.slice(1)
-                done = true
-            }
-
             if((!done && y !== newY) && (newCell.walls === WALL.SOUTH || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.SOUTH_WEST || newCell.walls === WALL.ALL)) {
                 // console.log(up)
                 // console.log(`up.length: ${up.length}`)
@@ -311,19 +336,19 @@ const illuminateThePath = (grid, selectedRobot) => {
         while(newY <= Y_MAX) {
             const newCell = grid[`${x},${newY}`]
 
-            // console.log(newCell)
-            if((!done && y !== newY) && (newCell.walls === WALL.NORTH || newCell.walls === WALL.NORTH_EAST || newCell.walls === WALL.NORTH_WEST || newCell.walls === WALL.ALL)) {
-                // console.log(`if.DOWN: ${down.map(obj => `(${obj.x}, ${obj.y})`)}`)
-                // console.log(`down.length: ${down.length}`)
-                down = down.slice(0, down.length)  // we hit a wall prior
-                done = true
-                // console.log(`if.after.slice.DOWN: ${down.map(obj => `(${obj.x}, ${obj.y})`)}`)
-            } 
-
             if(!done && y !== newY && newCell.robot) {
                 down = down.slice(down.length - 1)
                 done = true
             }
+
+            // console.log(newCell)
+            if((!done && y !== newY) && (newCell.walls === WALL.NORTH || newCell.walls === WALL.NORTH_EAST || newCell.walls === WALL.NORTH_WEST || newCell.walls === WALL.ALL)) {
+                console.log(`if.DOWN: ${down.map(obj => `(${obj.x}, ${obj.y})`)}`)
+                console.log(`down.length: ${down.length}`)
+                down = down.slice(0, down.length > 1 ? down.length : 0)  // we hit a wall prior
+                console.log(`if.after.slice.DOWN: ${down.map(obj => `(${obj.x}, ${obj.y})`)}`)
+                done = true
+            } 
 
             if(!done && newY === y && (newCell.walls === WALL.SOUTH || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.SOUTH_WEST)) {
                 done = true
@@ -342,7 +367,6 @@ const illuminateThePath = (grid, selectedRobot) => {
         }
     }
 
-    // TODO need to go through LEFT and RIGHT because the mechanics aren't accurate yet
     // LEFT
     if(x > X_MIN) {
         let done = false
@@ -351,23 +375,26 @@ const illuminateThePath = (grid, selectedRobot) => {
         console.log("Processing LEFT")
         while(newX >= 0) {
             const newCell = grid[`${newX},${y}`]
+
+            if(!done && x !== newX && newCell.robot) {
+                // console.log(`if.ROBOT.LEFT: ${left.map(obj => `(${obj.x}, ${obj.y})`)}`)
+                left = left.slice(1)
+                // console.log(`if.ROBOT.after.slice.LEFT: ${left.map(obj => `(${obj.x}, ${obj.y})`)}`)
+                done = true
+            }
             
             // console.log(newCell)
             if(!done && (newCell.walls === WALL.WEST || newCell.walls === WALL.NORTH_WEST || newCell.walls === WALL.SOUTH_WEST)) {
-                left.push({x: newX, y})
+                if(x !== newX) {
+                    left.push({x: newX, y})
+                }
                 done = true
             }
             
-            if(!done && x !== newX && newCell.robot) {
-                left = left.slice(1)
-                done = true
-            }
-
             if((!done && x !== newX) && (newCell.walls === WALL.EAST || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.ALL)) {
-                // console.log(left)
-                // console.log(`left.length: ${left.length}`)
+                // console.log(`if.LEFT: ${left.map(obj => `(${obj.x}, ${obj.y})`)}`)
                 left = left.slice(1)  // we hit a wall prior
-                // console.log(left)
+                // console.log(`if.after.slice.LEFT: ${left.map(obj => `(${obj.x}, ${obj.y})`)}`)
                 done = true
             }
 
@@ -387,23 +414,25 @@ const illuminateThePath = (grid, selectedRobot) => {
         while(newX <= X_MAX) {
             const newCell = grid[`${newX},${y}`]
 
-            // console.log(newCell)
-            if((!done && x !== newX) && (newCell.walls === WALL.WEST || newCell.walls === WALL.SOUTH_WEST || newCell.walls === WALL.NORTH_WEST)) {
-                // console.log(`if.RIGHT: ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
-                right = right.slice(0, right.length)  // we hit a wall prior
-                done = true
-                // console.log(`if.after.slice.RIGHT: ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
-            } 
-
             if(!done && x !== newX && newCell.robot) {
                 // console.log(`2.if.RIGHT: ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
-                right = right.slice(0, right.length)
+                right = right.slice(0, right.length > 1 ? right.length : 0)
                 // console.log(`2.after.slice.if.RIGHT: ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
                 done = true
             }
 
-            if(!done && (newCell.walls === WALL.EAST || newCell.walls === WALL.SOUTH_EAST)) {
-                right.push({x: newX, y})
+            // console.log(newCell)
+            if((!done && x !== newX) && (newCell.walls === WALL.WEST || newCell.walls === WALL.SOUTH_WEST || newCell.walls === WALL.NORTH_WEST)) {
+                // console.log(`if.RIGHT: ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
+                right = right.slice(0, right.length > 1 ? right.length : 0)  // we hit a wall prior
+                done = true
+                // console.log(`if.after.slice.RIGHT: ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
+            } 
+
+            if(!done && (newCell.walls === WALL.EAST || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.NORTH_EAST)) {
+                if(x !== newX) {
+                    right.push({x: newX, y})
+                }
                 done = true
             }
 
@@ -439,7 +468,6 @@ export function* moveUp() {
         console.log(`(${moveCoord.x}, ${moveCoord.y})`)
 
         yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: moveCoord.x, newY: moveCoord.y, robot: robot, direction: 'UP'}})
-
         yield call(updateRobotPath, { payload: robot})
     }
 }
@@ -490,11 +518,32 @@ export function* moveRight() {
     }  
 }
 
+export function* checkGoal() {
+    const grid = yield select(getGrid)
+    const robots = yield select(getRobots)
+
+    const goal = Object.values(grid).filter(element => element.goal)[0]
+
+    console.dir(goal)
+
+    console.dir(`x:${goal.x} y:${goal.y}`)
+
+    Object.values(robots).map(robot => console.dir(robot))
+
+    const winningRobot = Object.values(robots).filter(robot => robot.x === goal.x && robot.y === goal.y && robot.robot === goal.goal)
+
+    if(winningRobot && winningRobot.length === 1) {
+        yield put({type: types.SET_STATUS, payload: Status.WIN})
+    }
+}
+
 export const sagas = [
   takeEvery(types.SETUP_BOARD, setupBoard),
+  takeEvery(types.REFRESH_BOARD, refreshBoard),
   takeEvery(types.SELECT_ROBOT, updateRobotPath),
   takeEvery(types.MOVE_UP, moveUp),
   takeEvery(types.MOVE_DOWN, moveDown),
   takeEvery(types.MOVE_LEFT, moveLeft),
   takeEvery(types.MOVE_RIGHT, moveRight),
+  takeEvery(types.MOVE_SUCCESS, checkGoal),
 ]

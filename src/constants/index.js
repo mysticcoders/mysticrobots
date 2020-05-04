@@ -26,3 +26,8 @@ export const GOAL = {
     GREEN: 'GREEN',
     YELLOW: 'YELLOW'
 }
+
+export const Status = {
+    PLAYING: 'PLAYING',
+    WIN: 'WIN'
+}
