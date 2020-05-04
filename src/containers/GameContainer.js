@@ -1,5 +1,7 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
+import { useHistory } from 'react-router'
 
 import { useHotkeys } from 'react-hotkeys-hook'
 
@@ -17,13 +19,20 @@ import { ROBOT, Status } from '../constants'
 /**
  * Will contain the Retro Rockets gameboard
  */
-export const GameContainer = () => {
+export const GameContainer = ({goalIndex, goalColor}) => {
 
     const dispatch = useDispatch()
 
-    const history = useSelector(state => state.boards.history)
+    const history = useHistory()
+
+    const moveHistory = useSelector(state => state.boards.history)
     const status = useSelector(state => state.boards.status)
 
+    const metadata = useSelector(state => state.boards.metadata)
+
+    useEffect(() => {
+        history.replace(`/dashboard?goalIndex=${metadata.goalIndex}&goalColor=${metadata.goalColor}`)
+    }, [metadata, history])
 
     const move = (direction) => {
         console.log(status)
@@ -61,17 +70,17 @@ export const GameContainer = () => {
         <Column.Group>
 
             <Column>
-                <GameBoard />
+                <GameBoard goalIndex={goalIndex} goalColor={goalColor} />
             </Column>
             <Column>
                 {status === 'WIN' &&
                     <Notification color="success">
-                        Congratulations! You solved the grid in {history.length} moves! <Button onClick={()=>{dispatch(actions.refreshBoard())}}>Refresh</Button>
+                        Congratulations! You solved the grid in {moveHistory.length} moves! <Button onClick={()=>{dispatch(actions.refreshBoard())}}>Refresh</Button>
                     </Notification>
                 }
                 <Column.Group multiline style={{ backgroundColor: 'black', padding: '0.25rem', paddingBottom: '0'}}>
                     <Column align="left">
-                        { history.map((entry, idx) => (
+                        { moveHistory.map((entry, idx) => (
                             <React.Fragment key={idx}>
                             { entry.direction === 'UP' && (
                                 <FaArrowUp size="1.5em" style={{ color: entry.robot.toLowerCase() }} />

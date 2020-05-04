@@ -32,6 +32,8 @@ export const types = {
 
     UPDATE_ROBOT_PATH: 'UPDATE_ROBOT_PATH',
     SET_STATUS: 'SET_STATUS',
+
+    UPDATE_METADATA: 'UPDATE_METADATA',
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -56,6 +58,8 @@ export const actions = {
     setSelectedRobotPath: createAction(types.UPDATE_ROBOT_PATH),
 
     setStatus: createAction(types.SET_STATUS),
+
+    updateMetadata: createAction(types.UPDATE_METADATA),
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -70,6 +74,7 @@ export const initialState = {
     selectedRobotPath: {},
     selectedRobot: undefined,
     robotTabOrder: [ROBOT.BLUE, ROBOT.GREEN, ROBOT.YELLOW, ROBOT.RED],
+    metadata: {},
 }
 
 export default function (state = initialState, action) {
@@ -155,6 +160,11 @@ export default function (state = initialState, action) {
             ...state,
             status: action.payload,
         }
+    case types.UPDATE_METADATA:
+        return {
+            ...state,
+            metadata: action.payload,
+        }
     default:
       return state
   }
@@ -178,7 +188,7 @@ function randomIntFromInterval(min, max) {
 /**
  * Convert this to set up the board using Redux actions instead
  */
-export function* setupBoard() {
+export function* setupBoard({payload}) {
     const grid = {}
 
     for(let x = 0; x<16; x++) {
@@ -240,12 +250,17 @@ export function* setupBoard() {
 
     const corners = Object.values(grid).filter(element => element.walls === WALL.NORTH_WEST || element.walls === WALL.NORTH_EAST || element.walls === WALL.SOUTH_WEST || element === WALL.SOUTH_EAST)
 
-    const randomCornerIndex = randomIntFromInterval(0, corners.length - 1)
-    const randomCorner = corners[randomCornerIndex]
-    const goalIndex = randomIntFromInterval(0, Object.values(GOAL).length - 1)
-    const randomGoalColor = Object.values(GOAL)[goalIndex]
+    const goalIndex = payload.goalIndex >= 0 && payload.goalIndex < corners.length ? payload.goalIndex : randomIntFromInterval(0, corners.length - 1)
+    const randomCorner = corners[goalIndex]
 
+    const goals = Object.values(GOAL)
+
+    const goalColorIndex = payload.goalColor >= 0 && payload.goalColor < goals.length ? payload.goalColor : randomIntFromInterval(0, goals.length - 1)
+    const randomGoalColor = goals[goalColorIndex]
+    
     setGoal(grid, randomCorner.x, randomCorner.y, randomGoalColor)
+
+    yield put({ type: types.UPDATE_METADATA, payload: { goalIndex, goalColor: goalColorIndex }})
 
     // CENTER which is immovable!
     setWalls(grid, 7, 7, WALL.ALL)

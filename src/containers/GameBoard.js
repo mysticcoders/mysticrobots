@@ -9,14 +9,14 @@ import { Level } from 'rbx'
 /**
  * Will contain the Retro Rockets gameboard
  */
-export const GameBoard = () => {
+export const GameBoard = ({goalIndex, goalColor}) => {
 
     const dispatch = useDispatch()
 
     const [displayGrid, setDisplayGrid] = useState(null)
 
     useEffect(() => {
-        dispatch(actions.setupBoard())
+        dispatch(actions.setupBoard({goalIndex, goalColor}))
     }, [dispatch])
 
     const grid = useSelector(state => state.boards.grid)
