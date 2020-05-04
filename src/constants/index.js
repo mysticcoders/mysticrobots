@@ -12,7 +12,6 @@ export const WALL = {
 }
 
 export const ROBOT = {
-    NONE: null,
     RED: 'RED',
     BLUE: 'BLUE',
     GREEN: 'GREEN',
@@ -20,7 +19,6 @@ export const ROBOT = {
 }
 
 export const GOAL = {
-    NONE: null,
     RED: 'RED',
     BLUE: 'BLUE',
     GREEN: 'GREEN',

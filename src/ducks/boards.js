@@ -189,8 +189,6 @@ export function* setupBoard() {
         }
     }
 
-    setGoal(grid, 4, 13, GOAL.GREEN)
-
     // ROBOTS!
     setRobot(grid, 0, 3, ROBOT.RED)
     setRobot(grid, 12, 3, ROBOT.BLUE)
@@ -235,6 +233,18 @@ export function* setupBoard() {
 
     setWalls(grid, 3, 15, WALL.EAST)
     setWalls(grid, 11, 15, WALL.EAST)
+
+    const corners = Object.values(grid).filter(element => element.walls === WALL.NORTH_WEST || element.walls === WALL.NORTH_EAST || element.walls === WALL.SOUTH_WEST || element === WALL.SOUTH_EAST)
+
+    console.dir(corners)
+    console.log(`a random corner value: ${Math.floor(Math.random() * corners.length) + 1}`)
+    const randomCorner = corners[Math.floor(Math.random() * corners.length) + 1]
+
+    console.log(Object.values(GOAL))
+    console.log(`a random goal color index: ${Math.floor(Math.random() * Object.values(GOAL).length) + 1}`)
+    const randomGoalColor = Object.values(GOAL)[Math.floor(Math.random() * Object.values(GOAL).length) + 1]
+
+    setGoal(grid, randomCorner.x, randomCorner.y, randomGoalColor)
 
     // CENTER which is immovable!
     setWalls(grid, 7, 7, WALL.ALL)
