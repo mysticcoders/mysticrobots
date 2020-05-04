@@ -167,6 +167,10 @@ const setRobot = (grid, x, y, robot) => grid[`${x},${y}`] = {...grid[`${x},${y}`
 const setWalls = (grid, x, y, walls) => grid[`${x},${y}`] = {...grid[`${x},${y}`], walls}
 const setGoal = (grid, x, y, goal) => grid[`${x},${y}`] = {...grid[`${x},${y}`], goal}
 
+function randomIntFromInterval(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
 // /////////////////////////////////////////////////////////////////////////////
 // Sagas
 // /////////////////////////////////////////////////////////////////////////////
@@ -236,13 +240,10 @@ export function* setupBoard() {
 
     const corners = Object.values(grid).filter(element => element.walls === WALL.NORTH_WEST || element.walls === WALL.NORTH_EAST || element.walls === WALL.SOUTH_WEST || element === WALL.SOUTH_EAST)
 
-    console.dir(corners)
-    console.log(`a random corner value: ${Math.floor(Math.random() * corners.length) + 1}`)
-    const randomCorner = corners[Math.floor(Math.random() * corners.length) + 1]
-
-    console.log(Object.values(GOAL))
-    console.log(`a random goal color index: ${Math.floor(Math.random() * Object.values(GOAL).length) + 1}`)
-    const randomGoalColor = Object.values(GOAL)[Math.floor(Math.random() * Object.values(GOAL).length) + 1]
+    const randomCornerIndex = randomIntFromInterval(0, corners.length - 1)
+    const randomCorner = corners[randomCornerIndex]
+    const goalIndex = randomIntFromInterval(0, Object.values(GOAL).length - 1)
+    const randomGoalColor = Object.values(GOAL)[goalIndex]
 
     setGoal(grid, randomCorner.x, randomCorner.y, randomGoalColor)
 
