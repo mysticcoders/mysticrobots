@@ -31,11 +31,12 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y}) => {
     const metadata = useSelector(state => state.boards.metadata)
 
     useEffect(() => {
-        history.replace(`/dashboard?goalIndex=${metadata.goalIndex}&goalColor=${metadata.goalColor}&r=${metadata.r}&g=${metadata.g}&b=${metadata.b}&y=${metadata.y}`)
+        history.replace(`/puzzle?goalIndex=${metadata.goalIndex}&goalColor=${metadata.goalColor}&r=${metadata.r}&g=${metadata.g}&b=${metadata.b}&y=${metadata.y}`)
     }, [metadata, history])
 
     useEffect(()=> {
 
+        console.log("useEffect css crap")
         const navbarHeight = document.querySelector('.navbar').scrollHeight
 
         // Calculate our own vmin that is pixel based
@@ -46,9 +47,10 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y}) => {
         }
         setVmin()
         window.addEventListener('resize', setVmin)
-    })
+    }, [])
 
     const resetGameBoard = () => {
+        dispatch(actions.clearBoard({}))
         dispatch(actions.setupBoard({}))
     }
 

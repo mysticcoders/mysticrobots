@@ -46,6 +46,7 @@ export const types = {
 
 export const actions = {
     setupBoard: createAction(types.SETUP_BOARD),
+    clearBoard: createAction(types.CLEAR_BOARD),
     refreshBoard: createAction(types.REFRESH_BOARD),
 
     moveUp: createAction(types.MOVE_UP),
@@ -92,7 +93,14 @@ export default function (state = initialState, action) {
   switch (action.type) {
     case types.CLEAR_BOARD:
         return {
-            ...initialState,
+            status: Status.PLAYING,
+            robots: {},
+            history: [],
+            selectedRobotPath: {},
+            hoverRobotPath: undefined,
+            hoverRobot: undefined,
+            selectedRobot: undefined,
+            metadata: {},
         }
     case types.MOVE_SUCCESS:
 

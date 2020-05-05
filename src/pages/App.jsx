@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { DashboardPage } from './DashboardPage'
+import { PuzzlePage } from './PuzzlePage'
 import { AboutPage } from './AboutPage'
 
 import {
@@ -12,11 +12,14 @@ import { NotFoundPage } from './NotFoundPage'
 
 const App = () => (
     <Switch>
-        <Redirect exact from="/" to="/dashboard" />
+        <Redirect exact from="/" to="/random" />
 
-        <Route path="/dashboard">
-            <DashboardPage />
+        <Route path="/puzzle">
+            <PuzzlePage />
         </Route>
+
+        <Redirect from="/random" to="/puzzle" />
+
         <Route path="/about">
             <AboutPage />
         </Route>

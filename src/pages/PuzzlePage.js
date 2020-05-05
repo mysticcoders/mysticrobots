@@ -9,7 +9,7 @@ import { GameContainer } from '../containers/GameContainer'
 
 import queryString from 'query-string'
 
-export const DashboardPage = () => {
+export const PuzzlePage = () => {
   const { search } = useLocation()
 
   const query = queryString.parse(search.indexOf('?') === 0 ? search.substr(1) : search)
@@ -23,3 +23,5 @@ export const DashboardPage = () => {
     </div>
   )
 }
+
+export default PuzzlePage
