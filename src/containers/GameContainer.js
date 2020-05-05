@@ -25,10 +25,10 @@ export const GameContainer = ({ goalIndex, goalColor, r, g, b, y }) => {
 
     const history = useHistory()
 
-    const moveHistory = useSelector((state) => state.boards.history)
-    const status = useSelector((state) => state.boards.status)
+    const moveHistory = useSelector(state => state.boards.history)
+    const status = useSelector(state => state.boards.status)
 
-    const metadata = useSelector((state) => state.boards.metadata)
+    const metadata = useSelector(state => state.boards.metadata)
 
     useEffect(() => {
         history.replace(

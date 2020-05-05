@@ -296,7 +296,7 @@ export function* setupBoard({ payload }) {
     setWalls(grid, 8, 7, WALL.ALL)
 
     const corners = Object.values(grid).filter(
-        (element) =>
+        element =>
             element.walls === WALL.NORTH_WEST ||
             element.walls === WALL.NORTH_EAST ||
             element.walls === WALL.SOUTH_WEST ||
@@ -316,7 +316,7 @@ export function* setupBoard({ payload }) {
     setGoal(grid, randomCorner.x, randomCorner.y, randomGoalColor)
 
     // ROBOTS!
-    let availableSpots = Object.values(grid).filter((element) => element.walls !== WALL.ALL && !element.goal && !element.robot)
+    let availableSpots = Object.values(grid).filter(element => element.walls !== WALL.ALL && !element.goal && !element.robot)
 
     const rIndex = payload.r >= 0 && payload.r < availableSpots.length ? payload.r : randomIntFromInterval(0, availableSpots.length - 1)
     const redLocation = availableSpots[rIndex]
@@ -357,12 +357,12 @@ export function* refreshBoard() {
     yield put({ type: types.SET_STATUS, payload: Status.PLAYING })
 }
 
-export const getGrid = (state) => state.boards.grid
-export const getSelectedRobot = (state) => state.boards.robots[state.boards.selectedRobot]
+export const getGrid = state => state.boards.grid
+export const getSelectedRobot = state => state.boards.robots[state.boards.selectedRobot]
 
-export const getRobotPath = (state) => state.boards.selectedRobotPath
+export const getRobotPath = state => state.boards.selectedRobotPath
 
-export const getRobots = (state) => state.boards.robots
+export const getRobots = state => state.boards.robots
 
 const X_MIN = 0
 const Y_MIN = 0
@@ -468,10 +468,10 @@ const illuminateThePath = (grid, selectedRobot) => {
                     newCell.walls === WALL.NORTH_WEST ||
                     newCell.walls === WALL.ALL)
             ) {
-                console.log(`if.DOWN: ${down.map((obj) => `(${obj.x}, ${obj.y})`)}`)
+                console.log(`if.DOWN: ${down.map(obj => `(${obj.x}, ${obj.y})`)}`)
                 console.log(`down.length: ${down.length}`)
                 down = down.slice(0, down.length > 1 ? down.length : 0) // we hit a wall prior
-                console.log(`if.after.slice.DOWN: ${down.map((obj) => `(${obj.x}, ${obj.y})`)}`)
+                console.log(`if.after.slice.DOWN: ${down.map(obj => `(${obj.x}, ${obj.y})`)}`)
                 done = true
             }
 
@@ -586,10 +586,10 @@ const illuminateThePath = (grid, selectedRobot) => {
         }
     }
 
-    console.log(`UP ${up.map((obj) => `(${obj.x}, ${obj.y})`)}`)
-    console.log(`DOWN ${down.map((obj) => `(${obj.x}, ${obj.y})`)}`)
-    console.log(`LEFT ${left.map((obj) => `(${obj.x}, ${obj.y})`)}`)
-    console.log(`RIGHT ${right.map((obj) => `(${obj.x}, ${obj.y})`)}`)
+    console.log(`UP ${up.map(obj => `(${obj.x}, ${obj.y})`)}`)
+    console.log(`DOWN ${down.map(obj => `(${obj.x}, ${obj.y})`)}`)
+    console.log(`LEFT ${left.map(obj => `(${obj.x}, ${obj.y})`)}`)
+    console.log(`RIGHT ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
 
     return {
         up,
@@ -671,9 +671,9 @@ export function* checkGoal() {
     const grid = yield select(getGrid)
     const robots = yield select(getRobots)
 
-    const goal = Object.values(grid).filter((element) => element.goal)[0]
+    const goal = Object.values(grid).filter(element => element.goal)[0]
 
-    const winningRobot = Object.values(robots).filter((robot) => robot.x === goal.x && robot.y === goal.y && robot.robot === goal.goal)
+    const winningRobot = Object.values(robots).filter(robot => robot.x === goal.x && robot.y === goal.y && robot.robot === goal.goal)
 
     if (winningRobot && winningRobot.length === 1) {
         yield put({ type: types.SET_STATUS, payload: Status.WIN })
