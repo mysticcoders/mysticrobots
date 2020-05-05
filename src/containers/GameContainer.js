@@ -36,10 +36,13 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y}) => {
 
     useEffect(()=> {
 
+        const navbarHeight = document.querySelector('.navbar').scrollHeight
+
         // Calculate our own vmin that is pixel based
         function setVmin () {
-            const min = window.innerWidth > window.innerHeight ? (window.innerHeight - 52) : window.innerWidth
+            const min = window.innerWidth > window.innerHeight ? (window.innerHeight - navbarHeight) : window.innerWidth
             document.body.style.setProperty('--vmin-minus-header', `${min/100}px`)
+            document.body.style.setProperty('--vmin-source', `${min}px`)
         }
         setVmin()
         window.addEventListener('resize', setVmin)
@@ -60,9 +63,9 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y}) => {
     useHotkeys('right', () => status !== Status.WIN && dispatch(actions.moveRight()), {}, [status])
 
     return (
-        <Column.Group>
+        <Column.Group style={{margin: 0}}>
 
-            <Column style={{paddingBottom: 0}}>
+            <Column style={{padding: 0, margin: 0}}>
                 <GameBoard goalIndex={goalIndex} goalColor={goalColor} r={r} g={g} b={b} y={y} />
             </Column>
             <Column>
