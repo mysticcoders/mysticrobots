@@ -19,7 +19,7 @@ export const GamePiece = ({ gridCell, isInRobotPath = false }) => {
     }
 
     const Robot = () => (
-        <div style={{ width: 'calc(100% - 10px)', height: 'calc(100% - 10px)', margin: '5px', background: gridCell.robot.toLowerCase(), borderRadius: '50%' }}>&nbsp;</div>
+        <div style={{ width: '75%', height: '75%', margin: '12.5%', background: gridCell.robot.toLowerCase(), borderRadius: '50%' }}>&nbsp;</div>
     )
     
     let backgroundColor = 'rgba(226, 206, 170, 1)'

@@ -71,7 +71,7 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y}) => {
     useHotkeys('right', () => move('RIGHT'))
 
     return (
-        <Column.Group>
+        <Column.Group gapless>
 
             <Column>
                 <GameBoard goalIndex={goalIndex} goalColor={goalColor} r={r} g={g} b={b} y={y} />
