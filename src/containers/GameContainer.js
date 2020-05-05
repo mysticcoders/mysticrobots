@@ -34,41 +34,19 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y}) => {
         history.replace(`/dashboard?goalIndex=${metadata.goalIndex}&goalColor=${metadata.goalColor}&r=${metadata.r}&g=${metadata.g}&b=${metadata.b}&y=${metadata.y}`)
     }, [metadata, history])
 
-    const move = (direction) => {
-        console.log(status)
-        if(status !== Status.WIN) {
-            if(direction === 'UP') {
-                dispatch(actions.moveUp())
-            } else if(direction === 'DOWN') {
-                dispatch(actions.moveDown())
-            } else if(direction === 'LEFT') {
-                dispatch(actions.moveLeft())
-            } else if(direction === 'RIGHT') {
-                dispatch(actions.moveRight())
-            }
-        }
-    }
-
-    const selectRobot = (robot) => {
-        console.log(status)
-        if(status !== Status.WIN) {
-            dispatch(actions.selectRobot(robot))
-        }
-    }
-
     const resetGameBoard = () => {
         dispatch(actions.setupBoard({}))
     }
 
-    useHotkeys('1', () => selectRobot(ROBOT.RED))
-    useHotkeys('2', () => selectRobot(ROBOT.GREEN))
-    useHotkeys('3', () => selectRobot(ROBOT.BLUE))
-    useHotkeys('4', () => selectRobot(ROBOT.YELLOW))
+    useHotkeys('1', () => status !== Status.WIN && dispatch(actions.selectRobot(ROBOT.RED)), {}, [status] )
+    useHotkeys('2', () => status !== Status.WIN && dispatch(actions.selectRobot(ROBOT.GREEN)), {}, [status] )
+    useHotkeys('3', () => status !== Status.WIN && dispatch(actions.selectRobot(ROBOT.BLUE)), {}, [status] )
+    useHotkeys('4', () => status !== Status.WIN && dispatch(actions.selectRobot(ROBOT.YELLOW)), {}, [status] )
 
-    useHotkeys('up', () => move('UP'))
-    useHotkeys('down', () => move('DOWN'))
-    useHotkeys('left', () => move('LEFT'))
-    useHotkeys('right', () => move('RIGHT'))
+    useHotkeys('up', () => status !== Status.WIN && dispatch(actions.moveUp()), {}, [status])
+    useHotkeys('down', () => status !== Status.WIN && dispatch(actions.moveDown()), {}, [status])
+    useHotkeys('left', () => status !== Status.WIN && dispatch(actions.moveLeft()), {}, [status])
+    useHotkeys('right', () => status !== Status.WIN && dispatch(actions.moveRight()), {}, [status])
 
     return (
         <Column.Group>

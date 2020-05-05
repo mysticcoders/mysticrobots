@@ -14,6 +14,8 @@ export const GamePiece = ({ gridCell, isInRobotPath = false }) => {
     
     const selectedRobot = useSelector(state => state.boards.selectedRobot)
 
+    const theSelectedRobot = useSelector(state => state.boards.robots[selectedRobot])
+
     if(!gridCell) {
         return null
     }
@@ -50,11 +52,19 @@ export const GamePiece = ({ gridCell, isInRobotPath = false }) => {
 
     const handleClick = () => {
         if(gridCell.robot) {
-            console.log(gridCell)
             dispatch(actions.selectRobot(gridCell.robot))
-        } else if(gridCell.walls) {
-            console.log(gridCell)
+        } else if(isInRobotPath) {
+            if(gridCell.x < theSelectedRobot.x) {
+                dispatch(actions.moveLeft())
+            } else if(gridCell.x > theSelectedRobot.x) {
+                dispatch(actions.moveRight())
+            } else if(gridCell.y < theSelectedRobot.y) {
+                dispatch(actions.moveUp())
+            } else if(gridCell.y > theSelectedRobot.y) {
+                dispatch(actions.moveDown())
+            }
         }
+        console.log(gridCell)        
     }
 
     const pieceStyle = { 
