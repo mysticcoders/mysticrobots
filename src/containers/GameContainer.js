@@ -19,7 +19,7 @@ import { ROBOT, Status } from '../constants'
 /**
  * Will contain the Retro Rockets gameboard
  */
-export const GameContainer = ({goalIndex, goalColor}) => {
+export const GameContainer = ({goalIndex, goalColor, r, g, b, y}) => {
 
     const dispatch = useDispatch()
 
@@ -31,7 +31,7 @@ export const GameContainer = ({goalIndex, goalColor}) => {
     const metadata = useSelector(state => state.boards.metadata)
 
     useEffect(() => {
-        history.replace(`/dashboard?goalIndex=${metadata.goalIndex}&goalColor=${metadata.goalColor}`)
+        history.replace(`/dashboard?goalIndex=${metadata.goalIndex}&goalColor=${metadata.goalColor}&r=${metadata.r}&g=${metadata.g}&b=${metadata.b}&y=${metadata.y}`)
     }, [metadata, history])
 
     const move = (direction) => {
@@ -56,6 +56,10 @@ export const GameContainer = ({goalIndex, goalColor}) => {
         }
     }
 
+    const resetGameBoard = () => {
+        dispatch(actions.setupBoard({}))
+    }
+
     useHotkeys('1', () => selectRobot(ROBOT.RED))
     useHotkeys('2', () => selectRobot(ROBOT.GREEN))
     useHotkeys('3', () => selectRobot(ROBOT.BLUE))
@@ -70,7 +74,7 @@ export const GameContainer = ({goalIndex, goalColor}) => {
         <Column.Group>
 
             <Column>
-                <GameBoard goalIndex={goalIndex} goalColor={goalColor} />
+                <GameBoard goalIndex={goalIndex} goalColor={goalColor} r={r} g={g} b={b} y={y} />
             </Column>
             <Column>
                 {status === 'WIN' &&
@@ -105,6 +109,7 @@ export const GameContainer = ({goalIndex, goalColor}) => {
                         <Button onClick={() => { dispatch(actions.moveDown()) }}><Icon size="medium"><FaArrowAltCircleDown /></Icon></Button>
                         <Button onClick={() => { dispatch(actions.moveLeft()) }}><Icon size="medium"><FaArrowAltCircleLeft /></Icon></Button>
                         <Button onClick={() => { dispatch(actions.moveRight()) }}><Icon size="medium"><FaArrowAltCircleRight /></Icon></Button>
+                        <Button onClick={() => { resetGameBoard() }}>Reset Board</Button>
                     </Level.Item>
                 </Level>
             </Column>

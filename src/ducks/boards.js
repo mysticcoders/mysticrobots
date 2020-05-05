@@ -203,12 +203,6 @@ export function* setupBoard({payload}) {
         }
     }
 
-    // ROBOTS!
-    setRobot(grid, 0, 3, ROBOT.RED)
-    setRobot(grid, 12, 3, ROBOT.BLUE)
-    setRobot(grid, 8, 13, ROBOT.YELLOW)
-    setRobot(grid, 14, 9, ROBOT.GREEN)
-
     // WALLS
     setWalls(grid, 1, 0, WALL.EAST)
     setWalls(grid, 9, 0, WALL.EAST)
@@ -248,6 +242,12 @@ export function* setupBoard({payload}) {
     setWalls(grid, 3, 15, WALL.EAST)
     setWalls(grid, 11, 15, WALL.EAST)
 
+    // CENTER which is immovable!
+    setWalls(grid, 7, 7, WALL.ALL)
+    setWalls(grid, 7, 8, WALL.ALL)
+    setWalls(grid, 8, 8, WALL.ALL)
+    setWalls(grid, 8, 7, WALL.ALL)
+
     const corners = Object.values(grid).filter(element => element.walls === WALL.NORTH_WEST || element.walls === WALL.NORTH_EAST || element.walls === WALL.SOUTH_WEST || element === WALL.SOUTH_EAST)
 
     const goalIndex = payload.goalIndex >= 0 && payload.goalIndex < corners.length ? payload.goalIndex : randomIntFromInterval(0, corners.length - 1)
@@ -260,18 +260,34 @@ export function* setupBoard({payload}) {
     
     setGoal(grid, randomCorner.x, randomCorner.y, randomGoalColor)
 
-    yield put({ type: types.UPDATE_METADATA, payload: { goalIndex, goalColor: goalColorIndex }})
+    // ROBOTS!
+    let availableSpots = Object.values(grid).filter(element => element.walls !== WALL.ALL && !element.goal && !element.robot)
 
-    // CENTER which is immovable!
-    setWalls(grid, 7, 7, WALL.ALL)
-    setWalls(grid, 7, 8, WALL.ALL)
-    setWalls(grid, 8, 8, WALL.ALL)
-    setWalls(grid, 8, 7, WALL.ALL)
+    const rIndex = payload.r >= 0 && payload.r < availableSpots.length ? payload.r : randomIntFromInterval(0, availableSpots.length - 1)
+    const redLocation = availableSpots[rIndex]
+    setRobot(grid, redLocation.x, redLocation.y, ROBOT.RED)
+    yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.RED, x: redLocation.x, y: redLocation.y}})
+    availableSpots.splice(rIndex, 1)
 
-    yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.RED, x: 0, y: 3}})
-    yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.BLUE, x: 12, y: 3}})
-    yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.YELLOW, x: 8, y: 13}})
-    yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.GREEN, x: 14, y: 9}})
+    const gIndex = payload.g >= 0 && payload.g < availableSpots.length ? payload.g : randomIntFromInterval(0, availableSpots.length - 1)
+    const greenLocation = availableSpots[gIndex]
+    setRobot(grid, greenLocation.x, greenLocation.y, ROBOT.GREEN)
+    yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.GREEN, x: greenLocation.x, y: greenLocation.y}})
+    availableSpots.splice(gIndex, 1)
+
+    const bIndex = payload.b >= 0 && payload.b < availableSpots.length ? payload.b : randomIntFromInterval(0, availableSpots.length - 1)
+    const blueLocation = availableSpots[bIndex]
+    setRobot(grid, blueLocation.x, blueLocation.y, ROBOT.BLUE)
+    yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.BLUE, x: blueLocation.x, y: blueLocation.y}})
+    availableSpots.splice(bIndex, 1)
+
+    const yIndex = payload.y >= 0 && payload.y < availableSpots.length ? payload.y : randomIntFromInterval(0, availableSpots.length - 1)
+    const yellowLocation = availableSpots[yIndex]
+    setRobot(grid, yellowLocation.x, yellowLocation.y, ROBOT.YELLOW)
+    yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.YELLOW, x: yellowLocation.x, y: yellowLocation.y}})
+    availableSpots.splice(yIndex, 1)
+
+    yield put({ type: types.UPDATE_METADATA, payload: { goalIndex, goalColor: goalColorIndex, r: rIndex, g: gIndex, b: bIndex, y: yIndex }})
 
     yield put({ type: types.SETUP_BOARD_SUCCESS, payload: grid})
     yield put({ type: types.SELECT_ROBOT, payload: ROBOT.RED })
@@ -550,11 +566,11 @@ export function* checkGoal() {
 
     const goal = Object.values(grid).filter(element => element.goal)[0]
 
-    console.dir(goal)
+    // console.dir(goal)
 
-    console.dir(`x:${goal.x} y:${goal.y}`)
+    // console.dir(`x:${goal.x} y:${goal.y}`)
 
-    Object.values(robots).map(robot => console.dir(robot))
+    // Object.values(robots).map(robot => console.dir(robot))
 
     const winningRobot = Object.values(robots).filter(robot => robot.x === goal.x && robot.y === goal.y && robot.robot === goal.goal)
 

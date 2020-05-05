@@ -18,7 +18,7 @@ export const DashboardPage = () => {
     <div>
       <HeaderContainer />
       <Section style={{paddingTop: '0'}}>
-          <GameContainer goalIndex={query.goalIndex} goalColor={query.goalColor} />
+          <GameContainer goalIndex={query.goalIndex} goalColor={query.goalColor} r={query.r} g={query.g} b={query.b} y={query.y} />
       </Section> 
     </div>
   )
