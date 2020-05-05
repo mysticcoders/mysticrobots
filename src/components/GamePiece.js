@@ -58,8 +58,9 @@ export const GamePiece = ({ gridCell, isInRobotPath = false }) => {
     }
 
     const pieceStyle = { 
-        width: `${100/16}vmin`, 
-        height: `${100/16}vmin`, 
+        width: `calc( 6.25 * var(--vmin-minus-header) )`, 
+        height: `calc( 6.25 * var(--vmin-minus-header) )`, 
+        display: 'block',
         borderWidth: wallBorder, 
         borderStyle: "solid",  
         borderColor: "#000", 

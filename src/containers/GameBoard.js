@@ -61,7 +61,7 @@ export const GameBoard = ({goalIndex, goalColor, r, g, b, y}) => {
     }
 
     return (
-        <div style={{ width: '100vmin', height: '100vmin'}}>
+        <div style={{ width: 'calc(100 * var(--vmin-minus-header) )', height: 'calc(100 * var(--vmin-minus-header) )'}}>
         { displayGrid.map((row, y) => (
             <Level key={y} style={{margin: 0}}>
                 <Level.Item>

@@ -34,6 +34,17 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y}) => {
         history.replace(`/dashboard?goalIndex=${metadata.goalIndex}&goalColor=${metadata.goalColor}&r=${metadata.r}&g=${metadata.g}&b=${metadata.b}&y=${metadata.y}`)
     }, [metadata, history])
 
+    useEffect(()=> {
+
+        // Calculate our own vmin that is pixel based
+        function setVmin () {
+            const min = window.innerWidth > window.innerHeight ? (window.innerHeight - 52) : window.innerWidth
+            document.body.style.setProperty('--vmin-minus-header', `${min/100}px`)
+        }
+        setVmin()
+        window.addEventListener('resize', setVmin)
+    })
+
     const move = (direction) => {
         console.log(status)
         if(status !== Status.WIN) {
@@ -71,9 +82,9 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y}) => {
     useHotkeys('right', () => move('RIGHT'))
 
     return (
-        <Column.Group gapless>
+        <Column.Group>
 
-            <Column>
+            <Column style={{paddingBottom: 0}}>
                 <GameBoard goalIndex={goalIndex} goalColor={goalColor} r={r} g={g} b={b} y={y} />
             </Column>
             <Column>
