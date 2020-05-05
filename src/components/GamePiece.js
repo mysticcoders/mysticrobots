@@ -3,7 +3,7 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { actions } from '../ducks/boards'
 
-import { FaRobot } from 'react-icons/fa'
+import { FaRobot, FaStar } from 'react-icons/fa'
 
 import { WALL, ROBOT } from '../constants'
 
@@ -26,6 +26,10 @@ export const GamePiece = ({ gridCell, isInRobotPath = false }) => {
         <FaRobot style={{ width: '75%', height: '75%', margin: '12.5%', color: gridCell.robot.toLowerCase()}} />
     )
     
+    const Goal = () => (
+        <FaStar style={{ width: '75%', height: '75%', margin: '12.5%' }} />
+    )
+
     let backgroundColor = 'rgba(226, 206, 170, 1)'
 
     let wallBorder = "1px"
@@ -105,19 +109,20 @@ export const GamePiece = ({ gridCell, isInRobotPath = false }) => {
         }
     }
 
-    if(gridCell.goal) {
-        pieceStyle.backgroundColor = gridCell.goal.toLowerCase()
-    }
-
     if(gridCell.robot) {
         pieceStyle.cursor = 'pointer'
     }
 
     return (
         <div onClick={() => { handleClick() }} style={pieceStyle}>
-            { gridCell.robot && 
-                <Robot />
-            }
+            <>
+                { gridCell.robot && 
+                    <Robot />
+                }
+                { gridCell.goal &&
+                    <Goal />
+                }
+            </>
             
         </div>
     )
