@@ -6,6 +6,7 @@ import { useHistory } from 'react-router'
 import { useHotkeys } from 'react-hotkeys-hook'
 
 import { GameBoard } from '../containers/GameBoard'
+import { FooterContainer } from '../containers/FooterContainer'
 
 import { actions } from '../ducks/boards'
 
@@ -106,6 +107,8 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y}) => {
                         <Button onClick={() => { resetGameBoard() }}>Reset Board</Button>
                     </Level.Item>
                 </Level>
+
+                <FooterContainer />
             </Column>
         </Column.Group>
     )
