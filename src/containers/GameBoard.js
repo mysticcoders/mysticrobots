@@ -23,11 +23,25 @@ export const GameBoard = ({goalIndex, goalColor, r, g, b, y}) => {
 
     const selectedRobotPath = useSelector(state => state.boards.selectedRobotPath)
 
+    const hoverRobotPath = useSelector(state => state.boards.hoverRobotPath)
 
     const isInRobotPath = (x, y) => {
         if(!selectedRobotPath) return false
 
         const allPaths = [].concat(selectedRobotPath.left, selectedRobotPath.right, selectedRobotPath.up, selectedRobotPath.down)
+        const coords = allPaths.reduce((obj, item) => {
+            obj.push(`${item.x},${item.y}`)
+            return obj
+        }, [])
+        
+        return (coords.indexOf(`${x},${y}`) !== -1)
+    }
+
+    const isHoveringInRobotPath = (x, y) => {
+        if(!hoverRobotPath) return false
+
+        const allPaths = [].concat(hoverRobotPath.left, hoverRobotPath.right, hoverRobotPath.up, hoverRobotPath.down)
+
         const coords = allPaths.reduce((obj, item) => {
             obj.push(`${item.x},${item.y}`)
             return obj
@@ -61,12 +75,12 @@ export const GameBoard = ({goalIndex, goalColor, r, g, b, y}) => {
     }
 
     return (
-        <div style={{ width: 'calc(100 * var(--vmin-minus-header) )', height: 'calc(100 * var(--vmin-minus-header) )'}}>
+        <div style={{ marginLeft: '0', border: '10px solid white', background: 'black',  padding: '5px', width: 'calc(100 * var(--vmin-minus-header) )', height: 'calc(100 * var(--vmin-minus-header) )'}}>
         { displayGrid.map((row, y) => (
-            <Level key={y} style={{margin: 0}}>
+            <Level key={y} style={{margin: 0, background: 'white'}}>
                 <Level.Item>
                 { row.map((cell, x) => (
-                    <GamePiece key={`${x}-${y}`} gridCell={displayGrid[x][y]} isInRobotPath={isInRobotPath(x, y)} />
+                    <GamePiece key={`${x}-${y}`} gridCell={displayGrid[x][y]} isInRobotPath={isInRobotPath(x, y)} isHoveringInRobotPath={isHoveringInRobotPath(x, y)} />
                 ))}
                 </Level.Item>                
             </Level>
