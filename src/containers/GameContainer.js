@@ -52,7 +52,7 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y}) => {
 
     const resetGameBoard = () => {
         dispatch(actions.clearBoard({}))
-        dispatch(actions.setupBoard({}))
+        dispatch(actions.setupBoard(metadata))
     }
 
     useHotkeys('1', () => status !== Status.WIN && dispatch(actions.selectRobot(ROBOT.RED)), {}, [status] )
