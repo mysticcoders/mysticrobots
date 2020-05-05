@@ -29,3 +29,5 @@ export const Status = {
     PLAYING: 'PLAYING',
     WIN: 'WIN'
 }
+
+export const GOOGLE_ANALYTICS_KEY = 'UA-254925-15'
