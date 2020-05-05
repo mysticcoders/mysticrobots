@@ -10,13 +10,15 @@ import { WALL, ROBOT } from '../constants'
 /**
  * Will contain the Retro Rockets gameboard
  */
-export const GamePiece = ({ gridCell, isInRobotPath = false }) => {
+export const GamePiece = ({ gridCell, isInRobotPath = false, isHoveringInRobotPath = false }) => {
 
     const dispatch = useDispatch()
     
     const selectedRobot = useSelector(state => state.boards.selectedRobot)
+    const hoverRobot = useSelector(state => state.boards.hoverRobot)
 
     const theSelectedRobot = useSelector(state => state.boards.robots[selectedRobot])
+    const theHoverRobot = useSelector(state => hoverRobot && state.boards.robots[hoverRobot])
 
     if(!gridCell) {
         return null
@@ -72,7 +74,14 @@ export const GamePiece = ({ gridCell, isInRobotPath = false }) => {
                 dispatch(actions.moveDown())
             }
         }
-        console.log(gridCell)        
+
+        console.log(gridCell)   // DEBUG print of cell when clicked on
+    }
+
+    const handleOnMouseEnter = () => {
+        if(gridCell.robot) {
+            dispatch(actions.updateHoverRobotPath(gridCell.robot))
+        }
     }
 
     const pieceStyle = { 
@@ -99,7 +108,6 @@ export const GamePiece = ({ gridCell, isInRobotPath = false }) => {
     }
 
     if(isInRobotPath) {
-
         if(selectedRobot === ROBOT.BLUE) {
             pieceStyle.backgroundColor = "rgba(0, 0, 255, 0.2)"
         } else if(selectedRobot === ROBOT.RED) {
@@ -111,12 +119,26 @@ export const GamePiece = ({ gridCell, isInRobotPath = false }) => {
         }
     }
 
+    if(isHoveringInRobotPath) {
+
+        // TODO this looks wonky if we end up hovering and then moving that hover. fix styling.
+        if(hoverRobot === ROBOT.BLUE) {
+            pieceStyle.backgroundColor = "rgba(0, 0, 255, 0.2)"
+        } else if(hoverRobot === ROBOT.RED) {
+            pieceStyle.backgroundColor = "rgba(255, 0, 0, 0.2)"            
+        } else if(hoverRobot === ROBOT.GREEN) {
+            pieceStyle.backgroundColor = "rgba(0, 255, 0, 0.2)"
+        } else if(hoverRobot === ROBOT.YELLOW) {
+            pieceStyle.backgroundColor = "rgba(255, 255, 0, 0.2)"
+        }
+    }
+
     if(gridCell.robot) {
         pieceStyle.cursor = 'pointer'
     }
 
     return (
-        <div onClick={() => { handleClick() }} style={pieceStyle}>
+        <div onClick={() => { handleClick() }} onMouseEnter={()=> {handleOnMouseEnter() }} onMouseLeave={() => { dispatch(actions.clearHoverRobotPath() )}} style={pieceStyle}>
             <>
                 { gridCell.robot && 
                     <Robot />

@@ -34,6 +34,10 @@ export const types = {
     SET_STATUS: 'SET_STATUS',
 
     UPDATE_METADATA: 'UPDATE_METADATA',
+
+    UPDATE_HOVER_ROBOT_PATH: 'UPDATE_HOVER_ROBOT_PATH',
+    UPDATE_HOVER_ROBOT_PATH_SUCCESS: 'UPDATE_HOVER_ROBOT_PATH_SUCCESS',
+    CLEAR_HOVER_ROBOT_PATH: 'CLEAR_HOVER_ROBOT_PATH',
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -60,6 +64,11 @@ export const actions = {
     setStatus: createAction(types.SET_STATUS),
 
     updateMetadata: createAction(types.UPDATE_METADATA),
+
+    updateHoverRobotPath: createAction(types.UPDATE_HOVER_ROBOT_PATH),
+
+    clearHoverRobotPath: createAction(types.CLEAR_HOVER_ROBOT_PATH),
+
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -72,6 +81,8 @@ export const initialState = {
     robots: {},
     history: [],
     selectedRobotPath: {},
+    hoverRobotPath: undefined,
+    hoverRobot: undefined,
     selectedRobot: undefined,
     robotTabOrder: [ROBOT.BLUE, ROBOT.GREEN, ROBOT.YELLOW, ROBOT.RED],
     metadata: {},
@@ -139,9 +150,7 @@ export default function (state = initialState, action) {
             grid: action.payload
         }
     case types.SELECT_NEXT_ROBOT:
-        
-        console.dir(state.robotTabOrder)
-        console.dir(state.selectedRobot)
+        // TODO defunct, this doesn't work ... perhaps if we have a "tab" functionality        
         return {
             ...state
         }
@@ -154,6 +163,23 @@ export default function (state = initialState, action) {
                 left: action.payload.left,
                 right: action.payload.right,
             }
+        }
+    case types.UPDATE_HOVER_ROBOT_PATH_SUCCESS:
+        return {
+            ...state,
+            hoverRobotPath: {
+                up: action.payload.up,
+                down: action.payload.down,
+                left: action.payload.left,
+                right: action.payload.right,
+            },
+            hoverRobot: action.payload.robot
+        }
+    case types.CLEAR_HOVER_ROBOT_PATH:
+        return {
+            ...state,
+            hoverRobotPath: undefined,
+            hoverRobot: undefined,
         }
     case types.SET_STATUS:
         return {
@@ -313,7 +339,7 @@ const X_MAX = 15
 const Y_MAX = 15
 
 export function* updateRobotPath({payload}) {
-    console.dir(payload)
+    // console.dir(payload)
 
     const grid = yield select(getGrid)
 
@@ -324,6 +350,18 @@ export function* updateRobotPath({payload}) {
 
     yield put({ type: types.UPDATE_ROBOT_PATH, payload: { up, down, left, right }})
 }
+
+export function* updateHoverRobotPath({payload}) {
+    const grid = yield select(getGrid)
+
+    const robots = yield select(getRobots)
+    const selectedRobot = robots[payload]
+
+    const { up, down, left, right } = illuminateThePath(grid, selectedRobot)
+
+    yield put({ type: types.UPDATE_HOVER_ROBOT_PATH_SUCCESS, payload: { up, down, left, right, robot: payload }})
+}
+//  takeEvery(types.HOVER_ROBOT, updateHoverRobotPath),
 
 const illuminateThePath = (grid, selectedRobot) => {
     const {x, y} = selectedRobot
@@ -379,7 +417,7 @@ const illuminateThePath = (grid, selectedRobot) => {
             const newCell = grid[`${x},${newY}`]
 
             if(!done && y !== newY && newCell.robot) {
-                down = down.slice(down.length - 1)
+                down = down.slice(0, down.length)
                 done = true
             }
 
@@ -433,7 +471,9 @@ const illuminateThePath = (grid, selectedRobot) => {
                 done = true
             }
             
-            if((!done && x !== newX) && (newCell.walls === WALL.EAST || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.ALL)) {
+            // console.log(`x: ${x} newX: ${newX} newCell.walls: ${newCell.walls} done: ${done}`)
+            if((!done && x !== newX) && (newCell.walls === WALL.EAST || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.NORTH_EAST || newCell.walls === WALL.ALL)) {
+                // console.dir(newCell)
                 // console.log(`if.LEFT: ${left.map(obj => `(${obj.x}, ${obj.y})`)}`)
                 left = left.slice(1)  // we hit a wall prior
                 // console.log(`if.after.slice.LEFT: ${left.map(obj => `(${obj.x}, ${obj.y})`)}`)
@@ -456,7 +496,7 @@ const illuminateThePath = (grid, selectedRobot) => {
         while(newX <= X_MAX) {
             const newCell = grid[`${newX},${y}`]
 
-            if(!done && x !== newX && newCell.robot) {
+            if(!done && x !== newX && (newCell.robot || newCell.walls === WALL.ALL)) {
                 // console.log(`2.if.RIGHT: ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
                 right = right.slice(0, right.length > 1 ? right.length : 0)
                 // console.log(`2.after.slice.if.RIGHT: ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
@@ -507,7 +547,6 @@ export function* moveUp() {
 
     if(up && up.length > 0) {
         const moveCoord = up[up.length-1]
-        console.log(`(${moveCoord.x}, ${moveCoord.y})`)
 
         yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: moveCoord.x, newY: moveCoord.y, robot: robot, direction: 'UP'}})
         yield call(updateRobotPath, { payload: robot})
@@ -522,7 +561,6 @@ export function* moveDown() {
 
     if(down && down.length > 0) {
         const moveCoord = down[down.length-1]
-        console.log(`(${moveCoord.x}, ${moveCoord.y})`)
 
         yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: moveCoord.x, newY: moveCoord.y, robot: robot, direction: 'DOWN'}})        
         yield call(updateRobotPath, { payload: robot})
@@ -536,9 +574,7 @@ export function* moveLeft() {
     const { left } = yield select(getRobotPath)
 
     if(left && left.length > 0) {
-        console.log(left)
         const moveCoord = left[left.length-1]
-        console.log(`(${moveCoord.x}, ${moveCoord.y})`)
 
         yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: moveCoord.x, newY: moveCoord.y, robot: robot, direction: 'LEFT'}})        
         yield call(updateRobotPath, { payload: robot})
@@ -553,7 +589,6 @@ export function* moveRight() {
 
     if(right && right.length > 0) {
         const moveCoord = right[right.length-1]
-        console.log(`(${moveCoord.x}, ${moveCoord.y})`)
 
         yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: moveCoord.x, newY: moveCoord.y, robot: robot, direction: 'RIGHT'}})        
         yield call(updateRobotPath, { payload: robot})
@@ -566,12 +601,6 @@ export function* checkGoal() {
 
     const goal = Object.values(grid).filter(element => element.goal)[0]
 
-    // console.dir(goal)
-
-    // console.dir(`x:${goal.x} y:${goal.y}`)
-
-    // Object.values(robots).map(robot => console.dir(robot))
-
     const winningRobot = Object.values(robots).filter(robot => robot.x === goal.x && robot.y === goal.y && robot.robot === goal.goal)
 
     if(winningRobot && winningRobot.length === 1) {
@@ -583,6 +612,9 @@ export const sagas = [
   takeEvery(types.SETUP_BOARD, setupBoard),
   takeEvery(types.REFRESH_BOARD, refreshBoard),
   takeEvery(types.SELECT_ROBOT, updateRobotPath),
+
+  takeEvery(types.UPDATE_HOVER_ROBOT_PATH, updateHoverRobotPath),
+
   takeEvery(types.MOVE_UP, moveUp),
   takeEvery(types.MOVE_DOWN, moveDown),
   takeEvery(types.MOVE_LEFT, moveLeft),
