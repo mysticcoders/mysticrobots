@@ -25,9 +25,11 @@ export const GamePiece = ({ gridCell, isInRobotPath = false }) => {
     const Robot = () => (
         <FaRobot style={{ width: '75%', height: '75%', margin: '12.5%', color: gridCell.robot.toLowerCase()}} />
     )
-    
+
     const Goal = () => (
-        <FaStar style={{ width: '75%', height: '75%', margin: '12.5%' }} />
+        <div>
+            <FaStar style={{ width: '75%', height: '75%', margin: '12.5%', color: gridCell.goal.toLowerCase() }} />
+        </div>
     )
 
     let backgroundColor = 'rgba(226, 206, 170, 1)'
