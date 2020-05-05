@@ -3,6 +3,7 @@ import React from 'react'
 import { Section, Container, Content, Title } from "rbx";
 
 import { HeaderContainer } from '../containers/HeaderContainer'
+import { FooterContainer } from '../containers/FooterContainer'
 
 export const AboutPage = () => {
   return (
@@ -21,6 +22,8 @@ export const AboutPage = () => {
                 </Content>
             </Container>
             </Section>
+
+            <FooterContainer />
       </div>
 
   )

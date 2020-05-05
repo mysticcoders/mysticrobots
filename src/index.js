@@ -12,16 +12,16 @@ import App from './pages/App';
 
 import * as serviceWorker from './serviceWorker';
 
-// import ReactGA from 'react-ga'
-// import {
-//   GOOGLE_ANALYTICS_KEY,
-// } from './constants'
+import ReactGA from 'react-ga'
+import {
+  GOOGLE_ANALYTICS_KEY,
+} from './constants'
 
 const history = createBrowserHistory();
 const store = configureStore({}, history);
 const root = document.getElementById('root');
 
-// ReactGA.initialize(GOOGLE_ANALYTICS_KEY)
+ReactGA.initialize(GOOGLE_ANALYTICS_KEY)
 
 if (root instanceof Element) {
   ReactDOM.render(

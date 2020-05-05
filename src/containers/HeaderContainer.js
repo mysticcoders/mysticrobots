@@ -6,6 +6,8 @@ import { useHistory } from "react-router-dom"
 
 import { Navbar } from "rbx"
 
+import ReactGA from 'react-ga'
+
 // import store from 'store2'
 
 export const HeaderContainer = () => {
@@ -14,6 +16,9 @@ export const HeaderContainer = () => {
 
     const metadata = useSelector(state => state.boards.metadata)
 
+    useEffect(() => {
+        ReactGA.pageview(window.location.pathname + window.location.search)  
+    }, [])
 
     const homepageOrPuzzle = () => {
         if(metadata) {
