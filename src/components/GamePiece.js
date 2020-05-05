@@ -21,7 +21,7 @@ export const GamePiece = ({ gridCell, isInRobotPath = false }) => {
     }
 
     const Robot = () => (
-        <div style={{ width: 'calc(100% - 10px)', height: 'calc(100% - 10px)', margin: '5px', background: gridCell.robot.toLowerCase(), borderRadius: '50%' }}>&nbsp;</div>
+        <div style={{ width: '75%', height: '75%', margin: '12.5%', background: gridCell.robot.toLowerCase(), borderRadius: '50%' }}>&nbsp;</div>
     )
     
     let backgroundColor = 'rgba(226, 206, 170, 1)'
@@ -68,8 +68,9 @@ export const GamePiece = ({ gridCell, isInRobotPath = false }) => {
     }
 
     const pieceStyle = { 
-        width: `${100/16}vmin`, 
-        height: `${100/16}vmin`, 
+        width: `calc( 6.25 * var(--vmin-minus-header) )`, 
+        height: `calc( 6.25 * var(--vmin-minus-header) )`, 
+        display: 'block',
         borderWidth: wallBorder, 
         borderStyle: "solid",  
         borderColor: "#000", 
