@@ -68,7 +68,7 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y}) => {
             <Column>
                 {status === 'WIN' &&
                     <Notification color="success">
-                        Congratulations! You solved the grid in {moveHistory.length} moves! <Button onClick={()=>{dispatch(actions.refreshBoard())}}>Refresh</Button>
+                        Congratulations! You solved the grid in {moveHistory.length} moves! <Button onClick={()=>{dispatch(actions.setupBoard({}))}}>Refresh</Button>
                     </Notification>
                 }
                 <Column.Group multiline style={{ backgroundColor: 'black', padding: '0.25rem', paddingBottom: '0'}}>

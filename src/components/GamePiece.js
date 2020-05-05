@@ -3,6 +3,8 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { actions } from '../ducks/boards'
 
+import { FaRobot } from 'react-icons/fa'
+
 import { WALL, ROBOT } from '../constants'
 
 /**
@@ -21,7 +23,7 @@ export const GamePiece = ({ gridCell, isInRobotPath = false }) => {
     }
 
     const Robot = () => (
-        <div style={{ width: '75%', height: '75%', margin: '12.5%', background: gridCell.robot.toLowerCase(), borderRadius: '50%' }}>&nbsp;</div>
+        <FaRobot style={{ width: '75%', height: '75%', margin: '12.5%', color: gridCell.robot.toLowerCase()}} />
     )
     
     let backgroundColor = 'rgba(226, 206, 170, 1)'
