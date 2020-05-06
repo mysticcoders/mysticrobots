@@ -21,11 +21,12 @@ import { useInterval } from '../hooks/utils'
 
 import numeral from 'numeral'
 
+import queryString from 'query-string'
+
 /**
  * Will contain the Retro Rockets gameboard
  */
-export const GameContainer = ({goalIndex, goalColor, r, g, b, y}) => {
-
+export const GameContainer = ({goalIndex, goalColor, r, g, b, y, tl, tr, bl, br}) => {
     const dispatch = useDispatch()
 
     const history = useHistory()
@@ -53,12 +54,24 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y}) => {
     }, [status])
 
     useEffect(() => {
-        history.replace(`/puzzle?goalIndex=${metadata.goalIndex}&goalColor=${metadata.goalColor}&r=${metadata.r}&g=${metadata.g}&b=${metadata.b}&y=${metadata.y}`)
+
+        const values = {
+            goalIndex: metadata.goalIndex,
+            goalColor: metadata.goalColor,
+            r: metadata.r,
+            g: metadata.g,
+            b: metadata.b,
+            y: metadata.y,
+            tl: metadata.tl,
+            tr: metadata.tr,
+            bl: metadata.bl,
+            br: metadata.br
+        }
+
+        history.replace(`/puzzle?${queryString.stringify(values)}`)
     }, [metadata, history])
 
     useEffect(()=> {
-
-        console.log("useEffect css crap")
         const navbarHeight = document.querySelector('.navbar').scrollHeight
 
         // Calculate our own vmin that is pixel based
@@ -103,7 +116,7 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y}) => {
         <Column.Group style={{margin: 0}}>
 
             <Column style={{padding: 0, margin: 0}}>
-                <GameBoard goalIndex={goalIndex} goalColor={goalColor} r={r} g={g} b={b} y={y} />
+                <GameBoard goalIndex={goalIndex} goalColor={goalColor} r={r} g={g} b={b} y={y} tl={tl} tr={tr} bl={bl} br={br} />
             </Column>
             <Column>
                 {status === 'WIN' &&
