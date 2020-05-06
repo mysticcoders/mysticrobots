@@ -4,6 +4,8 @@ import { createAction } from '@reduxjs/toolkit'
 
 import { WALL, ROBOT, GOAL, Status } from '../constants'
 
+import board from '../constants/board'
+
 // /////////////////////////////////////////////////////////////////////////////
 // Action Types
 // /////////////////////////////////////////////////////////////////////////////
@@ -231,6 +233,21 @@ function randomIntFromInterval(min, max) {
  * Convert this to set up the board using Redux actions instead
  */
 export function* setupBoard({payload}) {
+
+    console.log("setupBoard")
+
+    console.dir(board)
+
+
+    let availableSpots = Object.values(grid).filter(element => element.walls !== WALL.ALL && !element.goal && !element.robot)
+
+    const rIndex = payload.r >= 0 && payload.r < availableSpots.length ? payload.r : randomIntFromInterval(0, availableSpots.length - 1)
+    const redLocation = availableSpots[rIndex]
+    setRobot(grid, redLocation.x, redLocation.y, ROBOT.RED)
+    yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.RED, x: redLocation.x, y: redLocation.y}})
+    availableSpots.splice(rIndex, 1)
+
+
     const grid = {}
 
     for(let x = 0; x<16; x++) {
