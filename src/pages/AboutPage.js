@@ -62,6 +62,23 @@ export const AboutPage = () => {
 
                 </Content>
 
+                <Title>How to move?</Title>
+                <Content>
+                    <p>
+                        If all keyboard, you can use the numbers 1 through 4 to select each of the robots. 1 = Rollie, 2 = Gumball, 3 = Blubber and 4 = Yolo. Use the arrow keys 
+                        to move them around
+                    </p>
+                    <p>
+                        Mouse controls available by rolling over any of the robots to see their path, or selecting the robot to see the path. And you can select on that path when the robot 
+                        is selected in order to move that robot.
+                    </p>
+                    <p>
+                        4 directional buttons are also given to your right (on desktop) and below (on mobile) so you can control with just mouse that way.
+                    </p>
+                    <p>
+                        Swipe will be added soon.
+                    </p>
+                </Content>
                 <Title>Who built this?</Title>
                 <Content>
                     This was built and coded by the team at <a href="https://mysticcoders.com">Mystic Coders, LLC</a>
