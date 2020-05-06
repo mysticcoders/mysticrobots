@@ -24,6 +24,12 @@ export const GamePiece = ({ gridCell, isInRobotPath = false, isHoveringInRobotPa
         return null
     }
 
+    const GoalWithRobot = () => (
+        <div style={{ backgroundColor: gridCell.goal.toLowerCase() }}>
+            <FaRobot style={{ display: 'inline', width: '75%', height: '75%', margin: '12.5%', color: gridCell.robot.toLowerCase()}} />
+        </div>
+    )
+
     const Robot = () => (
         <FaRobot style={{ width: '75%', height: '75%', margin: '12.5%', color: gridCell.robot.toLowerCase()}} />
     )
@@ -140,10 +146,13 @@ export const GamePiece = ({ gridCell, isInRobotPath = false, isHoveringInRobotPa
     return (
         <div onClick={() => { handleClick() }} onMouseEnter={()=> {handleOnMouseEnter() }} onMouseLeave={() => { dispatch(actions.clearHoverRobotPath() )}} style={pieceStyle}>
             <>
-                { gridCell.robot && 
+                { (gridCell.robot && gridCell.goal) &&
+                    <GoalWithRobot />
+                }
+                { (gridCell.robot && !gridCell.goal) && 
                     <Robot />
                 }
-                { gridCell.goal &&
+                { (gridCell.goal && !gridCell.robot) &&
                     <Goal />
                 }
             </>
