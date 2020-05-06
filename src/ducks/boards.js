@@ -25,6 +25,10 @@ export const types = {
     MOVE_SUCCESS: 'MOVE_SUCCESS',
     MOVE_ERROR: 'MOVE_ERROR',
 
+    START_TIMER: 'START_TIMER',
+    STOP_TIMER: 'STOP_TIMER',
+    RESET_TIMER: 'RESET_TIMER',
+
     SET_ROBOT: 'SET_ROBOT',
     SELECT_ROBOT: 'SELECT_ROBOT',
 
@@ -53,6 +57,10 @@ export const actions = {
     moveDown: createAction(types.MOVE_DOWN),
     moveLeft: createAction(types.MOVE_LEFT),
     moveRight: createAction(types.MOVE_RIGHT),
+
+    startTimer: createAction(types.START_TIMER),
+    stopTimer: createAction(types.STOP_TIMER),
+    resetTimer: createAction(types.RESET_TIMER),
 
     setRobot: createAction(types.SET_ROBOT),
 
