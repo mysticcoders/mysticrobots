@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { useHistory } from 'react-router'
@@ -10,12 +10,16 @@ import { FooterContainer } from '../containers/FooterContainer'
 
 import { actions } from '../ducks/boards'
 
-import { Column, Level, Button, Icon, Notification } from 'rbx'
+import { Column, Level, Button, Icon, Notification, Title } from 'rbx'
 
 import { FaArrowUp, FaArrowDown, FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import { FaArrowAltCircleUp, FaArrowAltCircleDown, FaArrowAltCircleLeft, FaArrowAltCircleRight } from 'react-icons/fa'
 
 import { ROBOT, Status } from '../constants'
+
+import { useInterval } from '../hooks/utils'
+
+import numeral from 'numeral'
 
 /**
  * Will contain the Retro Rockets gameboard
@@ -30,6 +34,23 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y}) => {
     const status = useSelector(state => state.boards.status)
 
     const metadata = useSelector(state => state.boards.metadata)
+
+    const [timerOn, setTimerOn] = useState(true)
+    const [startTime, setStartTime] = useState(new Date().valueOf())
+    const [elapsedTime, setElapsedTime] = useState(0)
+
+    useInterval(() => {
+        if(timerOn) {
+            setElapsedTime(new Date().valueOf() - startTime)
+        }
+    }, 1000)
+
+
+    useEffect(() => {
+        if(status === 'WIN') {
+            setTimerOn(false)
+        }
+    }, [status])
 
     useEffect(() => {
         history.replace(`/puzzle?goalIndex=${metadata.goalIndex}&goalColor=${metadata.goalColor}&r=${metadata.r}&g=${metadata.g}&b=${metadata.b}&y=${metadata.y}`)
@@ -53,6 +74,9 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y}) => {
     const resetGameBoard = () => {
         dispatch(actions.clearBoard({}))
         dispatch(actions.setupBoard(metadata))
+
+        setStartTime(new Date().valueOf())
+        setTimerOn(true)
     }
 
     useHotkeys('1', () => status !== Status.WIN && dispatch(actions.selectRobot(ROBOT.RED)), {}, [status] )
@@ -64,6 +88,16 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y}) => {
     useHotkeys('down', () => status !== Status.WIN && dispatch(actions.moveDown()), {}, [status])
     useHotkeys('left', () => status !== Status.WIN && dispatch(actions.moveLeft()), {}, [status])
     useHotkeys('right', () => status !== Status.WIN && dispatch(actions.moveRight()), {}, [status])
+
+    const renderElapsedTime = () => {
+        const inSeconds = elapsedTime / 1000
+        const minutes = Math.floor(inSeconds / 60)
+        const seconds = Math.floor(inSeconds - (minutes * 60))
+
+        return (
+            `${numeral(minutes).format('00')}:${numeral(seconds).format('00')}`
+        )
+    }
 
     return (
         <Column.Group style={{margin: 0}}>
@@ -105,6 +139,12 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y}) => {
                         <Button onClick={() => { dispatch(actions.moveLeft()) }}><Icon size="medium"><FaArrowAltCircleLeft /></Icon></Button>
                         <Button onClick={() => { dispatch(actions.moveRight()) }}><Icon size="medium"><FaArrowAltCircleRight /></Icon></Button>
                         <Button onClick={() => { resetGameBoard() }}>Reset Board</Button>
+                    </Level.Item>
+                </Level>
+
+                <Level>
+                    <Level.Item>
+                        <Title>{renderElapsedTime()}</Title>
                     </Level.Item>
                 </Level>
 
