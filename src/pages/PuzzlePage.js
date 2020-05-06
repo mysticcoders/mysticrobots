@@ -19,7 +19,18 @@ export const PuzzlePage = () => {
     <div>
       <HeaderContainer />
       <Section style={{padding: '0'}}>
-          <GameContainer goalIndex={query.goalIndex} goalColor={query.goalColor} r={query.r} g={query.g} b={query.b} y={query.y} />
+          <GameContainer 
+              goalIndex={query.goalIndex} 
+              goalColor={query.goalColor} 
+              r={query.r} 
+              g={query.g} 
+              b={query.b} 
+              y={query.y} 
+              tl={query.tl}
+              tr={query.tr}
+              bl={query.bl}
+              br={query.bl}
+          />
       </Section> 
     </div>
   )
