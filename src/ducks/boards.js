@@ -4,6 +4,8 @@ import { createAction } from '@reduxjs/toolkit'
 
 import { WALL, ROBOT, GOAL, Status } from '../constants'
 
+import board from '../constants/board'
+
 // /////////////////////////////////////////////////////////////////////////////
 // Action Types
 // /////////////////////////////////////////////////////////////////////////////
@@ -227,68 +229,164 @@ function randomIntFromInterval(min, max) {
 // Sagas
 // /////////////////////////////////////////////////////////////////////////////
 
+function rotate(matrix, times = 1) {
+    do {
+        const N = matrix.length - 1
+        const result = matrix.map((row, i) =>
+            row.map((val, j) => matrix[N - j][i])
+        )
+        matrix.length = 0
+        matrix.push(...result)
+
+        --times
+    } while(times > 0)
+    return matrix
+}
+
+function processBoard(board, location) {
+    let centerSquare = undefined
+    let newBoard = JSON.parse(JSON.stringify(board))
+
+    if(newBoard[0][0] === 'X') {
+        centerSquare = 1
+    } else if(newBoard[0][7] === 'X') {
+        centerSquare = 2
+    } else if(newBoard[7][0] === 'X') {
+        centerSquare = 3
+    } else if(newBoard[7][7] === 'X') {
+        centerSquare = 4
+    }
+
+    if(centerSquare === 1) {
+        if(location === 'TL') {
+            newBoard = rotate(newBoard, 2)
+        } else if(location === 'TR') {
+            newBoard = rotate(newBoard, 3)
+        } else if(location === 'BL') {
+            newBoard = rotate(newBoard)
+        } 
+    } else if(centerSquare === 2) {
+        if(location === 'TL') {
+            newBoard = rotate(newBoard)
+        } else if(location === 'TR') {
+            newBoard = rotate(newBoard, 2)
+        } else if(location === 'BR') {
+            newBoard = rotate(newBoard, 3)
+        }
+    } else if(centerSquare === 3) {
+        if(location === 'TL') {
+            newBoard = rotate(newBoard, 3)
+        } else if(location === 'BL') {
+            newBoard = rotate(newBoard, 2)
+        } else if(location === 'BR') {
+            newBoard = rotate(newBoard)
+        }
+    } else if(centerSquare === 4) {
+        if(location === 'TR') {
+            newBoard = rotate(newBoard)
+        } else if(location === 'BL') {  
+            newBoard = rotate(newBoard, 3)
+        } else if(location === 'BR') {
+            newBoard = rotate(newBoard, 2)
+        }
+    }
+
+    return newBoard
+}
+
+/**
+ * Debug print the board
+ * 
+ * @param {*} board 
+ */
+const printBoard = (board) => {
+    for(let y=0; y<board.length; y++) {
+        console.log(board[y].join(','))
+    }
+}
+
+function processBoards(boardTL, boardTR, boardBL, boardBR) {
+
+    return {
+        TL: processBoard(boardTL, 'TL'),
+        TR: processBoard(boardTR, 'TR'),
+        BL: processBoard(boardBL, 'BL'),
+        BR: processBoard(boardBR, 'BR')
+    }
+}
+
 /**
  * Convert this to set up the board using Redux actions instead
  */
 export function* setupBoard({payload}) {
+    let boardKeys = Object.keys(board)
+
+    let boardTLKey = Object.prototype.hasOwnProperty.call(board, payload.tl) ? payload.tl : boardKeys[randomIntFromInterval(0, boardKeys.length - 1)]
+    let boardTL = board[boardTLKey]
+
+    let boardTRKey = Object.prototype.hasOwnProperty.call(board, payload.tr) ? payload.tr : boardKeys[randomIntFromInterval(0, boardKeys.length - 1)]
+    let boardTR = board[boardTRKey]
+
+    let boardBLKey = Object.prototype.hasOwnProperty.call(board, payload.bl) ? payload.bl : boardKeys[randomIntFromInterval(0, boardKeys.length - 1)]
+    let boardBL = board[boardBLKey]
+
+    let boardBRKey = Object.prototype.hasOwnProperty.call(board, payload.br) ? payload.br : boardKeys[randomIntFromInterval(0, boardKeys.length - 1)]
+    let boardBR = board[boardBRKey]
+
+    // console.log(`TL: (${boardTLKey}) TR: (${boardTRKey})`)
+    // console.log(`BL: (${boardBLKey}) BR: (${boardBRKey})`)
+
+    const { TL, TR, BL, BR } = processBoards(boardTL, boardTR, boardBL, boardBR)
+
+    const boardGrid = []
+    boardGrid.push(TL[0].concat(TR[0]))
+    boardGrid.push(TL[1].concat(TR[1]))
+    boardGrid.push(TL[2].concat(TR[2]))
+    boardGrid.push(TL[3].concat(TR[3]))
+    boardGrid.push(TL[4].concat(TR[4]))
+    boardGrid.push(TL[5].concat(TR[5]))
+    boardGrid.push(TL[6].concat(TR[6]))
+    boardGrid.push(TL[7].concat(TR[7]))
+    boardGrid.push(BL[0].concat(BR[0]))
+    boardGrid.push(BL[1].concat(BR[1]))
+    boardGrid.push(BL[2].concat(BR[2]))
+    boardGrid.push(BL[3].concat(BR[3]))
+    boardGrid.push(BL[4].concat(BR[4]))
+    boardGrid.push(BL[5].concat(BR[5]))
+    boardGrid.push(BL[6].concat(BR[6]))
+    boardGrid.push(BL[7].concat(BR[7]))
+
     const grid = {}
 
+    const ACRONYM_TO_FULL = {
+        'N': WALL.NORTH,
+        'E': WALL.EAST,
+        'S': WALL.SOUTH,
+        'W': WALL.WEST,
+        'NE': WALL.NORTH_EAST,
+        'NW': WALL.NORTH_WEST,
+        'SE': WALL.SOUTH_EAST,
+        'SW': WALL.SOUTH_WEST,
+        'X': WALL.ALL
+    }
     for(let x = 0; x<16; x++) {
         for(let y = 0; y<16; y++) {
+            let walls = 0
+
+            const boardGridElement = boardGrid[y][x]
+            if(boardGridElement !== '') {
+                walls = ACRONYM_TO_FULL[boardGridElement]
+            }
+
             grid[`${x},${y}`] = {
                 x,
                 y,
-                walls: 0,
+                walls: walls,
                 robot: null,
                 goal: null,
             }
         }
     }
-
-    // WALLS
-    setWalls(grid, 1, 0, WALL.EAST)
-    setWalls(grid, 9, 0, WALL.EAST)
-
-    setWalls(grid, 4, 1, WALL.NORTH_WEST)
-    setWalls(grid, 14, 1, WALL.NORTH_WEST)
-
-    setWalls(grid, 1, 2, WALL.NORTH_EAST)
-    setWalls(grid, 11, 2, WALL.SOUTH_WEST)
-
-    setWalls(grid, 6, 3, WALL.SOUTH_EAST)
-
-    setWalls(grid, 0, 5, WALL.SOUTH)
-
-    setWalls(grid, 3, 6, WALL.NORTH_WEST)
-    setWalls(grid, 13, 6, WALL.SOUTH_EAST)
-
-    setWalls(grid, 10, 7, WALL.NORTH_EAST)
-
-    setWalls(grid, 15, 8, WALL.SOUTH)
-
-    setWalls(grid, 0, 9, WALL.SOUTH)
-
-    setWalls(grid, 3, 10, WALL.SOUTH_EAST)
-    setWalls(grid, 8, 10, WALL.NORTH_WEST)
-    setWalls(grid, 13, 10, WALL.NORTH_WEST)
-
-    setWalls(grid, 5, 11, WALL.NORTH_EAST)
-    setWalls(grid, 10, 11, WALL.SOUTH_EAST)
-
-    setWalls(grid, 2, 12, WALL.SOUTH_WEST)
-    setWalls(grid, 14, 12, WALL.SOUTH_WEST)
-
-    setWalls(grid, 4, 13, WALL.NORTH_WEST)
-    setWalls(grid, 9, 14, WALL.NORTH_EAST)
-
-    setWalls(grid, 3, 15, WALL.EAST)
-    setWalls(grid, 11, 15, WALL.EAST)
-
-    // CENTER which is immovable!
-    setWalls(grid, 7, 7, WALL.ALL)
-    setWalls(grid, 7, 8, WALL.ALL)
-    setWalls(grid, 8, 8, WALL.ALL)
-    setWalls(grid, 8, 7, WALL.ALL)
 
     const corners = Object.values(grid).filter(element => element.walls === WALL.NORTH_WEST || element.walls === WALL.NORTH_EAST || element.walls === WALL.SOUTH_WEST || element === WALL.SOUTH_EAST)
 
@@ -329,7 +427,18 @@ export function* setupBoard({payload}) {
     yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.YELLOW, x: yellowLocation.x, y: yellowLocation.y}})
     availableSpots.splice(yIndex, 1)
 
-    yield put({ type: types.UPDATE_METADATA, payload: { goalIndex, goalColor: goalColorIndex, r: rIndex, g: gIndex, b: bIndex, y: yIndex }})
+    yield put({ type: types.UPDATE_METADATA, payload: { 
+            goalIndex, 
+            goalColor: goalColorIndex, 
+            r: rIndex, 
+            g: gIndex, 
+            b: bIndex, 
+            y: yIndex,
+            tl: boardTLKey,
+            tr: boardTRKey,
+            bl: boardTLKey,
+            br: boardBRKey
+        }})
 
     yield put({ type: types.SETUP_BOARD_SUCCESS, payload: grid})
     yield put({ type: types.SELECT_ROBOT, payload: ROBOT.RED })
