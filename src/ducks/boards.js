@@ -91,7 +91,7 @@ export const initialState = {
     grid: {},
     robots: {},
     history: [],
-    selectedRobotPath: {},
+    selectedRobotPath: undefined,
     hoverRobotPath: undefined,
     hoverRobot: undefined,
     selectedRobot: undefined,
@@ -106,7 +106,7 @@ export default function (state = initialState, action) {
             status: Status.PLAYING,
             robots: {},
             history: [],
-            selectedRobotPath: {},
+            selectedRobotPath: undefined,
             hoverRobotPath: undefined,
             hoverRobot: undefined,
             selectedRobot: undefined,
@@ -218,7 +218,7 @@ export default function (state = initialState, action) {
 // Utils
 // /////////////////////////////////////////////////////////////////////////////
 const setRobot = (grid, x, y, robot) => grid[`${x},${y}`] = {...grid[`${x},${y}`], robot}
-const setWalls = (grid, x, y, walls) => grid[`${x},${y}`] = {...grid[`${x},${y}`], walls}
+// const setWalls = (grid, x, y, walls) => grid[`${x},${y}`] = {...grid[`${x},${y}`], walls}
 const setGoal = (grid, x, y, goal) => grid[`${x},${y}`] = {...grid[`${x},${y}`], goal}
 
 function randomIntFromInterval(min, max) {
@@ -482,9 +482,11 @@ export function* updateHoverRobotPath({payload}) {
     const robots = yield select(getRobots)
     const selectedRobot = robots[payload]
 
-    const { up, down, left, right } = illuminateThePath(grid, selectedRobot)
+    if(selectedRobot) {
+        const { up, down, left, right } = illuminateThePath(grid, selectedRobot)
 
-    yield put({ type: types.UPDATE_HOVER_ROBOT_PATH_SUCCESS, payload: { up, down, left, right, robot: payload }})
+        yield put({ type: types.UPDATE_HOVER_ROBOT_PATH_SUCCESS, payload: { up, down, left, right, robot: payload }})
+    }
 }
 //  takeEvery(types.HOVER_ROBOT, updateHoverRobotPath),
 
@@ -501,7 +503,7 @@ const illuminateThePath = (grid, selectedRobot) => {
         let done = false
         let newY = y
 
-        console.log("Processing UP")
+        // console.log("Processing UP")
         while(newY >= 0) {
             // console.log(`newY: ${newY}`)
             const newCell = grid[`${x},${newY}`]
@@ -537,7 +539,7 @@ const illuminateThePath = (grid, selectedRobot) => {
         let done = false
         let newY = y
 
-        console.log("Processing DOWN")
+        // console.log("Processing DOWN")
         while(newY <= Y_MAX) {
             const newCell = grid[`${x},${newY}`]
 
@@ -548,10 +550,10 @@ const illuminateThePath = (grid, selectedRobot) => {
 
             // console.log(newCell)
             if((!done && y !== newY) && (newCell.walls === WALL.NORTH || newCell.walls === WALL.NORTH_EAST || newCell.walls === WALL.NORTH_WEST || newCell.walls === WALL.ALL)) {
-                console.log(`if.DOWN: ${down.map(obj => `(${obj.x}, ${obj.y})`)}`)
-                console.log(`down.length: ${down.length}`)
+                // console.log(`if.DOWN: ${down.map(obj => `(${obj.x}, ${obj.y})`)}`)
+                // console.log(`down.length: ${down.length}`)
                 down = down.slice(0, down.length > 1 ? down.length : 0)  // we hit a wall prior
-                console.log(`if.after.slice.DOWN: ${down.map(obj => `(${obj.x}, ${obj.y})`)}`)
+                // console.log(`if.after.slice.DOWN: ${down.map(obj => `(${obj.x}, ${obj.y})`)}`)
                 done = true
             } 
 
@@ -577,7 +579,7 @@ const illuminateThePath = (grid, selectedRobot) => {
         let done = false
         let newX = x
 
-        console.log("Processing LEFT")
+        // console.log("Processing LEFT")
         while(newX >= 0) {
             const newCell = grid[`${newX},${y}`]
 
@@ -617,7 +619,7 @@ const illuminateThePath = (grid, selectedRobot) => {
         let done = false
         let newX = x
 
-        console.log("Processing RIGHT")
+        // console.log("Processing RIGHT")
         while(newX <= X_MAX) {
             const newCell = grid[`${newX},${y}`]
 
@@ -651,10 +653,10 @@ const illuminateThePath = (grid, selectedRobot) => {
         }
     }    
 
-    console.log(`UP ${up.map(obj => `(${obj.x}, ${obj.y})`)}`)
-    console.log(`DOWN ${down.map(obj => `(${obj.x}, ${obj.y})`)}`)
-    console.log(`LEFT ${left.map(obj => `(${obj.x}, ${obj.y})`)}`)
-    console.log(`RIGHT ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
+    // console.log(`UP ${up.map(obj => `(${obj.x}, ${obj.y})`)}`)
+    // console.log(`DOWN ${down.map(obj => `(${obj.x}, ${obj.y})`)}`)
+    // console.log(`LEFT ${left.map(obj => `(${obj.x}, ${obj.y})`)}`)
+    // console.log(`RIGHT ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
 
     return {
         up,

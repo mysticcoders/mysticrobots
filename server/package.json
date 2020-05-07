@@ -1,0 +1,49 @@
+{
+  "name": "mrserver",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "chalk": "^3.0.0",
+    "cors": "^2.8.5",
+    "cronstrue": "^1.86.0",
+    "express": "^4.17.1",
+    "http-server": "^0.12.1",
+    "minimist": "^1.2.0",
+    "moment": "^2.23.0",
+    "moment-timezone": "^0.5.27",
+    "morgan": "^1.9.1",
+    "numeral": "^2.0.6",
+    "query-string": "^6.10.1",
+    "rotating-file-stream": "^2.0.1",
+    "yup": "^0.28.3"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-config-prettier": "^6.9.0",
+    "eslint-plugin-import": "^2.20.0",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.18.0",
+    "nodemon": "^2.0.2",
+    "npm-check": "^5.9.0",
+    "nyc": "^15.0.0",
+    "pre-commit": "^1.2.2",
+    "prettier": "^1.19.1",
+    "sinon": "^8.1.1",
+    "sinon-chai": "^3.4.0",
+    "sinon-express-mock": "^2.2.1"
+  },
+  "scripts": {
+    "start": "nodemon --watch routes ./index.js",
+    "test": "CI=true npm test",
+    "test:watch": "npm test --env=jsdom",
+    "upgrade-interactive": "npm-check --update"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
