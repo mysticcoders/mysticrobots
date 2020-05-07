@@ -1,3 +1,6 @@
+export const GOOGLE_ANALYTICS_KEY = 'UA-254925-15'
+
+
 export const WALL = {
     NONE: null,
     NORTH_WEST: 'NORTH_WEST',
@@ -30,4 +33,3 @@ export const Status = {
     WIN: 'WIN'
 }
 
-export const GOOGLE_ANALYTICS_KEY = 'UA-254925-15'

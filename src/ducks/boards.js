@@ -218,7 +218,7 @@ export default function (state = initialState, action) {
 // Utils
 // /////////////////////////////////////////////////////////////////////////////
 const setRobot = (grid, x, y, robot) => grid[`${x},${y}`] = {...grid[`${x},${y}`], robot}
-const setWalls = (grid, x, y, walls) => grid[`${x},${y}`] = {...grid[`${x},${y}`], walls}
+// const setWalls = (grid, x, y, walls) => grid[`${x},${y}`] = {...grid[`${x},${y}`], walls}
 const setGoal = (grid, x, y, goal) => grid[`${x},${y}`] = {...grid[`${x},${y}`], goal}
 
 function randomIntFromInterval(min, max) {
