@@ -17,6 +17,7 @@ export const GameBoard = ({goalIndex, goalColor, r, g, b, y, tl, tr, bl, br}) =>
 
     useEffect(() => {
         dispatch(actions.setupBoard({goalIndex, goalColor, r, g, b, y, tl, tr, bl, br}))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch])
 
     const grid = useSelector(state => state.boards.grid)
@@ -29,6 +30,7 @@ export const GameBoard = ({goalIndex, goalColor, r, g, b, y, tl, tr, bl, br}) =>
         if(!selectedRobotPath) return false
 
         const allPaths = [].concat(selectedRobotPath.left, selectedRobotPath.right, selectedRobotPath.up, selectedRobotPath.down)
+
         const coords = allPaths.reduce((obj, item) => {
             obj.push(`${item.x},${item.y}`)
             return obj
@@ -51,6 +53,8 @@ export const GameBoard = ({goalIndex, goalColor, r, g, b, y, tl, tr, bl, br}) =>
     }
 
     useEffect(() => {
+        // console.log(grid)
+
         if(grid && Object.keys(grid).length > 0) {
 
             let g = []
@@ -64,6 +68,8 @@ export const GameBoard = ({goalIndex, goalColor, r, g, b, y, tl, tr, bl, br}) =>
             }
 
             setDisplayGrid(g)
+        } else {
+            console.log("uh oh, grid is screwy")
         }
 
     }, [grid])

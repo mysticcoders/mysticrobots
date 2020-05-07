@@ -1,6 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
+import { useDispatch } from 'react-redux'
 import { useLocation } from 'react-router'
+
+import { actions } from '../ducks/boards'
 
 import { Section } from "rbx";
 
@@ -13,7 +16,16 @@ import queryString from 'query-string'
 export const PuzzlePage = () => {
   const { search } = useLocation()
 
+  const dispatch = useDispatch()
+
   const query = queryString.parse(search.indexOf('?') === 0 ? search.substr(1) : search)
+
+  useEffect(() => {
+    if(query.reset) {
+      dispatch(actions.clearBoard({}))
+      dispatch(actions.setupBoard({}))
+    }
+  }, [dispatch, query.reset])
 
   return (
     <div>

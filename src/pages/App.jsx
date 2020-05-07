@@ -18,7 +18,7 @@ const App = () => (
             <PuzzlePage />
         </Route>
 
-        <Redirect from="/random" to="/puzzle" />
+        <Redirect from="/random" to="/puzzle?reset=true" />
 
         <Route path="/about">
             <AboutPage />
