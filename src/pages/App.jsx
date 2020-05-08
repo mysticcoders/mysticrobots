@@ -14,6 +14,10 @@ const App = () => (
     <Switch>
         <Redirect exact from="/" to="/random" />
 
+        <Route path="/puzzle/:shareKey">
+            <PuzzlePage />
+        </Route>
+
         <Route path="/puzzle">
             <PuzzlePage />
         </Route>
