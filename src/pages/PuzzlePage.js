@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 
 import { useDispatch } from 'react-redux'
-import { useLocation } from 'react-router'
+import { useLocation, useParams } from 'react-router'
 
 import { actions } from '../ducks/boards'
 
@@ -15,6 +15,7 @@ import queryString from 'query-string'
 
 export const PuzzlePage = () => {
   const { search } = useLocation()
+  const { shareKey } = useParams()
 
   const dispatch = useDispatch()
 

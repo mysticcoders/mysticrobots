@@ -18,6 +18,7 @@ import { FaArrowAltCircleUp, FaArrowAltCircleDown, FaArrowAltCircleLeft, FaArrow
 import { ROBOT, Status } from '../constants'
 
 import { useInterval } from '../hooks/utils'
+import ShareButtons from '../components/ShareButtons'
 
 import numeral from 'numeral'
 
@@ -67,6 +68,10 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, tl, tr, bl, br}
             bl: metadata.bl,
             br: metadata.br
         }
+
+        const stringified = queryString.stringify(values)
+        console.log(btoa(stringified))
+
 
         history.replace(`/puzzle?${queryString.stringify(values)}`)
     }, [metadata, history])
@@ -121,10 +126,15 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, tl, tr, bl, br}
             <Column>
                 {status === 'WIN' &&
                     <Notification color="success">
-                        Congratulations! You solved the grid in {moveHistory.length} moves! <Button onClick={()=>{dispatch(actions.setupBoard({}))}}>Refresh</Button>
+                        Congratulations! You solved the grid in {moveHistory.length} moves! and it took you {renderElapsedTime()} to complete.
+                        Share on <ShareButtons 
+                            title={`I solved this puzzle in ${moveHistory.length} moves, can you do better? `}
+                            shareUrl={document.location}
+                        />
+
                     </Notification>
                 }
-                <Column.Group multiline style={{ backgroundColor: 'black', padding: '0.25rem', paddingBottom: '0'}}>
+                <Column.Group multiline style={{ backgroundColor: 'black', padding: '0.25rem', margin: '0.50rem', paddingBottom: '0'}}>
                     <Column align="left">
                         { moveHistory.map((entry, idx) => (
                             <React.Fragment key={idx}>
@@ -159,9 +169,14 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, tl, tr, bl, br}
                     <Level.Item>
                         <Title>{renderElapsedTime()}</Title>
                     </Level.Item>
-                </Level>
+                    <Level.Item>
+                    <ShareButtons 
+                            title="Challenge me to mystic robots"
+                            shareUrl={document.location}
+                        />
+                    </Level.Item>
 
-                <FooterContainer />
+                </Level>
             </Column>
         </Column.Group>
     )
