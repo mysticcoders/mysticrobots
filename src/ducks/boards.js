@@ -229,11 +229,36 @@ function randomIntFromInterval(min, max) {
 // Sagas
 // /////////////////////////////////////////////////////////////////////////////
 
+
+function rotateWall90(wall) {
+    if(wall === 'N') {
+        return 'E'
+    } else if(wall === 'E') {
+        return 'S'
+    } else if(wall === 'S') {
+        return 'W'
+    } else if(wall === 'W') {
+        return 'N'
+    } else if(wall === 'NE') {
+        return 'SE'
+    } else if(wall === 'NW') {
+        return 'NE'
+    } else if(wall === 'SW') {
+        return 'NW'
+    } else if(wall === 'SE') {
+        return 'SW'
+    } else if(wall === 'X') {
+        return 'X'
+    } else {
+        return ''
+    }
+}
+
 function rotate(matrix, times = 1) {
     do {
         const N = matrix.length - 1
         const result = matrix.map((row, i) =>
-            row.map((val, j) => matrix[N - j][i])
+            row.map((val, j) => rotateWall90(matrix[N - j][i]))
         )
         matrix.length = 0
         matrix.push(...result)
@@ -321,17 +346,40 @@ function processBoards(boardTL, boardTR, boardBL, boardBR) {
 export function* setupBoard({payload}) {
     let boardKeys = Object.keys(board)
 
-    let boardTLKey = Object.prototype.hasOwnProperty.call(board, payload.tl) ? payload.tl : boardKeys[randomIntFromInterval(0, boardKeys.length - 1)]
-    let boardTL = board[boardTLKey]
+    const randomBoard = () => {
+        return [randomIntFromInterval(0,3), randomIntFromInterval(0,3), randomIntFromInterval(0,3), randomIntFromInterval(0,3)].join('')
+    }
 
-    let boardTRKey = Object.prototype.hasOwnProperty.call(board, payload.tr) ? payload.tr : boardKeys[randomIntFromInterval(0, boardKeys.length - 1)]
-    let boardTR = board[boardTRKey]
+    console.log(payload.config)
+    
+    let boardPayload = payload.config && payload.config.length === 4 ? payload.config : randomBoard()
+    let boardSplit = boardPayload.split('').map(entry => Number(entry))
 
-    let boardBLKey = Object.prototype.hasOwnProperty.call(board, payload.bl) ? payload.bl : boardKeys[randomIntFromInterval(0, boardKeys.length - 1)]
-    let boardBL = board[boardBLKey]
+    if(boardSplit[0] < 0 || boardSplit[0] > 3 ||
+        boardSplit[1] < 0 || boardSplit[1] > 3 ||
+        boardSplit[2] < 0 || boardSplit[2] > 3 ||
+        boardSplit[3] < 0 || boardSplit[3] > 3) {
+        
+        console.log("received bad payload")
+        boardPayload = randomBoard()
+        boardSplit = boardPayload.split('').map(entry => Number(entry))
+    }
 
-    let boardBRKey = Object.prototype.hasOwnProperty.call(board, payload.br) ? payload.br : boardKeys[randomIntFromInterval(0, boardKeys.length - 1)]
-    let boardBR = board[boardBRKey]
+    // let boardTLKey = Object.prototype.hasOwnProperty.call(board, payload.tl) ? payload.tl : boardKeys[randomIntFromInterval(0, boardKeys.length - 1)]
+    let boardTL = board['classic']['RED'][boardSplit[0]]
+    // let boardTL = board[boardTLKey]
+
+    // let boardTRKey = Object.prototype.hasOwnProperty.call(board, payload.tr) ? payload.tr : boardKeys[randomIntFromInterval(0, boardKeys.length - 1)]
+    // let boardTR = board[boardTRKey]
+    let boardTR = board['classic']['GREEN'][boardSplit[1]]
+
+    // let boardBLKey = Object.prototype.hasOwnProperty.call(board, payload.bl) ? payload.bl : boardKeys[randomIntFromInterval(0, boardKeys.length - 1)]
+    // let boardBL = board[boardBLKey]
+    let boardBL = board['classic']['YELLOW'][boardSplit[2]]
+
+    // let boardBRKey = Object.prototype.hasOwnProperty.call(board, payload.br) ? payload.br : boardKeys[randomIntFromInterval(0, boardKeys.length - 1)]
+    // let boardBR = board[boardBRKey]
+    let boardBR = board['classic']['BLUE'][boardSplit[3]]
 
     // console.log(`TL: (${boardTLKey}) TR: (${boardTRKey})`)
     // console.log(`BL: (${boardBLKey}) BR: (${boardBRKey})`)
@@ -434,10 +482,11 @@ export function* setupBoard({payload}) {
             g: gIndex, 
             b: bIndex, 
             y: yIndex,
-            tl: boardTLKey,
-            tr: boardTRKey,
-            bl: boardTLKey,
-            br: boardBRKey
+            config: boardPayload,
+            // tl: boardTLKey,
+            // tr: boardTRKey,
+            // bl: boardTLKey,
+            // br: boardBRKey
         }})
 
     yield put({ type: types.SETUP_BOARD_SUCCESS, payload: grid})
