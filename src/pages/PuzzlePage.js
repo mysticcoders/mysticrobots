@@ -15,7 +15,6 @@ import queryString from 'query-string'
 
 export const PuzzlePage = () => {
   const { search } = useLocation()
-  const { shareKey } = useParams()
 
   const dispatch = useDispatch()
 
@@ -39,10 +38,7 @@ export const PuzzlePage = () => {
               g={query.g} 
               b={query.b} 
               y={query.y} 
-              tl={query.tl}
-              tr={query.tr}
-              bl={query.bl}
-              br={query.bl}
+              config={query.config}
           />
       </Section> 
     </div>
