@@ -9,14 +9,14 @@ import { Level } from 'rbx'
 /**
  * Will contain the Retro Rockets gameboard
  */
-export const GameBoard = ({goalIndex, goalColor, r, g, b, y, tl, tr, bl, br}) => {
+export const GameBoard = ({goalIndex, goalColor, r, g, b, y, config}) => {
 
     const dispatch = useDispatch()
 
     const [displayGrid, setDisplayGrid] = useState(null)
 
     useEffect(() => {
-        dispatch(actions.setupBoard({goalIndex, goalColor, r, g, b, y, tl, tr, bl, br}))
+        dispatch(actions.setupBoard({goalIndex, goalColor, r, g, b, y, config}))
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch])
 

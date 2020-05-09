@@ -6,7 +6,6 @@ import { useHistory } from 'react-router'
 import { useHotkeys } from 'react-hotkeys-hook'
 
 import { GameBoard } from '../containers/GameBoard'
-import { FooterContainer } from '../containers/FooterContainer'
 
 import { actions } from '../ducks/boards'
 
@@ -27,7 +26,7 @@ import queryString from 'query-string'
 /**
  * Will contain the Retro Rockets gameboard
  */
-export const GameContainer = ({goalIndex, goalColor, r, g, b, y, tl, tr, bl, br}) => {
+export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
     const dispatch = useDispatch()
 
     const history = useHistory()
@@ -48,6 +47,8 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, tl, tr, bl, br}
     }, 1000)
 
 
+    console.dir(config)
+    
     useEffect(() => {
         if(status === 'WIN') {
             setTimerOn(false)
@@ -63,17 +64,12 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, tl, tr, bl, br}
             g: metadata.g,
             b: metadata.b,
             y: metadata.y,
-            tl: metadata.tl,
-            tr: metadata.tr,
-            bl: metadata.bl,
-            br: metadata.br
+            config: metadata.config,
         }
 
         const stringified = queryString.stringify(values)
-        console.log(btoa(stringified))
 
-
-        history.replace(`/puzzle?${queryString.stringify(values)}`)
+        history.replace(`/puzzle?${stringified}`)
     }, [metadata, history])
 
     useEffect(()=> {
@@ -121,7 +117,7 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, tl, tr, bl, br}
         <Column.Group style={{margin: 0}}>
 
             <Column style={{padding: 0, margin: 0}}>
-                <GameBoard goalIndex={goalIndex} goalColor={goalColor} r={r} g={g} b={b} y={y} tl={tl} tr={tr} bl={bl} br={br} />
+                <GameBoard goalIndex={goalIndex} goalColor={goalColor} r={r} g={g} b={b} y={y} config={config} />
             </Column>
             <Column>
                 {status === 'WIN' &&
