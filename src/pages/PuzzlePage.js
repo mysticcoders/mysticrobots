@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 
 import { useDispatch } from 'react-redux'
-import { useLocation, useParams } from 'react-router'
+import { useLocation } from 'react-router'
 
 import { actions } from '../ducks/boards'
 

@@ -1,14 +1,10 @@
 import React, { useEffect } from 'react'
 
 import { useSelector } from 'react-redux'
-
 import { useHistory } from "react-router-dom"
-
 import { Navbar } from "rbx"
 
 import ReactGA from 'react-ga'
-
-// import store from 'store2'
 
 export const HeaderContainer = () => {
 
@@ -39,7 +35,10 @@ export const HeaderContainer = () => {
             <Navbar.Menu>
                 <Navbar.Segment align="start">
                 <Navbar.Item onClick={() => history.push('/random')}>
-                    Random Challenge
+                    Random Puzzle
+                </Navbar.Item>
+                <Navbar.Item onClick={() => history.push('/daily')}>
+                    Daily Challenge
                 </Navbar.Item>
                 <Navbar.Item onClick={() => history.push('/about')}>
                     About

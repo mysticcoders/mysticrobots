@@ -18,7 +18,7 @@ export const GamePiece = ({ gridCell, isInRobotPath = false, isHoveringInRobotPa
     const hoverRobot = useSelector(state => state.boards.hoverRobot)
 
     const theSelectedRobot = useSelector(state => state.boards.robots[selectedRobot])
-    const theHoverRobot = useSelector(state => hoverRobot && state.boards.robots[hoverRobot])
+    // const theHoverRobot = useSelector(state => hoverRobot && state.boards.robots[hoverRobot])
 
     if(!gridCell) {
         return null
@@ -144,7 +144,7 @@ export const GamePiece = ({ gridCell, isInRobotPath = false, isHoveringInRobotPa
     }
 
     return (
-        <div onClick={() => { handleClick() }} onMouseEnter={()=> {handleOnMouseEnter() }} onMouseLeave={() => { dispatch(actions.clearHoverRobotPath() )}} style={pieceStyle}>
+        <div onClick={() => { handleClick() }} onMouseEnter={()=> { handleOnMouseEnter() }} onMouseLeave={() => { dispatch(actions.clearHoverRobotPath()) }} style={pieceStyle}>
             <>
                 { (gridCell.robot && gridCell.goal) &&
                     <GoalWithRobot />

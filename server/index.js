@@ -37,11 +37,29 @@ app.options('*', cors(corsOptions))
  * Mimic the finagle lifecycle management endpoints.
  */
 
-app.get('/health',
-    require('./routes/health_check'));
+app.get('/health', require('./routes/health_check'));
 
-// app.get('/games', cors(corsOptions), require('./routes/get_games'))
+app.get('/challenges', cors(corsOptions), require('./routes/get_challenges'))
 
+app.get('/challenges/:id', cors(corsOptions), require('./routes/get_challenges_by_id'))
+
+app.get('/puzzles/:challengeId', cors(corsOptions), require('./routes/get_puzzles_by_challenge_id'))
+
+app.get('/scores/:challengeId', cors(corsOptions), require('./routes/get_scores_by_challenge_id'))
+
+app.post('/scores/:challengeId', cors(corsOptions), require('./routes/save_score_by_challenge_id'))
+
+
+/*
+
+`POST /scores/:challengeId`
+
+ip_address
+name varchar(100)
+
+
+`GET /scores/:challengeId`
+*/
 const server = app.listen(process.env.PORT || 5000, function() {
 		/**
 		 * The TFE expects keep-alive connections to remain open forever. Expressjs defaults to a

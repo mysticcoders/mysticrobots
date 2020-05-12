@@ -52,6 +52,7 @@
   },
   "devDependencies": {
     "eslint-plugin-jsx-a11y": "^6.2.3",
+    "lerna": "^3.20.2",
     "redux-immutable-state-invariant": "^2.1.0"
   }
 }

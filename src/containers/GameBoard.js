@@ -53,7 +53,6 @@ export const GameBoard = ({goalIndex, goalColor, r, g, b, y, config}) => {
     }
 
     useEffect(() => {
-        // console.log(grid)
 
         if(grid && Object.keys(grid).length > 0) {
 
@@ -68,9 +67,7 @@ export const GameBoard = ({goalIndex, goalColor, r, g, b, y, config}) => {
             }
 
             setDisplayGrid(g)
-        } else {
-            console.log("uh oh, grid is screwy")
-        }
+        } 
 
     }, [grid])
 
@@ -94,7 +91,5 @@ export const GameBoard = ({goalIndex, goalColor, r, g, b, y, config}) => {
         </div>
     )
 }
-
-
 
 export default GameBoard

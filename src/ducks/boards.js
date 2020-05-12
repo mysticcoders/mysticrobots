@@ -1,3 +1,5 @@
+import api from '../api/mainApi'
+
 import { call, put, select, takeEvery } from 'redux-saga/effects'
 
 import { createAction } from '@reduxjs/toolkit'
@@ -27,9 +29,11 @@ export const types = {
     MOVE_SUCCESS: 'MOVE_SUCCESS',
     MOVE_ERROR: 'MOVE_ERROR',
 
-    START_TIMER: 'START_TIMER',
-    STOP_TIMER: 'STOP_TIMER',
-    RESET_TIMER: 'RESET_TIMER',
+    FETCH_LATEST_CHALLENGE: 'FETCH_LATEST_CHALLENGE',
+    FETCH_LATEST_CHALLENGE_SUCCESS: 'FETCH_LATEST_CHALLENGE_SUCCESS',
+
+    FETCH_PUZZLES_BY_CHALLENGE: 'FETCH_PUZZLES_BY_CHALLENGE',
+    FETCH_PUZZLES_BY_CHALLENGE_SUCCESS: 'FETCH_PUZZLES_BY_CHALLENGE_SUCCESS',
 
     SET_ROBOT: 'SET_ROBOT',
     SELECT_ROBOT: 'SELECT_ROBOT',
@@ -46,9 +50,9 @@ export const types = {
     CLEAR_HOVER_ROBOT_PATH: 'CLEAR_HOVER_ROBOT_PATH',
 }
 
-// /////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Action Creators
-// /////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 export const actions = {
     setupBoard: createAction(types.SETUP_BOARD),
@@ -60,9 +64,8 @@ export const actions = {
     moveLeft: createAction(types.MOVE_LEFT),
     moveRight: createAction(types.MOVE_RIGHT),
 
-    startTimer: createAction(types.START_TIMER),
-    stopTimer: createAction(types.STOP_TIMER),
-    resetTimer: createAction(types.RESET_TIMER),
+    fetchLatestChallenge: createAction(types.FETCH_LATEST_CHALLENGE),
+    fetchPuzzlesByChallenge: createAction(types.FETCH_PUZZLES_BY_CHALLENGE),
 
     setRobot: createAction(types.SET_ROBOT),
 
@@ -82,9 +85,9 @@ export const actions = {
 
 }
 
-// /////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Reducers
-// /////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 export const initialState = {
     status: Status.PLAYING,
@@ -209,10 +212,24 @@ export default function (state = initialState, action) {
             ...state,
             metadata: action.payload,
         }
+    case types.FETCH_LATEST_CHALLENGE_SUCCESS:
+        return {
+            ...state,
+            challenge: {
+                challengeId: action.payload.challengeId,
+                startTime: action.payload.startTime,
+                endTime: action.payload.endTime
+            }
+        }
+    case types.FETCH_PUZZLES_BY_CHALLENGE_SUCCESS:
+        return {
+            ...state
+        }
     default:
       return state
   }
 }
+
 
 // /////////////////////////////////////////////////////////////////////////////
 // Utils
@@ -225,10 +242,9 @@ function randomIntFromInterval(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-// /////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Sagas
-// /////////////////////////////////////////////////////////////////////////////
-
+////////////////////////////////////////////////////////////////////////////////
 
 function rotateWall90(wall) {
     if(wall === 'N') {
@@ -324,34 +340,20 @@ function processBoard(board, location) {
  * 
  * @param {*} board 
  */
-const printBoard = (board) => {
-    for(let y=0; y<board.length; y++) {
-        console.log(board[y].join(','))
-    }
-}
-
-function processBoards(boardTL, boardTR, boardBL, boardBR) {
-
-    return {
-        TL: processBoard(boardTL, 'TL'),
-        TR: processBoard(boardTR, 'TR'),
-        BL: processBoard(boardBL, 'BL'),
-        BR: processBoard(boardBR, 'BR')
-    }
-}
+// const printBoard = (board) => {
+//     for(let y=0; y<board.length; y++) {
+//         console.log(board[y].join(','))
+//     }
+// }
 
 /**
  * Convert this to set up the board using Redux actions instead
  */
 export function* setupBoard({payload}) {
-    let boardKeys = Object.keys(board)
-
     const randomBoard = () => {
         return [randomIntFromInterval(0,3), randomIntFromInterval(0,3), randomIntFromInterval(0,3), randomIntFromInterval(0,3)].join('')
     }
 
-    console.log(payload.config)
-    
     let boardPayload = payload.config && payload.config.length === 4 ? payload.config : randomBoard()
     let boardSplit = boardPayload.split('').map(entry => Number(entry))
 
@@ -365,44 +367,26 @@ export function* setupBoard({payload}) {
         boardSplit = boardPayload.split('').map(entry => Number(entry))
     }
 
-    // let boardTLKey = Object.prototype.hasOwnProperty.call(board, payload.tl) ? payload.tl : boardKeys[randomIntFromInterval(0, boardKeys.length - 1)]
     let boardTL = board['classic']['RED'][boardSplit[0]]
-    // let boardTL = board[boardTLKey]
-
-    // let boardTRKey = Object.prototype.hasOwnProperty.call(board, payload.tr) ? payload.tr : boardKeys[randomIntFromInterval(0, boardKeys.length - 1)]
-    // let boardTR = board[boardTRKey]
     let boardTR = board['classic']['GREEN'][boardSplit[1]]
-
-    // let boardBLKey = Object.prototype.hasOwnProperty.call(board, payload.bl) ? payload.bl : boardKeys[randomIntFromInterval(0, boardKeys.length - 1)]
-    // let boardBL = board[boardBLKey]
     let boardBL = board['classic']['YELLOW'][boardSplit[2]]
-
-    // let boardBRKey = Object.prototype.hasOwnProperty.call(board, payload.br) ? payload.br : boardKeys[randomIntFromInterval(0, boardKeys.length - 1)]
-    // let boardBR = board[boardBRKey]
     let boardBR = board['classic']['BLUE'][boardSplit[3]]
 
-    // console.log(`TL: (${boardTLKey}) TR: (${boardTRKey})`)
-    // console.log(`BL: (${boardBLKey}) BR: (${boardBRKey})`)
+    const TL = processBoard(boardTL, 'TL')
+    const TR = processBoard(boardTR, 'TR')
+    const BL = processBoard(boardBL, 'BL')
+    const BR = processBoard(boardBR, 'BR')
 
-    const { TL, TR, BL, BR } = processBoards(boardTL, boardTR, boardBL, boardBR)
 
     const boardGrid = []
-    boardGrid.push(TL[0].concat(TR[0]))
-    boardGrid.push(TL[1].concat(TR[1]))
-    boardGrid.push(TL[2].concat(TR[2]))
-    boardGrid.push(TL[3].concat(TR[3]))
-    boardGrid.push(TL[4].concat(TR[4]))
-    boardGrid.push(TL[5].concat(TR[5]))
-    boardGrid.push(TL[6].concat(TR[6]))
-    boardGrid.push(TL[7].concat(TR[7]))
-    boardGrid.push(BL[0].concat(BR[0]))
-    boardGrid.push(BL[1].concat(BR[1]))
-    boardGrid.push(BL[2].concat(BR[2]))
-    boardGrid.push(BL[3].concat(BR[3]))
-    boardGrid.push(BL[4].concat(BR[4]))
-    boardGrid.push(BL[5].concat(BR[5]))
-    boardGrid.push(BL[6].concat(BR[6]))
-    boardGrid.push(BL[7].concat(BR[7]))
+
+    for(let t=0; t<8; t++) {
+        boardGrid.push(TL[t].concat(TR[t]))
+    }
+    
+    for(let tt=0; tt<8; tt++) {
+        boardGrid.push(BL[tt].concat(BR[tt]))
+    }
 
     const grid = {}
 
@@ -475,6 +459,10 @@ export function* setupBoard({payload}) {
     yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.YELLOW, x: yellowLocation.x, y: yellowLocation.y}})
     availableSpots.splice(yIndex, 1)
 
+
+    // const query = `INSERT INTO challenge_puzzle (id, challenge_id, goal_color, goal_index, red_bot, green_bot, blue_bot, yellow_bot, config, created_at) VALUES (DEFAULT, '954369ba-d0e1-4b8f-b374-6960a08c6b2b', ${goalIndex}, ${goalColorIndex}, ${rIndex}, ${gIndex}, ${bIndex}, ${yIndex}, ${boardPayload}, DEFAULT)`
+    //  console.log(query)
+
     yield put({ type: types.UPDATE_METADATA, payload: { 
             goalIndex, 
             goalColor: goalColorIndex, 
@@ -483,10 +471,6 @@ export function* setupBoard({payload}) {
             b: bIndex, 
             y: yIndex,
             config: boardPayload,
-            // tl: boardTLKey,
-            // tr: boardTRKey,
-            // bl: boardTLKey,
-            // br: boardBRKey
         }})
 
     yield put({ type: types.SETUP_BOARD_SUCCESS, payload: grid})
@@ -784,12 +768,42 @@ export function* checkGoal() {
     }
 }
 
+export function* fetchLatestChallenge() {
+    try {
+        const latestChallenges = yield call(api.fetchLatestChallenge)
+
+        const latestChallenge = latestChallenges[0]
+
+        yield put({ type: types.FETCH_LATEST_CHALLENGE_SUCCESS, payload: { challengeId: latestChallenge.id, startTime: latestChallenge.start_time, endTime: latestChallenge.end_time }})
+
+    } catch(error) {
+        console.error(error)
+    }
+}
+
+export function* fetchPuzzlesByChallenge({payload}) {
+    console.dir(payload)
+    
+    try {
+        const puzzles = yield call(api.fetchPuzzlesByChallenge, payload.challengeId)
+
+        console.dir(puzzles)
+
+    } catch(error) {
+        console.error(error)
+    }
+}
+
 export const sagas = [
   takeEvery(types.SETUP_BOARD, setupBoard),
   takeEvery(types.REFRESH_BOARD, refreshBoard),
   takeEvery(types.SELECT_ROBOT, updateRobotPath),
 
   takeEvery(types.UPDATE_HOVER_ROBOT_PATH, updateHoverRobotPath),
+
+  takeEvery(types.FETCH_LATEST_CHALLENGE, fetchLatestChallenge),
+
+  takeEvery(types.FETCH_PUZZLES_BY_CHALLENGE, fetchPuzzlesByChallenge),
 
   takeEvery(types.MOVE_UP, moveUp),
   takeEvery(types.MOVE_DOWN, moveDown),
