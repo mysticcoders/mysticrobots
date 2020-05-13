@@ -12,9 +12,16 @@
     "rotating-file-stream": "^2.1.0"
   },
   "scripts": {
-    "start": "node index.js"
+    "release": "standard-version",
+    "start": "nodemon -q -L -e js,json,yml,yaml --exec 'node index.js'"
+  },
+  "standard-version": {
+    "skip": {
+      "tag": true
+    }
   },
   "devDependencies": {
+    "nodemon": "^2.0.3",
     "standard-version": "^7.0.0"
   }
 }

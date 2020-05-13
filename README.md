@@ -18,3 +18,5 @@ The largest problem to solve which may enable us to offer varying levels of comp
 You'll need Yarn and Lerna installed to manage packages and shared modules.
 
 Get started by running `lerna bootstrap`. You'll want to rerun this any time you pull changes where new dependencies have been added.
+
+To run the project, you can use `lerna run --stream start`. I like the `--stream` option as it follows the logs nicely together.

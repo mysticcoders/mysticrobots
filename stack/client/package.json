@@ -23,7 +23,7 @@
     "react-redux": "^7.2.0",
     "react-router": "^5.1.2",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "3.4.1",
+    "react-scripts": "3.4.0",
     "react-share": "^4.1.0",
     "redux": "^4.0.5",
     "redux-saga": "^1.1.3"
@@ -32,7 +32,13 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "release": "standard-version"
+  },
+  "standard-version": {
+    "skip": {
+      "tag": true
+    }
   },
   "eslintConfig": {
     "extends": "react-app"

@@ -7,10 +7,16 @@ const http = require('http');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
+const {
+    name:APP_NAME,
+    version:APP_VERSION
+} = require('./package.json')
+
 const app = express();
 
 const STAGING_ENVIRONMENT = 'staging';
 const PRODUCTION_ENVIRONMENT = 'prod';
+const SERVER_PORT = process.env.PORT || 5000
 
 // Set up basic access logging with file rotation:
 app.use(morgan('combined', {stream: rfs.createStream('access.log', {maxFiles: 5, size: '100M'})}));
@@ -60,12 +66,13 @@ name varchar(100)
 
 `GET /scores/:challengeId`
 */
-const server = app.listen(process.env.PORT || 5000, function() {
+const server = app.listen(SERVER_PORT, function() {
 		/**
 		 * The TFE expects keep-alive connections to remain open forever. Expressjs defaults to a
 		 * timeout of 2 minutes. This causes many ChannelClosedExceptions for the TFE.
 		 */
     server.setTimeout(0)
+    console.log(`${APP_NAME} v${APP_VERSION} listening on ${SERVER_PORT}`)
 
     /**
      * Node's default behavior is to close the connection on upgrade requests. The HTTP2 spec
