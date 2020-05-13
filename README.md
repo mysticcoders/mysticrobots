@@ -11,3 +11,12 @@ Items to figure out
 
 ## Solver
 The largest problem to solve which may enable us to offer varying levels of complexity in the game is the solver. How do you devise a way to get a specific robot into the goal in the smallest number of moves. Alone is one level, and using the other robots is another level of complexity.
+
+## Contributing
+
+### Lerna Monorepo
+You'll need Yarn and Lerna installed to manage packages and shared modules.
+
+Get started by running `lerna bootstrap`. You'll want to rerun this any time you pull changes where new dependencies have been added.
+
+To run the project, you can use `lerna run --stream start`. I like the `--stream` option as it follows the logs nicely together.

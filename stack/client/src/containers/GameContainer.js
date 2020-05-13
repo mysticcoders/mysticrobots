@@ -45,12 +45,9 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
             setElapsedTime(new Date().valueOf() - startTime)
         }
     }, 1000)
-
-
-    console.dir(config)
     
     useEffect(() => {
-        if(status === 'WIN') {
+        if(status === Status.WIN) {
             setTimerOn(false)
         }
     }, [status])
@@ -120,13 +117,11 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
                 <GameBoard goalIndex={goalIndex} goalColor={goalColor} r={r} g={g} b={b} y={y} config={config} />
             </Column>
             <Column>
-                {status === 'WIN' &&
+                {status === Status.WIN &&
                     <Notification color="success">
                         Congratulations! You solved the grid in {moveHistory.length} moves! and it took you {renderElapsedTime()} to complete.
                         Share on <ShareButtons 
-                            title={`I solved this puzzle in ${moveHistory.length} moves, can you do better? `}
-                            shareUrl={document.location}
-                        />
+                                    title={`I solved this puzzle in ${moveHistory.length} moves, can you do better? `} shareUrl={document.location} />
 
                     </Notification>
                 }

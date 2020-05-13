@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { PuzzlePage } from './PuzzlePage'
+import { DailyChallengePage } from './DailyChallengePage'
 import { AboutPage } from './AboutPage'
 
 import {
@@ -20,6 +21,10 @@ const App = () => (
 
         <Route path="/puzzle">
             <PuzzlePage />
+        </Route>
+
+        <Route path="/daily">
+            <DailyChallengePage />
         </Route>
 
         <Redirect from="/random" to="/puzzle?reset=true" />

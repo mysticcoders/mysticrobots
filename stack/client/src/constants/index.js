@@ -1,5 +1,14 @@
-export const GOOGLE_ANALYTICS_KEY = 'UA-254925-15'
+export const {
+    REACT_APP_API_PROD_URL:API_PROD_URL,
+    REACT_APP_API_STAGE_URL:API_STAGE_URL,
+    REACT_APP_API_DEV_URL:API_DEV_URL,
+    REACT_APP_API_LOCAL_URL:API_LOCAL_URL,
+    REACT_APP_GOOGLE_ANALYTICS_KEY: GOOGLE_ANALYTICS_KEY,
+} = process.env;
 
+export const STAGE_ENV = 'staging';
+export const PROD_ENV = 'prod';
+export const LOCAL_ENV = 'local';
 
 export const WALL = {
     NONE: null,
