@@ -52,3 +52,4 @@
 ::1 - - [11/May/2020:05:59:31 +0000] "GET /puzzles/b7b5156f-36ad-448f-bd26-bcef43ba3ef8 HTTP/1.1" 200 2 "http://localhost:3000/daily" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:77.0) Gecko/20100101 Firefox/77.0"
 ::ffff:127.0.0.1 - - [11/May/2020:06:13:16 +0000] "GET /challenges?latest=true HTTP/1.1" 200 143 "http://localhost:3000/daily" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:77.0) Gecko/20100101 Firefox/77.0"
 ::ffff:127.0.0.1 - - [11/May/2020:06:13:18 +0000] "GET /puzzles/b7b5156f-36ad-448f-bd26-bcef43ba3ef8 HTTP/1.1" 304 - "http://localhost:3000/daily" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:77.0) Gecko/20100101 Firefox/77.0"
+::ffff:127.0.0.1 - - [13/May/2020:14:26:33 +0000] "GET / HTTP/1.1" 404 139 "-" "curl/7.58.0"
