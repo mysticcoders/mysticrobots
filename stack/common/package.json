@@ -1,0 +1,26 @@
+{
+  "name": "common",
+  "version": "1.0.0",
+  "description": "> TODO: description",
+  "author": "Andrew Lombardi <andrew@mysticcoders.com>",
+  "homepage": "https://github.com/mysticcoders/mysticrobots#readme",
+  "license": "ISC",
+  "main": "lib/common.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mysticcoders/mysticrobots.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/mysticcoders/mysticrobots/issues"
+  }
+}
