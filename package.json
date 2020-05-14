@@ -2,6 +2,17 @@
   "name": "mysticrobots",
   "version": "0.1.0",
   "private": true,
+  "description": "Ricochet Robots Mystic Edition",
+  "author": "Andrew Lombardi <andrew@mysticcoders.com>",
+  "homepage": "https://github.com/mysticcoders/mysticrobots#readme",
+  "bugs": {
+    "url": "https://github.com/mysticcoders/mysticrobots/issues"
+  },
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mysticcoders/mysticrobots.git"
+  },
   "dependencies": {
   },
   "workspaces": [
