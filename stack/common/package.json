@@ -16,6 +16,9 @@
     }
   },
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": "mocha ./test --exit"
+  },
+  "devDependencies": {
+    "mocha": "^7.1.2"
   }
 }
