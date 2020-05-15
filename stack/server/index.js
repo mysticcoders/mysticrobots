@@ -55,17 +55,6 @@ app.get('/scores/:challengeId', cors(corsOptions), require('./routes/get_scores_
 
 app.post('/scores/:challengeId', cors(corsOptions), require('./routes/save_score_by_challenge_id'))
 
-
-/*
-
-`POST /scores/:challengeId`
-
-ip_address
-name varchar(100)
-
-
-`GET /scores/:challengeId`
-*/
 const server = app.listen(SERVER_PORT, function() {
 		/**
 		 * The TFE expects keep-alive connections to remain open forever. Expressjs defaults to a
