@@ -2,7 +2,7 @@
   "name": "common",
   "version": "0.1.0",
   "private": true,
-  "main": "lib/common.js",
+  "main": "index.js",
   "directories": {
     "lib": "lib",
     "test": "__tests__"

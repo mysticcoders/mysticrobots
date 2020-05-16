@@ -7,8 +7,6 @@ const http = require('http');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
-const { common } = require('common')
-
 const {
     name:APP_NAME,
     version:APP_VERSION
@@ -64,7 +62,6 @@ const server = app.listen(SERVER_PORT, function() {
 		 */
     server.setTimeout(0)
     console.log(`${APP_NAME} v${APP_VERSION} listening on ${SERVER_PORT}`)
-    common()
 
     /**
      * Node's default behavior is to close the connection on upgrade requests. The HTTP2 spec

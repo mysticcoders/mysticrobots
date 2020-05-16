@@ -6,7 +6,7 @@ import { createAction } from '@reduxjs/toolkit'
 
 import { WALL, ROBOT, GOAL, Status } from '../constants'
 
-import board from '../constants/board'
+const { board } = require('common')
 
 // /////////////////////////////////////////////////////////////////////////////
 // Action Types
