@@ -206,6 +206,187 @@ function setupRobots({ grid, r, g, b, y}) {
     }
 }
 
+const X_MIN = 0
+const Y_MIN = 0
+const X_MAX = 15
+const Y_MAX = 15
+
+function illuminateThePath({grid, selectedRobot}) {
+    const {x, y} = selectedRobot
+
+    let up = []
+    let down = []
+    let left = []
+    let right = []
+
+    // UP
+    if(y > Y_MIN) {
+        let done = false
+        let newY = y
+
+        // console.log("Processing UP")
+        while(newY >= 0) {
+            // console.log(`newY: ${newY}`)
+            const newCell = grid[`${x},${newY}`]
+            
+            if(!done && y !== newY && newCell.robot) {
+                up = up.slice(1)
+                done = true
+            }
+
+            // console.log(newCell)
+            if(!done && (newCell.walls === WALL.NORTH || newCell.walls === WALL.NORTH_WEST || newCell.walls === WALL.NORTH_EAST)) {
+                up.push({x, y: newY})
+                done = true
+            }
+            
+            if((!done && y !== newY) && (newCell.walls === WALL.SOUTH || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.SOUTH_WEST || newCell.walls === WALL.ALL)) {
+                // console.log(up)
+                // console.log(`up.length: ${up.length}`)
+                up = up.slice(1)  // we hit a wall prior
+                // console.log(up)
+                done = true
+            }
+
+            if(!done) {
+                up.push({x, y: newY})
+            }
+            --newY
+        }
+    }
+
+    // DOWN
+    if(y < Y_MAX) {
+        let done = false
+        let newY = y
+
+        // console.log("Processing DOWN")
+        while(newY <= Y_MAX) {
+            const newCell = grid[`${x},${newY}`]
+
+            if(!done && y !== newY && newCell.robot) {
+                down = down.slice(0, down.length)
+                done = true
+            }
+
+            // console.log(newCell)
+            if((!done && y !== newY) && (newCell.walls === WALL.NORTH || newCell.walls === WALL.NORTH_EAST || newCell.walls === WALL.NORTH_WEST || newCell.walls === WALL.ALL)) {
+                // console.log(`if.DOWN: ${down.map(obj => `(${obj.x}, ${obj.y})`)}`)
+                // console.log(`down.length: ${down.length}`)
+                down = down.slice(0, down.length > 1 ? down.length : 0)  // we hit a wall prior
+                // console.log(`if.after.slice.DOWN: ${down.map(obj => `(${obj.x}, ${obj.y})`)}`)
+                done = true
+            } 
+
+            if(!done && newY === y && (newCell.walls === WALL.SOUTH || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.SOUTH_WEST)) {
+                done = true
+            }
+
+            if(!done && (newCell.walls === WALL.SOUTH || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.SOUTH_WEST)) {
+                down.push({x, y: newY})
+                done = true
+            }
+
+            if(!done) {
+                down.push({x, y: newY})
+            }
+
+            ++newY            
+        }
+    }
+
+    // LEFT
+    if(x > X_MIN) {
+        let done = false
+        let newX = x
+
+        // console.log("Processing LEFT")
+        while(newX >= 0) {
+            const newCell = grid[`${newX},${y}`]
+
+            if(!done && x !== newX && newCell.robot) {
+                // console.log(`if.ROBOT.LEFT: ${left.map(obj => `(${obj.x}, ${obj.y})`)}`)
+                left = left.slice(1)
+                // console.log(`if.ROBOT.after.slice.LEFT: ${left.map(obj => `(${obj.x}, ${obj.y})`)}`)
+                done = true
+            }
+            
+            // console.log(newCell)
+            if(!done && (newCell.walls === WALL.WEST || newCell.walls === WALL.NORTH_WEST || newCell.walls === WALL.SOUTH_WEST)) {
+                if(x !== newX) {
+                    left.push({x: newX, y})
+                }
+                done = true
+            }
+            
+            // console.log(`x: ${x} newX: ${newX} newCell.walls: ${newCell.walls} done: ${done}`)
+            if((!done && x !== newX) && (newCell.walls === WALL.EAST || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.NORTH_EAST || newCell.walls === WALL.ALL)) {
+                // console.dir(newCell)
+                // console.log(`if.LEFT: ${left.map(obj => `(${obj.x}, ${obj.y})`)}`)
+                left = left.slice(1)  // we hit a wall prior
+                // console.log(`if.after.slice.LEFT: ${left.map(obj => `(${obj.x}, ${obj.y})`)}`)
+                done = true
+            }
+
+            if(!done) {
+                left.push({x: newX, y})
+            }
+            --newX
+        }
+    }
+
+    // RIGHT
+    if(x < X_MAX) {
+        let done = false
+        let newX = x
+
+        // console.log("Processing RIGHT")
+        while(newX <= X_MAX) {
+            const newCell = grid[`${newX},${y}`]
+
+            if(!done && x !== newX && (newCell.robot || newCell.walls === WALL.ALL)) {
+                // console.log(`2.if.RIGHT: ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
+                right = right.slice(0, right.length > 1 ? right.length : 0)
+                // console.log(`2.after.slice.if.RIGHT: ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
+                done = true
+            }
+
+            // console.log(newCell)
+            if((!done && x !== newX) && (newCell.walls === WALL.WEST || newCell.walls === WALL.SOUTH_WEST || newCell.walls === WALL.NORTH_WEST)) {
+                // console.log(`if.RIGHT: ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
+                right = right.slice(0, right.length > 1 ? right.length : 0)  // we hit a wall prior
+                done = true
+                // console.log(`if.after.slice.RIGHT: ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
+            } 
+
+            if(!done && (newCell.walls === WALL.EAST || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.NORTH_EAST)) {
+                if(x !== newX) {
+                    right.push({x: newX, y})
+                }
+                done = true
+            }
+
+            if(!done) {
+                right.push({x: newX, y})
+            }
+
+            ++newX            
+        }
+    }    
+
+    // console.log(`UP ${up.map(obj => `(${obj.x}, ${obj.y})`)}`)
+    // console.log(`DOWN ${down.map(obj => `(${obj.x}, ${obj.y})`)}`)
+    // console.log(`LEFT ${left.map(obj => `(${obj.x}, ${obj.y})`)}`)
+    // console.log(`RIGHT ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
+
+    return {
+        up,
+        down,
+        left,
+        right,
+    }
+}
+
 // Red Boards
 const RED_BOARD_1 = [
     ['','','','','E','','',''],
@@ -398,4 +579,5 @@ module.exports = {
     setupBoard,
     setupGoal,
     setupRobots,
+    illuminateThePath,
 }
