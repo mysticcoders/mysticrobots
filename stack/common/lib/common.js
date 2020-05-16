@@ -1,7 +1,12 @@
-function common() {
-    console.log('Common')
-}
+const board = require('./board')
+const utils = require('./utils')
+const constants = require('./constants')
 
 module.exports = {
-    common
+    board,
+    utils,
+    WALL: constants.WALL,
+    ROBOT: constants.ROBOT,
+    GOAL: constants.GOAL,
+    Status: constants.Status,
 }

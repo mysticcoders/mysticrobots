@@ -14,7 +14,7 @@ import { Column, Level, Button, Icon, Notification, Title } from 'rbx'
 import { FaArrowUp, FaArrowDown, FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import { FaArrowAltCircleUp, FaArrowAltCircleDown, FaArrowAltCircleLeft, FaArrowAltCircleRight } from 'react-icons/fa'
 
-import { ROBOT, Status } from '../constants'
+import { ROBOT, Status } from 'common'
 
 import { useInterval } from '../hooks/utils'
 import ShareButtons from '../components/ShareButtons'

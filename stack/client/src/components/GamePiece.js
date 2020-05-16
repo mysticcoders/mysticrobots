@@ -5,7 +5,7 @@ import { actions } from '../ducks/boards'
 
 import { FaRobot, FaStar } from 'react-icons/fa'
 
-import { WALL, ROBOT } from '../constants'
+import { WALL, ROBOT } from 'common'
 
 /**
  * Will contain the Retro Rockets gameboard
