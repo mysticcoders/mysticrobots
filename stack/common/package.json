@@ -16,9 +16,6 @@
     }
   },
   "scripts": {
-    "test": "mocha ./test --exit"
-  },
-  "devDependencies": {
-    "mocha": "^7.1.2"
+    "test": "jest"
   }
 }

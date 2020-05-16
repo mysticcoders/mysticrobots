@@ -1,8 +1,8 @@
-const {pool} = require('../database')
+const scores = require('../services/scores')
 
 const save_score_by_challenge_id = async (req, res) => {
     console.log(req.body)
-    res.send(pool ? "OK" : "FAIL")
+    res.send("OK")
 }
 
 module.exports = save_score_by_challenge_id

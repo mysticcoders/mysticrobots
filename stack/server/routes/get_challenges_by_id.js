@@ -1,4 +1,4 @@
-const {pool} = require('../database')
+const challenges = require('../services/challenges')
 
 const get_challenges_by_id = async (req, res) => {
     const id = req.params.id
@@ -8,11 +8,9 @@ const get_challenges_by_id = async (req, res) => {
         return
     }
  
-    let query = `SELECT id, start_time, end_time, created_at FROM challenge WHERE 
-                    id = $1`
-    
-    const result = await pool.query(query, [id])
-    res.send(result.rows)
+    const data = await challenges.get_challenge_by_id({ challengeId: req.params.id })
+
+    res.send(data)
 }
 
 module.exports = get_challenges_by_id

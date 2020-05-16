@@ -9,9 +9,6 @@ const cors = require('cors');
 
 const { board } = require('common')
 
-console.log("server damnit")
-console.dir(board)
-
 const {
     name:APP_NAME,
     version:APP_VERSION

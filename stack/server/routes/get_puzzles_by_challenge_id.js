@@ -1,4 +1,4 @@
-const {pool} = require('../database')
+const puzzles = require('../services/puzzles')
 
 const get_puzzles_by_challenge_id = async (req, res) => {
     const challengeId = req.params.challengeId
@@ -8,12 +8,8 @@ const get_puzzles_by_challenge_id = async (req, res) => {
         return
     }
     
-    let query = `SELECT id, challenge_id, goal_color, goal_index, 
-                    red_bot, green_bot, blue_bot, yellow_bot, config, 
-                    created_at FROM challenge_puzzle WHERE challenge_id = $1`
-
-    const result = await pool.query(query, [challengeId])
-    res.send(result.rows)
+    const data = await puzzles.get_puzzles_by_challenge_id({challengeId})
+    res.send(data)
 }
 
 module.exports = get_puzzles_by_challenge_id

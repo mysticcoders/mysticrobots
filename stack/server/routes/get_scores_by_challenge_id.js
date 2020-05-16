@@ -1,4 +1,4 @@
-const {pool} = require('../database')
+const scores = require('../services/scores')
 
 const get_scores_by_challenge_id = async (req, res) => {
     const challengeId = req.params.challengeId
@@ -8,11 +8,8 @@ const get_scores_by_challenge_id = async (req, res) => {
         return
     }
 
-    let query = `SELECT id, challenge_id, name, ip_address, 
-                    move_count. created_at FROM score WHERE challenge_id = $1`
-
-    const result = await pool.query(query, [challengeId])
-    res.send(result.rows)
+    const data = await scores.get_scores_by_challenge_id({ challengeId })
+    res.send(data)
 }
 
 module.exports = get_scores_by_challenge_id
