@@ -40,6 +40,17 @@ function randomIntFromInterval(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+/**
+ * Debug print the board
+ * 
+ * @param {*} board 
+ */
+// const printBoard = (board) => {
+//     for(let y=0; y<board.length; y++) {
+//         console.log(board[y].join(','))
+//     }
+// }
+
 module.exports = {
     rotate,
     randomIntFromInterval
