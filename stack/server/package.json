@@ -17,7 +17,7 @@
   "scripts": {
     "release": "standard-version",
     "start": "nodemon -q -L -e js,json,yml,yaml --exec 'node -r dotenv/config index.js'",
-    "cli": "node cli.js"
+    "cli": "node -r dotenv/config cli.js"
   },
   "standard-version": {
     "skip": {

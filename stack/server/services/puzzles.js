@@ -1,4 +1,5 @@
 const { pool } = require('../database')
+const { GOAL } = require('common')
 
 const get_puzzles_by_challenge_id = async({ challengeId }) => {
     if(!challengeId) {
@@ -24,11 +25,24 @@ const save_puzzle = async({
     yellowBot,
     config}) => {
 
+    console.log(challengeId)
+    console.log(goalColor)
+    console.log(goalIndex)
+
+    const goals = Object.values(GOAL)
+
+    if(goalIndex < 0 || goalIndex > goals.length - 1) {
+        console.error(`Goal index must be a value between 0 and ${goals.length - 1}`)
+        return
+    }
+
+    const goalColorIndex = goals.indexOf(goalColor)
+
     let query = `INSERT INTO challenge_puzzle 
                 (challenge_id, goal_color, goal_index, red_bot, green_bot, blue_bot, yellow_bot, config)
-                VALUES ('$1', '$2', $3, $4, $5, $6, $7, '$8')`
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
-    await pool.query(query, [challengeId, goalColor, goalIndex, redBot, greenBot, blueBot, yellowBot, config])
+    await pool.query(query, [challengeId, goalColorIndex, goalIndex, redBot, greenBot, blueBot, yellowBot, config])
 
 }
 

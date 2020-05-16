@@ -7,7 +7,7 @@ const main = (argv) => {
 
     if(argv.board) {
         const challengeId = argv.challengeId
-        
+    
         if(!challengeId) {
             console.error("Challenge ID is a required field")
             process.exit()
@@ -31,8 +31,7 @@ const main = (argv) => {
                 yellowBot: robotData.yIndex,
                 config: boardData.config
             })
-        }
-        
+        }        
     }
 }
 
