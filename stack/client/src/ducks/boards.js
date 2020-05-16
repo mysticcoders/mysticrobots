@@ -4,9 +4,7 @@ import { call, put, select, takeEvery } from 'redux-saga/effects'
 
 import { createAction } from '@reduxjs/toolkit'
 
-import { WALL, ROBOT, GOAL, Status } from '../constants'
-
-import board from '../constants/board'
+import { board, Status, WALL, ROBOT, GOAL } from 'common'
 
 // /////////////////////////////////////////////////////////////////////////////
 // Action Types
@@ -246,94 +244,96 @@ function randomIntFromInterval(min, max) {
 // Sagas
 ////////////////////////////////////////////////////////////////////////////////
 
-function rotateWall90(wall) {
-    if(wall === 'N') {
-        return 'E'
-    } else if(wall === 'E') {
-        return 'S'
-    } else if(wall === 'S') {
-        return 'W'
-    } else if(wall === 'W') {
-        return 'N'
-    } else if(wall === 'NE') {
-        return 'SE'
-    } else if(wall === 'NW') {
-        return 'NE'
-    } else if(wall === 'SW') {
-        return 'NW'
-    } else if(wall === 'SE') {
-        return 'SW'
-    } else if(wall === 'X') {
-        return 'X'
-    } else {
-        return ''
-    }
-}
+// function rotateWall90(wall) {
+//     if(wall === 'N') {
+//         return 'E'
+//     } else if(wall === 'E') {
+//         return 'S'
+//     } else if(wall === 'S') {
+//         return 'W'
+//     } else if(wall === 'W') {
+//         return 'N'
+//     } else if(wall === 'NE') {
+//         return 'SE'
+//     } else if(wall === 'NW') {
+//         return 'NE'
+//     } else if(wall === 'SW') {
+//         return 'NW'
+//     } else if(wall === 'SE') {
+//         return 'SW'
+//     } else if(wall === 'X') {
+//         return 'X'
+//     } else {
+//         return ''
+//     }
+// }
 
-function rotate(matrix, times = 1) {
-    do {
-        const N = matrix.length - 1
-        const result = matrix.map((row, i) =>
-            row.map((val, j) => rotateWall90(matrix[N - j][i]))
-        )
-        matrix.length = 0
-        matrix.push(...result)
+// function rotate(matrix, times = 1) {
+//     do {
+//         const N = matrix.length - 1
+//         const result = matrix.map((row, i) =>
+//             row.map((val, j) => rotateWall90(matrix[N - j][i]))
+//         )
+//         matrix.length = 0
+//         matrix.push(...result)
 
-        --times
-    } while(times > 0)
-    return matrix
-}
+//         --times
+//     } while(times > 0)
+//     return matrix
+// }
 
-function processBoard(board, location) {
-    let centerSquare = undefined
-    let newBoard = JSON.parse(JSON.stringify(board))
+//////
 
-    if(newBoard[0][0] === 'X') {
-        centerSquare = 1
-    } else if(newBoard[0][7] === 'X') {
-        centerSquare = 2
-    } else if(newBoard[7][0] === 'X') {
-        centerSquare = 3
-    } else if(newBoard[7][7] === 'X') {
-        centerSquare = 4
-    }
+// function processBoard(board, location) {
+//     let centerSquare = undefined
+//     let newBoard = JSON.parse(JSON.stringify(board))
 
-    if(centerSquare === 1) {
-        if(location === 'TL') {
-            newBoard = rotate(newBoard, 2)
-        } else if(location === 'TR') {
-            newBoard = rotate(newBoard, 3)
-        } else if(location === 'BL') {
-            newBoard = rotate(newBoard)
-        } 
-    } else if(centerSquare === 2) {
-        if(location === 'TL') {
-            newBoard = rotate(newBoard)
-        } else if(location === 'TR') {
-            newBoard = rotate(newBoard, 2)
-        } else if(location === 'BR') {
-            newBoard = rotate(newBoard, 3)
-        }
-    } else if(centerSquare === 3) {
-        if(location === 'TL') {
-            newBoard = rotate(newBoard, 3)
-        } else if(location === 'BL') {
-            newBoard = rotate(newBoard, 2)
-        } else if(location === 'BR') {
-            newBoard = rotate(newBoard)
-        }
-    } else if(centerSquare === 4) {
-        if(location === 'TR') {
-            newBoard = rotate(newBoard)
-        } else if(location === 'BL') {  
-            newBoard = rotate(newBoard, 3)
-        } else if(location === 'BR') {
-            newBoard = rotate(newBoard, 2)
-        }
-    }
+//     if(newBoard[0][0] === 'X') {
+//         centerSquare = 1
+//     } else if(newBoard[0][7] === 'X') {
+//         centerSquare = 2
+//     } else if(newBoard[7][0] === 'X') {
+//         centerSquare = 3
+//     } else if(newBoard[7][7] === 'X') {
+//         centerSquare = 4
+//     }
 
-    return newBoard
-}
+//     if(centerSquare === 1) {
+//         if(location === 'TL') {
+//             newBoard = utils.rotate(newBoard, 2)
+//         } else if(location === 'TR') {
+//             newBoard = utils.rotate(newBoard, 3)
+//         } else if(location === 'BL') {
+//             newBoard = utils.rotate(newBoard)
+//         } 
+//     } else if(centerSquare === 2) {
+//         if(location === 'TL') {
+//             newBoard = utils.rotate(newBoard)
+//         } else if(location === 'TR') {
+//             newBoard = utils.rotate(newBoard, 2)
+//         } else if(location === 'BR') {
+//             newBoard = utils.rotate(newBoard, 3)
+//         }
+//     } else if(centerSquare === 3) {
+//         if(location === 'TL') {
+//             newBoard = utils.rotate(newBoard, 3)
+//         } else if(location === 'BL') {
+//             newBoard = utils.rotate(newBoard, 2)
+//         } else if(location === 'BR') {
+//             newBoard = utils.rotate(newBoard)
+//         }
+//     } else if(centerSquare === 4) {
+//         if(location === 'TR') {
+//             newBoard = utils.rotate(newBoard)
+//         } else if(location === 'BL') {  
+//             newBoard = utils.rotate(newBoard, 3)
+//         } else if(location === 'BR') {
+//             newBoard = utils.rotate(newBoard, 2)
+//         }
+//     }
+
+//     return newBoard
+// }
 
 /**
  * Debug print the board
@@ -372,10 +372,10 @@ export function* setupBoard({payload}) {
     let boardBL = board['classic']['YELLOW'][boardSplit[2]]
     let boardBR = board['classic']['BLUE'][boardSplit[3]]
 
-    const TL = processBoard(boardTL, 'TL')
-    const TR = processBoard(boardTR, 'TR')
-    const BL = processBoard(boardBL, 'BL')
-    const BR = processBoard(boardBR, 'BR')
+    const TL = board.processBoard(boardTL, 'TL')
+    const TR = board.processBoard(boardTR, 'TR')
+    const BL = board.processBoard(boardBL, 'BL')
+    const BR = board.processBoard(boardBR, 'BR')
 
 
     const boardGrid = []
@@ -420,17 +420,19 @@ export function* setupBoard({payload}) {
         }
     }
 
-    const corners = Object.values(grid).filter(element => element.walls === WALL.NORTH_WEST || element.walls === WALL.NORTH_EAST || element.walls === WALL.SOUTH_WEST || element === WALL.SOUTH_EAST)
+    const goalData = board.setupGoal({ grid: grid, goalIndex: payload.goalIndex, goalColor: payload.goalColor })
 
-    const goalIndex = payload.goalIndex >= 0 && payload.goalIndex < corners.length ? payload.goalIndex : randomIntFromInterval(0, corners.length - 1)
-    const randomCorner = corners[goalIndex]
+    // const corners = Object.values(grid).filter(element => element.walls === WALL.NORTH_WEST || element.walls === WALL.NORTH_EAST || element.walls === WALL.SOUTH_WEST || element === WALL.SOUTH_EAST)
 
-    const goals = Object.values(GOAL)
+    // const goalIndex = payload.goalIndex >= 0 && payload.goalIndex < corners.length ? payload.goalIndex : randomIntFromInterval(0, corners.length - 1)
+    // const randomCorner = corners[goalIndex]
 
-    const goalColorIndex = payload.goalColor >= 0 && payload.goalColor < goals.length ? payload.goalColor : randomIntFromInterval(0, goals.length - 1)
-    const randomGoalColor = goals[goalColorIndex]
+    // const goals = Object.values(GOAL)
+
+    // const goalColorIndex = payload.goalColor >= 0 && payload.goalColor < goals.length ? payload.goalColor : randomIntFromInterval(0, goals.length - 1)
+    // const randomGoalColor = goals[goalColorIndex]
+    setGoal(grid, goalData.x, goalData.y, goalData.goalColor)
     
-    setGoal(grid, randomCorner.x, randomCorner.y, randomGoalColor)
 
     // ROBOTS!
     let availableSpots = Object.values(grid).filter(element => element.walls !== WALL.ALL && !element.goal && !element.robot)
@@ -459,13 +461,9 @@ export function* setupBoard({payload}) {
     yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.YELLOW, x: yellowLocation.x, y: yellowLocation.y}})
     availableSpots.splice(yIndex, 1)
 
-
-    // const query = `INSERT INTO challenge_puzzle (id, challenge_id, goal_color, goal_index, red_bot, green_bot, blue_bot, yellow_bot, config, created_at) VALUES (DEFAULT, '954369ba-d0e1-4b8f-b374-6960a08c6b2b', ${goalIndex}, ${goalColorIndex}, ${rIndex}, ${gIndex}, ${bIndex}, ${yIndex}, ${boardPayload}, DEFAULT)`
-    //  console.log(query)
-
     yield put({ type: types.UPDATE_METADATA, payload: { 
-            goalIndex, 
-            goalColor: goalColorIndex, 
+            goalIndex: goalData.goalIndex,
+            goalColor: goalData.goalColor,
             r: rIndex, 
             g: gIndex, 
             b: bIndex, 

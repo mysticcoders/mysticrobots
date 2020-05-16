@@ -17,14 +17,15 @@ import {
   GOOGLE_ANALYTICS_KEY,
 } from './constants'
 
-import { common } from 'common'
+import { board } from 'common'
 
 const history = createBrowserHistory();
 const store = configureStore({}, history);
 const root = document.getElementById('root');
 
 ReactGA.initialize(GOOGLE_ANALYTICS_KEY)
-common()
+
+console.dir(board)
 
 if (root instanceof Element) {
   ReactDOM.render(

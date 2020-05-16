@@ -8,7 +8,7 @@ import { Section } from "rbx";
 
 import { HeaderContainer } from '../containers/HeaderContainer'
 
-import { GameContainer } from '../containers/GameContainer'
+// import { GameContainer } from '../containers/GameContainer'
 
 export const DailyChallengePage = () => {
   const dispatch = useDispatch()
@@ -26,7 +26,7 @@ export const DailyChallengePage = () => {
                 challengeId: challenge.challengeId
             }))
       }
-  }, [challenge])
+  }, [dispatch, challenge])
 
   return (
     <div>
