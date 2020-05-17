@@ -40,6 +40,9 @@ export const HeaderContainer = () => {
                 <Navbar.Item onClick={() => history.push('/daily')}>
                     Daily Challenge
                 </Navbar.Item>
+                <Navbar.Item onClick={() => history.push('/challenges')}>
+                    Challenges
+                </Navbar.Item>
                 <Navbar.Item onClick={() => history.push('/about')}>
                     About
                 </Navbar.Item>

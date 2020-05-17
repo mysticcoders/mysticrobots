@@ -25,7 +25,7 @@ const get_challenge_by_id = async({ challengeId }) => {
     
     const result = await pool.query(query, [challengeId])
 
-    return result.rows
+    return result.rows[0]
 }
 
 module.exports = {

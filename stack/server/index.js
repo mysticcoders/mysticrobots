@@ -49,7 +49,7 @@ app.get('/health', require('./routes/health_check'));
 
 app.get('/challenges', cors(corsOptions), require('./routes/get_challenges'))
 
-app.get('/challenges/:id', cors(corsOptions), require('./routes/get_challenges_by_id'))
+app.get('/challenges/:id', cors(corsOptions), require('./routes/get_challenge_by_id'))
 
 app.get('/puzzles/:puzzleId', cors(corsOptions), require('./routes/get_puzzle_by_id'))
 
