@@ -1,5 +1,5 @@
 
-const { board, utils } = require('common')
+const { board } = require('common')
 
 const puzzles = require('./services/puzzles')
 

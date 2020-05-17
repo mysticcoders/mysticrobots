@@ -1,5 +1,7 @@
 const { pool } = require('../database')
 
+const moment = require('moment')
+
 const get_challenges = async ({ latest }) => {
     let query = `SELECT id, start_time, end_time, created_at FROM challenge `
 

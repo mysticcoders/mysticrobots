@@ -26,7 +26,7 @@ import queryString from 'query-string'
 /**
  * Will contain the Retro Rockets gameboard
  */
-export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
+export const GameContainer = ({puzzleId, goalIndex, goalColor, r, g, b, y, config}) => {
     const dispatch = useDispatch()
 
     const history = useHistory()
@@ -53,20 +53,28 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
     }, [status])
 
     useEffect(() => {
-
-        const values = {
-            goalIndex: metadata.goalIndex,
-            goalColor: metadata.goalColor,
-            r: metadata.r,
-            g: metadata.g,
-            b: metadata.b,
-            y: metadata.y,
-            config: metadata.config,
+        if(puzzleId) {
+            dispatch(actions.clearBoard({}))
+            dispatch(actions.fetchPuzzle({ id: puzzleId }))    
         }
+    }, [dispatch, puzzleId])
 
-        const stringified = queryString.stringify(values)
+    useEffect(() => {
+        if(!puzzleId) {
+            const values = {
+                goalIndex: metadata.goalIndex,
+                goalColor: metadata.goalColor,
+                r: metadata.r,
+                g: metadata.g,
+                b: metadata.b,
+                y: metadata.y,
+                config: metadata.config,
+            }
 
-        history.replace(`/puzzle?${stringified}`)
+            const stringified = queryString.stringify(values)
+
+            history.replace(`/puzzle?${stringified}`)
+        }
     }, [metadata, history])
 
     useEffect(()=> {
@@ -110,11 +118,17 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
         )
     }
 
+    if(!metadata || Object.values(metadata).length === 0) {
+        return (
+            <h1>Loading...</h1>
+        )
+    }
+
     return (
         <Column.Group style={{margin: 0}}>
 
             <Column style={{padding: 0, margin: 0}}>
-                <GameBoard goalIndex={goalIndex} goalColor={goalColor} r={r} g={g} b={b} y={y} config={config} />
+                <GameBoard goalIndex={metadata.goalIndex} goalColor={metadata.goalColor} r={metadata.r} g={metadata.g} b={metadata.b} y={metadata.y} config={metadata.config} />
             </Column>
             <Column>
                 {status === Status.WIN &&

@@ -30,6 +30,18 @@ export const types = {
     FETCH_LATEST_CHALLENGE: 'FETCH_LATEST_CHALLENGE',
     FETCH_LATEST_CHALLENGE_SUCCESS: 'FETCH_LATEST_CHALLENGE_SUCCESS',
 
+    FETCH_CHALLENGES: 'FETCH_CHALLENGES',
+    FETCH_CHALLENGES_SUCCESS: 'FETCH_CHALLENGES_SUCCESS',
+    FETCH_CHALLENGES_ERROR: 'FETCH_CHALLENGES_ERROR',
+
+    FETCH_PUZZLE: 'FETCH_PUZZLE',
+    FETCH_PUZZLE_SUCCESS: 'FETCH_PUZZLE_SUCCESS',
+    FETCH_PUZZLE_ERROR: 'FETCH_PUZZLE_ERROR',
+
+    FETCH_CHALLENGE: 'FETCH_CHALLENGE',
+    FETCH_CHALLENGE_SUCCESS: 'FETCH_CHALLENGE_SUCCESS',
+    FETCH_CHALLENGE_ERROR: 'FETCH_CHALLENGE_ERROR',
+
     FETCH_PUZZLES_BY_CHALLENGE: 'FETCH_PUZZLES_BY_CHALLENGE',
     FETCH_PUZZLES_BY_CHALLENGE_SUCCESS: 'FETCH_PUZZLES_BY_CHALLENGE_SUCCESS',
 
@@ -64,6 +76,9 @@ export const actions = {
 
     fetchLatestChallenge: createAction(types.FETCH_LATEST_CHALLENGE),
     fetchPuzzlesByChallenge: createAction(types.FETCH_PUZZLES_BY_CHALLENGE),
+    fetchChallenges: createAction(types.FETCH_CHALLENGES),
+    fetchChallenge: createAction(types.FETCH_CHALLENGE),
+    fetchPuzzle: createAction(types.FETCH_PUZZLE),
 
     setRobot: createAction(types.SET_ROBOT),
 
@@ -215,6 +230,11 @@ export default function (state = initialState, action) {
                 startTime: action.payload.startTime,
                 endTime: action.payload.endTime
             }
+        }
+    case types.FETCH_CHALLENGES_SUCCESS:
+        return {
+            ...state,
+            challenges: action.payload,
         }
     case types.FETCH_PUZZLES_BY_CHALLENGE_SUCCESS:
         return {
@@ -387,13 +407,58 @@ export function* fetchLatestChallenge() {
     }
 }
 
+export function* fetchChallenges() {
+    try {
+        const challenges = yield call(api.fetchChallenges)
+
+        yield put({ type: types.FETCH_CHALLENGES_SUCCESS, payload: challenges })
+
+    } catch(error) {
+        console.error(error)
+    }
+}
+
+export function* fetchPuzzle({payload}) {
+    const { id } = payload
+
+    try {
+        const puzzle = yield call(api.fetchPuzzle, id)
+
+        yield put({ type: types.UPDATE_METADATA, payload: { 
+            config: puzzle.config,
+            goalIndex: puzzle.goal_index,
+            goalColor: puzzle.goal_color,
+            r: puzzle.red_bot,
+            g: puzzle.green_bot,
+            b: puzzle.blue_bot,
+            y: puzzle.yellow_bot,
+        }})
+
+    } catch(error) {
+        console.error(error)
+    }
+}
+
+export function* fetchChallenge({payload}) {
+    const { id } = payload
+
+    try {
+        const challenge = yield call(api.fetchChallenge, id)
+
+        yield put({ type: types.FETCH_CHALLENGE_SUCCESS, payload: challenge })
+
+    } catch(error) {
+        console.error(error)
+    }
+}
+
 export function* fetchPuzzlesByChallenge({payload}) {
     console.dir(payload)
     
     try {
         const puzzles = yield call(api.fetchPuzzlesByChallenge, payload.challengeId)
 
-        console.dir(puzzles)
+        yield put({ type: types.FETCH_PUZZLES_BY_CHALLENGE_SUCCESS, payload: puzzles})
 
     } catch(error) {
         console.error(error)
@@ -408,7 +473,10 @@ export const sagas = [
   takeEvery(types.UPDATE_HOVER_ROBOT_PATH, updateHoverRobotPath),
 
   takeEvery(types.FETCH_LATEST_CHALLENGE, fetchLatestChallenge),
+  takeEvery(types.FETCH_PUZZLE, fetchPuzzle),
   takeEvery(types.FETCH_PUZZLES_BY_CHALLENGE, fetchPuzzlesByChallenge),
+  takeEvery(types.FETCH_CHALLENGES, fetchChallenges),
+  takeEvery(types.FETCH_CHALLENGE, fetchChallenge),
 
   takeEvery(types.MOVE_UP, moveUp),
   takeEvery(types.MOVE_DOWN, moveDown),

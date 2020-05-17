@@ -51,7 +51,9 @@ app.get('/challenges', cors(corsOptions), require('./routes/get_challenges'))
 
 app.get('/challenges/:id', cors(corsOptions), require('./routes/get_challenges_by_id'))
 
-app.get('/puzzles/:challengeId', cors(corsOptions), require('./routes/get_puzzles_by_challenge_id'))
+app.get('/puzzles/:puzzleId', cors(corsOptions), require('./routes/get_puzzle_by_id'))
+
+app.get('/challenges/:challengeId/puzzles', cors(corsOptions), require('./routes/get_puzzles_by_challenge_id'))
 
 app.get('/scores/:challengeId', cors(corsOptions), require('./routes/get_scores_by_challenge_id'))
 

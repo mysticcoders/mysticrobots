@@ -15,6 +15,20 @@ const get_puzzles_by_challenge_id = async({ challengeId }) => {
     return result.rows
 }
 
+const get_puzzle_by_id = async({ puzzleId }) => {
+    if(!puzzleId) {
+        throw new Error("Puzzle ID required")
+    }
+
+    let query = `SELECT id, challenge_id, goal_color, goal_index, 
+                    red_bot, green_bot, blue_bot, yellow_bot, config, 
+                    created_at FROM challenge_puzzle WHERE id = $1`
+
+    const result = await pool.query(query, [puzzleId])
+
+    return result.rows[0]
+}
+
 const save_puzzle = async({ 
     challengeId, 
     goalColor, 
@@ -24,10 +38,6 @@ const save_puzzle = async({
     blueBot, 
     yellowBot,
     config}) => {
-
-    console.log(challengeId)
-    console.log(goalColor)
-    console.log(goalIndex)
 
     const goals = Object.values(GOAL)
 
@@ -48,5 +58,6 @@ const save_puzzle = async({
 
 module.exports = {
     get_puzzles_by_challenge_id,
+    get_puzzle_by_id,
     save_puzzle,
 }

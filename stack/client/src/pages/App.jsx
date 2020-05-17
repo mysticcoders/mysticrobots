@@ -1,7 +1,9 @@
 import React from 'react'
 
+import { ViewPuzzlePage } from './ViewPuzzlePage'
 import { PuzzlePage } from './PuzzlePage'
 import { DailyChallengePage } from './DailyChallengePage'
+import { ChallengesPage } from './ChallengesPage'
 import { AboutPage } from './AboutPage'
 
 import {
@@ -15,8 +17,8 @@ const App = () => (
     <Switch>
         <Redirect exact from="/" to="/random" />
 
-        <Route path="/puzzle/:shareKey">
-            <PuzzlePage />
+        <Route path="/puzzle/:puzzleId">
+            <ViewPuzzlePage />
         </Route>
 
         <Route path="/puzzle">
@@ -25,6 +27,10 @@ const App = () => (
 
         <Route path="/daily">
             <DailyChallengePage />
+        </Route>
+
+        <Route path="/challenges">
+            <ChallengesPage />
         </Route>
 
         <Redirect from="/random" to="/puzzle?reset=true" />

@@ -16,6 +16,9 @@ export const GameBoard = ({goalIndex, goalColor, r, g, b, y, config}) => {
     const [displayGrid, setDisplayGrid] = useState(null)
 
     useEffect(() => {
+        console.log("hi hi hi")
+        console.log(`goalIndex: ${goalIndex}`)
+        console.log(`goalColor: ${goalColor}`)
         dispatch(actions.setupBoard({goalIndex, goalColor, r, g, b, y, config}))
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch])
@@ -70,7 +73,7 @@ export const GameBoard = ({goalIndex, goalColor, r, g, b, y, config}) => {
         } 
 
     }, [grid])
-
+    
     if(!displayGrid) {
         return (
             <h1>Loading...</h1>
