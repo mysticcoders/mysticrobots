@@ -58,7 +58,7 @@ export default class RasamApi {
 
     static fetchPuzzlesByChallenge(challengeId) {
 
-        const url = `${apiUrl()}/puzzles/${challengeId}`
+        const url = `${apiUrl()}/challenges/${challengeId}/puzzles`
 
         console.log(url)
 

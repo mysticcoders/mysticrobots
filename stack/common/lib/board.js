@@ -160,12 +160,11 @@ function setupGoal({ grid, goalIndex, goalColor }) {
 
     setGoal(grid, randomCorner.x, randomCorner.y, randomGoalColor)
 
-    console.log("Setting up the goal")
     return {
         x: randomCorner.x,
         y: randomCorner.y,
-        goalIndex: goalColorIndex,
-        goalColor: randomGoalColor
+        goalIndex: randomGoalIndex,
+        goalColor: goalColorIndex
     }
 }
 

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { Link } from 'react-router-dom'
 
-import { actions } from '../ducks/boards'
+import { actions } from '../ducks/challenges'
 
 import { Section, Title, Table, Container } from "rbx";
 
@@ -15,7 +15,7 @@ import moment from 'moment'
 export const ChallengesPage = () => {
   const dispatch = useDispatch()
 
-  const challenges = useSelector(state => state.boards.challenges)
+  const challenges = useSelector(state => state.challenges.challenges)
 
   useEffect(() => {
       dispatch(actions.fetchChallenges())

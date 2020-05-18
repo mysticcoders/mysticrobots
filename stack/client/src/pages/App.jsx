@@ -4,6 +4,7 @@ import { ViewPuzzlePage } from './ViewPuzzlePage'
 import { PuzzlePage } from './PuzzlePage'
 import { DailyChallengePage } from './DailyChallengePage'
 import { ChallengesPage } from './ChallengesPage'
+import { ChallengePage } from './ChallengePage'
 import { AboutPage } from './AboutPage'
 
 import {
@@ -31,6 +32,10 @@ const App = () => (
 
         <Route path="/challenges">
             <ChallengesPage />
+        </Route>
+
+        <Route path="/challenge/:challengeId">
+            <ChallengePage />
         </Route>
 
         <Redirect from="/random" to="/puzzle?reset=true" />
