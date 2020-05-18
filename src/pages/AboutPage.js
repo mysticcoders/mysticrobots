@@ -81,7 +81,12 @@ export const AboutPage = () => {
                 </Content>
                 <Title>Who built this?</Title>
                 <Content>
-                    This was built and coded by the team at <a href="https://mysticcoders.com">Mystic Coders, LLC</a>
+                    This was built and coded by the team at <a href="https://mysticcoders.com" target="_blank" rel="noopener noreferrer">Mystic Coders, LLC</a>
+                </Content>
+
+                <Title>Contributions</Title>
+                <Content>
+                    Please <a href="https://github.com/mysticcoders/mysticrobots" target="_blank" rel="noopener noreferrer">check out the repo on GitHub</a>.
                 </Content>
             </Container>
             </Section>
