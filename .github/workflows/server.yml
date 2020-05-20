@@ -6,6 +6,7 @@ name: Server CI
 on:
   push:
     branches: [ master ]
+    paths: [ '.github/workflows/server.yml', 'stack/common', 'stack/server' ]
   pull_request:
     branches: [ master ]
 
