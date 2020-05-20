@@ -26,5 +26,5 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm i -g lerna
     - run: lerna bootstrap
-    - run: cd stack/server
-    - run: npm test
+    - run: cd stack/common && npm test
+    - run: cd stack/server && npm test
