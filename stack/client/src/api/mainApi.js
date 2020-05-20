@@ -17,10 +17,48 @@ export default class RasamApi {
             .catch(handleAxiosError);
     }
 
-    static fetchPuzzlesByChallenge(challengeId) {
-        console.dir(challengeId)
+    static fetchChallenges() {
+        return axios
+            .get(`${apiUrl()}/challenges`, defaultHeaders)
+            .then(response => {
+                const { data } = response;
 
-        const url = `${apiUrl()}/puzzles/${challengeId}`
+                return {
+                    ...data
+                }
+            })
+            .catch(handleAxiosError);
+    }
+
+    static fetchPuzzle(id) {
+        return axios
+            .get(`${apiUrl()}/puzzles/${id}`, defaultHeaders)
+            .then(response => {
+                const { data } = response;
+
+                return {
+                    ...data
+                }
+            })
+            .catch(handleAxiosError);
+    }
+
+    static fetchChallenge(id) {
+        return axios
+            .get(`${apiUrl()}/challenges/${id}`, defaultHeaders)
+            .then(response => {
+                const { data } = response;
+
+                return {
+                    ...data
+                }
+            })
+            .catch(handleAxiosError);
+    }
+
+    static fetchPuzzlesByChallenge(challengeId) {
+
+        const url = `${apiUrl()}/challenges/${challengeId}/puzzles`
 
         console.log(url)
 

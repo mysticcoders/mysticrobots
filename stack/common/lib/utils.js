@@ -1,3 +1,9 @@
+
+/**
+ * Transmute directional value 90 degrees clockwise
+ * 
+ * @param {*} wall 
+ */
 function rotateWall90(wall) {
     if(wall === 'N') {
         return 'E'
@@ -22,6 +28,12 @@ function rotateWall90(wall) {
     }
 }
 
+/**
+ * Rotates a matrix 90 degrees clockwise
+ * 
+ * @param {*} matrix 
+ * @param {*} times 
+ */
 function rotate(matrix, times = 1) {
     do {
         const N = matrix.length - 1
@@ -36,22 +48,18 @@ function rotate(matrix, times = 1) {
     return matrix
 }
 
+/**
+ * Return a random integer between min and max
+ * 
+ * @param {*} min 
+ * @param {*} max 
+ */
 function randomIntFromInterval(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-/**
- * Debug print the board
- * 
- * @param {*} board 
- */
-// const printBoard = (board) => {
-//     for(let y=0; y<board.length; y++) {
-//         console.log(board[y].join(','))
-//     }
-// }
-
 module.exports = {
     rotate,
-    randomIntFromInterval
+    randomIntFromInterval,
+    rotateWall90,
 }

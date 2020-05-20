@@ -13,7 +13,7 @@ import { HeaderContainer } from '../containers/HeaderContainer'
 export const DailyChallengePage = () => {
   const dispatch = useDispatch()
 
-  const challenge = useSelector(state => state.boards.challenge)
+  const challenge = useSelector(state => state.challenges.challenge)
 
   useEffect(() => {
     dispatch(actions.fetchLatestChallenge())

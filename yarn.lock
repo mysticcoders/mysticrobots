@@ -2968,6 +2968,19 @@ anymatch@~3.1.1:
     normalize-path "^3.0.0"
     picomatch "^2.0.4"
 
+"api@file:stack/server":
+  version "0.1.0"
+  dependencies:
+    body-parser "^1.19.0"
+    cors "^2.8.5"
+    dotenv "^8.2.0"
+    express "^4.17.1"
+    minimist "^1.2.5"
+    moment "^2.25.3"
+    morgan "^1.10.0"
+    pg "^8.0.3"
+    rotating-file-stream "^2.1.0"
+
 aproba@^1.0.3, aproba@^1.1.1:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/aproba/-/aproba-1.2.0.tgz#6802e6264efd18c790a1b0d517f0f2627bf2c94a"
@@ -4105,6 +4118,34 @@ cli-width@^2.0.0:
   resolved "https://registry.yarnpkg.com/cli-width/-/cli-width-2.2.1.tgz#b0433d0b4e9c847ef18868a4ef16fd5fc8271c48"
   integrity sha512-GRMWDxpOB6Dgk2E5Uo+3eEBvtOOlimMmpbFiKuLFnQzYDavtLFY3K5ona41jgN/WdRZtG7utuVSVTL4HbZHGkw==
 
+"client@file:stack/client":
+  version "0.1.0"
+  dependencies:
+    "@reduxjs/toolkit" "^1.3.5"
+    "@testing-library/jest-dom" "^4.2.4"
+    "@testing-library/react" "^9.5.0"
+    "@testing-library/user-event" "^7.2.1"
+    axios "^0.19.2"
+    connected-react-router "^6.8.0"
+    history "^4.10.1"
+    immutable "^4.0.0-rc.12"
+    morgan "^1.10.0"
+    node-sass "^4.14.0"
+    numeral "^2.0.6"
+    rbx "^2.2.0"
+    react "^16.13.1"
+    react-dom "^16.13.1"
+    react-ga "^2.7.0"
+    react-hotkeys-hook "^2.1.3"
+    react-icons "^3.10.0"
+    react-redux "^7.2.0"
+    react-router "^5.1.2"
+    react-router-dom "^5.1.2"
+    react-scripts "3.4.0"
+    react-share "^4.1.0"
+    redux "^4.0.5"
+    redux-saga "^1.1.3"
+
 cliui@^4.0.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/cliui/-/cliui-4.1.0.tgz#348422dbe82d800b3022eef4f6ac10bf2e4d1b49"
@@ -4260,6 +4301,9 @@ common-tags@^1.8.0:
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/common-tags/-/common-tags-1.8.0.tgz#8e3153e542d4a39e9b10554434afaaf98956a937"
   integrity sha512-6P6g0uetGpW/sdyUy/iQQCbFF0kWVMSIVSyYz7Zgjcgh8mgw8PQzDNZeyZ5DQ2gM7LBoZPHmnjz8rUthkBG5tw==
+
+"common@file:stack/common":
+  version "0.1.0"
 
 commondir@^1.0.1:
   version "1.0.1"

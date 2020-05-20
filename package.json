@@ -14,13 +14,20 @@
     "url": "git+https://github.com/mysticcoders/mysticrobots.git"
   },
   "dependencies": {
+    "api": "file:stack/server",
+    "client": "file:stack/client",
+    "common": "file:stack/common"
   },
   "workspaces": [
     "stack/*"
   ],
-  "scripts": {
-  },
+  "scripts": {},
   "devDependencies": {
-    "lerna": "^3.20.2"
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "lerna": "^3.20.2",
+    "mocha": "^7.1.2",
+    "nodemon": "^2.0.3",
+    "redux-immutable-state-invariant": "^2.1.0",
+    "standard-version": "^7.0.0"
   }
 }

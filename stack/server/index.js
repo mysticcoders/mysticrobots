@@ -9,9 +9,6 @@ const cors = require('cors');
 
 const { board } = require('common')
 
-console.log("server damnit")
-console.dir(board)
-
 const {
     name:APP_NAME,
     version:APP_VERSION
@@ -52,9 +49,11 @@ app.get('/health', require('./routes/health_check'));
 
 app.get('/challenges', cors(corsOptions), require('./routes/get_challenges'))
 
-app.get('/challenges/:id', cors(corsOptions), require('./routes/get_challenges_by_id'))
+app.get('/challenges/:id', cors(corsOptions), require('./routes/get_challenge_by_id'))
 
-app.get('/puzzles/:challengeId', cors(corsOptions), require('./routes/get_puzzles_by_challenge_id'))
+app.get('/puzzles/:puzzleId', cors(corsOptions), require('./routes/get_puzzle_by_id'))
+
+app.get('/challenges/:challengeId/puzzles', cors(corsOptions), require('./routes/get_puzzles_by_challenge_id'))
 
 app.get('/scores/:challengeId', cors(corsOptions), require('./routes/get_scores_by_challenge_id'))
 

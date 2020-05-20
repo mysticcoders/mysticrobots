@@ -163,8 +163,8 @@ function setupGoal({ grid, goalIndex, goalColor }) {
     return {
         x: randomCorner.x,
         y: randomCorner.y,
-        goalIndex: goalColorIndex,
-        goalColor: randomGoalColor
+        goalIndex: randomGoalIndex,
+        goalColor: goalColorIndex
     }
 }
 
