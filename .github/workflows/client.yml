@@ -5,7 +5,7 @@ name: Client CI
 
 on:
   push:
-    tags: '*'
+    # tags: '*'
     branches: [ master, staging, production ]
     paths: [ '.github/workflows/client.yml', 'stack/common', 'stack/client' ]
   pull_request:
@@ -34,13 +34,17 @@ jobs:
       if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
       run: ''
 
-  merge_to_staging:
+  push_to_staging:
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
     needs: test
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - run: git push origin master:staging --force
+    - name: Push to staging
+      uses: actions/checkout@v2
+      run: git push origin master:staging --force
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN_Actions_CI }}
+
 
   staging:
     if: github.event_name == 'push' && contains(github.ref, 'refs/heads/staging')
