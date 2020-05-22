@@ -38,7 +38,10 @@ jobs:
     steps:
     - name: Push to staging
       uses: actions/checkout@v2
-    - run: git push origin master:staging --force
+    - run: |
+        git fetch --all --prune
+        git checkout master
+        git push origin master:staging --force
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN_MYSTIC_CI }}
 
