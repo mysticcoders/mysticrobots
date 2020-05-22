@@ -21,12 +21,22 @@
   "workspaces": [
     "stack/*"
   ],
-  "scripts": {},
+  "scripts": {
+    "test:bdd": "cucumber-js features",
+    "test:e2e": "jest"
+  },
   "devDependencies": {
+    "chai": "^4.2.0",
+    "cucumber": "^6.0.5",
     "eslint-plugin-jsx-a11y": "^6.2.3",
+    "faker": "^4.1.0",
+    "jest": "^24.9.0",
+    "jest-cli": "^24.9.0",
+    "jest-puppeteer": "^4.4.0",
     "lerna": "^3.20.2",
     "mocha": "^7.1.2",
     "nodemon": "^2.0.3",
+    "puppeteer": "^3.1.0",
     "redux-immutable-state-invariant": "^2.1.0",
     "standard-version": "^7.0.0"
   }
