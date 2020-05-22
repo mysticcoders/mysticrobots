@@ -29,3 +29,17 @@ jobs:
     - run: lerna bootstrap
     - run: CI=true lerna run test --stream --scope common -- --ci --passWithNoTests
     - run: CI=true lerna run test --stream --scope client -- --ci --passWithNoTests
+
+  staging:
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    needs: test
+    steps:
+    - name: Check out from Git
+      uses: actions/checkout@v2
+
+    - name: Check if Git tag exists
+      run: echo "::set-env name=HEAD_TAG::$(git tag --points-at HEAD)"
+
+    - name: Runs only if Git tag exists
+      run: echo "This runs because Git tag points at HEAD ..."
+      if: env.HEAD_TAG != '' 
