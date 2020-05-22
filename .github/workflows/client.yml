@@ -21,7 +21,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Setup Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
@@ -29,18 +29,31 @@ jobs:
     - run: lerna bootstrap
     - run: CI=true lerna run test --stream --scope common -- --ci --passWithNoTests
     - run: CI=true lerna run test --stream --scope client -- --ci --passWithNoTests
+    - run: CI=true lerna run build --stream --scope client -- --ci
 
   staging:
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
     needs: test
     runs-on: ubuntu-latest
+
+    container: node:10.18-jessie
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
-    - name: Check out from Git
-      uses: actions/checkout@v2
-
-    - name: Check if Git tag exists
-      run: echo "::set-env name=HEAD_TAG::$(git tag --points-at HEAD)"
-
-    - name: Runs only if Git tag exists
-      run: echo "This runs because Git tag points at HEAD ..."
-      if: env.HEAD_TAG != '' 
+    - uses: actions/checkout@v2
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm i -g lerna
+    - run: lerna bootstrap
+    - run: CI=true lerna run build --stream --scope client -- --ci
