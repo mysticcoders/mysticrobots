@@ -11,3 +11,4 @@ const common = require('common');
 ```
 
 .bump-for-ci
+.bump-for-ci

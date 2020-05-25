@@ -5,7 +5,7 @@ name: Client CI
 
 on:
   push:
-    tags: '*'
+    tags: 'client*'
     branches: [ master, staging, production ]
     paths: [ '.github/workflows/client.yml', 'stack/common', 'stack/client' ]
   pull_request:
