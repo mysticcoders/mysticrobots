@@ -15,7 +15,7 @@ jobs:
   rn:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Run - bump"
+      - run: echo "Run"
 
   chk_tag:
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
