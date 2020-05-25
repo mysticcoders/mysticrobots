@@ -20,16 +20,17 @@ jobs:
         node-version: [12.x]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm i -g lerna
-    - run: lerna bootstrap
-    - run: CI=true lerna run test --stream --scope common -- --ci --passWithNoTests
-    - run: CI=true lerna run test --stream --scope client -- --ci --passWithNoTests
-    - run: CI=true lerna run build --stream --scope client -- --ci
+      - run: echo "Run"
+    # - uses: actions/checkout@v2
+    # - name: Setup Node.js ${{ matrix.node-version }}
+    #   uses: actions/setup-node@v1
+    #   with:
+    #     node-version: ${{ matrix.node-version }}
+    # - run: npm i -g lerna
+    # - run: lerna bootstrap
+    # - run: CI=true lerna run test --stream --scope common -- --ci --passWithNoTests
+    # - run: CI=true lerna run test --stream --scope client -- --ci --passWithNoTests
+    # - run: CI=true lerna run build --stream --scope client -- --ci
 
   # push_to_staging:
   #   if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
