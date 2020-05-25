@@ -9,3 +9,5 @@ const common = require('common');
 
 // TODO: DEMONSTRATE API
 ```
+
+.bump-for-ci
