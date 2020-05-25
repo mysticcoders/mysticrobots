@@ -43,7 +43,7 @@ jobs:
         git checkout master
         git push origin master:staging --force
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN_MYSTIC_CI }}
+        GITHUB_TOKEN: ${{ secrets.TOKEN_Actions_CI }}
 
 
   staging:
