@@ -45,7 +45,7 @@ jobs:
         git fetch --all --prune
         git checkout master
         git push origin master:staging --force
-      # env:
+      env:
         GITHUB_TOKEN: ${{ secrets.MysticRobots_Access }}
 
 
