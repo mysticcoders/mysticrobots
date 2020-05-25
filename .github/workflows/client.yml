@@ -38,6 +38,8 @@ jobs:
     steps:
     - name: Push to staging
       uses: actions/checkout@v2
+      with:
+        persist-credentials: false
     - run: |
         git fetch --all --prune
         git checkout master
