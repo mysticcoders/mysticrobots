@@ -34,19 +34,25 @@ struct GameView : View {
                     
                     VStack {
                         HStack {
+                            Spacer()
                             Text(self.gameLogic.elapsedTime.stringFormatted()).foregroundColor(.white).font(.system(size: 30))
                             Spacer()
                             
-                            Text("Moves: \(self.gameLogic.moves.count)").foregroundColor(.white).font(.system(size: 30))
                         }.padding()
                         
-                        ScrollView(.horizontal, showsIndicators: true) {
-                            HStack {
-                                ForEach(self.gameLogic.moveViews(), id: \.self) { moveView in
-                                    moveView
+                        VStack {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(alignment: .top, spacing: 0) {
+                                    ForEach(self.gameLogic.moveViews().reversed(), id: \.self) { moveView in
+                                        moveView.padding(.all, 5)
+                                    }
                                 }
                             }
+                            if self.gameLogic.moves.count > 0 {
+                                Text("\(self.gameLogic.moves.count)").foregroundColor(.white).font(.system(size: 30))
+                            }
                         }
+                        
                         
                     }.alert(isPresented: self.$gameLogic.solved) {
                         let alert = Alert(title: Text("Great job!"), message: Text("Level complete"), dismissButton: .default(Text("OK"), action: {

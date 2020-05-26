@@ -90,7 +90,7 @@ struct MoveView : View, Hashable {
     
     var body : some View {
         ZStack {
-            iconImageFor(move.direction).font(.system(size: 50)).foregroundColor(move.bot.color.color())
+            iconImageFor(move.direction).font(.system(size: 30)).foregroundColor(move.bot.color.color()).padding(.all, 0)
         }
     }
     
