@@ -18,6 +18,7 @@
 		706C0B662473CDFA0014FFC2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 706C0B652473CDFA0014FFC2 /* Assets.xcassets */; };
 		706C0B692473CDFA0014FFC2 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 706C0B682473CDFA0014FFC2 /* Preview Assets.xcassets */; };
 		706C0B6C2473CDFA0014FFC2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 706C0B6A2473CDFA0014FFC2 /* LaunchScreen.storyboard */; };
+		70A8E588247CEBC100F5B152 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70A8E587247CEBC100F5B152 /* GameView.swift */; };
 		70F4018F247BBBD400BB562D /* RobotButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F4018E247BBBD400BB562D /* RobotButton.swift */; };
 		70F40191247BBCD300BB562D /* BoardLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F40190247BBCD300BB562D /* BoardLogic.swift */; };
 		70F40193247BBE9F00BB562D /* SquareLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F40192247BBE9F00BB562D /* SquareLogic.swift */; };
@@ -39,6 +40,7 @@
 		706C0B682473CDFA0014FFC2 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		706C0B6B2473CDFA0014FFC2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		706C0B6D2473CDFA0014FFC2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		70A8E587247CEBC100F5B152 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
 		70F4018E247BBBD400BB562D /* RobotButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobotButton.swift; sourceTree = "<group>"; };
 		70F40190247BBCD300BB562D /* BoardLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardLogic.swift; sourceTree = "<group>"; };
 		70F40192247BBE9F00BB562D /* SquareLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareLogic.swift; sourceTree = "<group>"; };
@@ -108,6 +110,7 @@
 		70F4018D247BBBC600BB562D /* Board */ = {
 			isa = PBXGroup;
 			children = (
+				70A8E587247CEBC100F5B152 /* GameView.swift */,
 				702DA72924777E5A00D64E0D /* BoardView.swift */,
 				70F40190247BBCD300BB562D /* BoardLogic.swift */,
 				70375BD8247BC56F00D50EED /* GameLogic.swift */,
@@ -206,6 +209,7 @@
 				70F40193247BBE9F00BB562D /* SquareLogic.swift in Sources */,
 				70F4018F247BBBD400BB562D /* RobotButton.swift in Sources */,
 				706C0B622473CDF90014FFC2 /* ARBoardView.swift in Sources */,
+				70A8E588247CEBC100F5B152 /* GameView.swift in Sources */,
 				70375BD9247BC56F00D50EED /* GameLogic.swift in Sources */,
 				70F40197247BBF3000BB562D /* Goal.swift in Sources */,
 				70375BDB247BC90900D50EED /* Extensions.swift in Sources */,

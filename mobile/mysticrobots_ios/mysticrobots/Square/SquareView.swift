@@ -33,13 +33,19 @@ struct Square : View {
                 wall
             }
             
-            if logic.robot != nil {
-                RobotView(robot: logic.robot!)
+            if logic.isRobot && logic.isGoal {
+                GoalView(color: logic.goal!.color)
+            } else {
+                if logic.robot != nil {
+                    RobotView(robot: logic.robot!)
+                }
+                
+                if logic.goal != nil {
+                    GoalView(color: logic.goal!.color)
+                }
             }
             
-            if logic.goal != nil {
-                GoalView(color: logic.goal!.color)
-            }
+            
             
         }.onTapGesture {
             self.logic.onTap()
