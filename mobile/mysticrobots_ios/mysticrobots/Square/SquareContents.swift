@@ -79,24 +79,6 @@ struct GoalView : View, Hashable {
     }
 }
 
-extension Color {
-    struct Mystic {
-        static var yellow : Color {
-            return Color(red: 1, green: 1, blue: 0)
-        }
-        static var red : Color {
-            return Color(red: 1, green: 0, blue: 0)
-        }
-        static var green : Color {
-            return Color(red: 0, green: 128/255, blue: 0)
-        }
-        static var blue : Color {
-            return Color(red: 0, green: 0, blue: 1.0)
-        }
-    }
-}
-
-
 enum RobotColor : CaseIterable {
     case green, red, blue, yellow
     

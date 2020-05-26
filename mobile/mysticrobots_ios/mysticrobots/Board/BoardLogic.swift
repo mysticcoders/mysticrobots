@@ -11,13 +11,13 @@ import Combine
 
 class BoardLogic : ObservableObject {
     
-    @Published var gameLogic = GameLogic()
+    var gameLogic : GameLogic
     
     @Published var grid : [[SquareLogic]]
     
     @Published var selectedRobot : Robot?
     
-    var gameLogicObserver : AnyCancellable?
+    //var gameLogicObserver : AnyCancellable?
             
     func select(robot: Robot) {
         if let square = try? self.findRobot(robot.color) {
@@ -47,11 +47,13 @@ class BoardLogic : ObservableObject {
         
         grid = Array<[SquareLogic]>()
         self.height = height
+        self.gameLogic = GameLogic()
+        
         resetBoard()
         
-        gameLogicObserver = gameLogic.objectWillChange.sink {
-            self.objectWillChange.send()
-        }
+//        gameLogicObserver = gameLogic.objectWillChange.sink {
+//            self.objectWillChange.send()
+//        }
     }
     
     private func placeRobots() {

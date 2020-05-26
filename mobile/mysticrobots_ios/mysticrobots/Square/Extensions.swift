@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 extension TimeInterval {
     func stringFormatted() -> String {
@@ -19,4 +20,25 @@ extension TimeInterval {
         return formatter.string(from: self)! // + ".\(ms)"
     }
 
+}
+
+extension Color {
+    struct Mystic {
+        static var yellow : Color {
+            return Color(red: 1, green: 1, blue: 0)
+        }
+        static var red : Color {
+            return Color(red: 1, green: 0, blue: 0)
+        }
+        static var green : Color {
+            return Color(red: 0, green: 128/255, blue: 0)
+        }
+        static var blue : Color {
+            return Color(red: 0, green: 0, blue: 1.0)
+        }
+        static var boardBackground : Color {
+            return Color(red: 226/255, green: 206/255, blue: 170/255)
+        }
+
+    }
 }

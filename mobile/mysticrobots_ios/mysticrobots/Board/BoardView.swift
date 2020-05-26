@@ -10,7 +10,7 @@ import SwiftUI
 
 struct BoardView: View {
     
-    @Binding var boardLogic : BoardLogic
+    @ObservedObject var boardLogic : BoardLogic
     
     private func squareHeightFor(view size: CGSize) -> CGFloat {
         return CGFloat((size.width - CGFloat(boardLogic.grid.count * 2)) / CGFloat(boardLogic.grid.count) )
@@ -40,7 +40,7 @@ struct BoardView: View {
 #if DEBUG
 struct BoardView_Previews: PreviewProvider {
     static var previews: some View {
-        BoardView(boardLogic: .constant(BoardLogic(height: 16)))
+        BoardView(boardLogic: BoardLogic(height: 16))
     }
 }
 #endif

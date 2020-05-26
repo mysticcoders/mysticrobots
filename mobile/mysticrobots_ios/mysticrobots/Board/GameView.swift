@@ -9,11 +9,16 @@
 import SwiftUI
 
 struct GameView : View {
+        
+    @ObservedObject var boardLogic : BoardLogic = BoardLogic(height: 16)
+    @ObservedObject var gameLogic : GameLogic = GameLogic()
     
-    @State var boardLogic = BoardLogic(height: 16)
-    @State var gameLogic = GameLogic()
+    init() {
+        boardLogic.gameLogic = gameLogic
+        gameLogic.reset()
+    }
     
-    private var isDragging = false
+    var isDragging = false
     
     @GestureState private var dragging = false
     @GestureState private var isTapped = false
@@ -43,11 +48,17 @@ struct GameView : View {
                             }
                         }
                         
+                    }.alert(isPresented: self.$gameLogic.solved) {
+                        let alert = Alert(title: Text("Great job!"), message: Text("Level complete"), dismissButton: .default(Text("OK"), action: {
+                            self.boardLogic.resetBoard()
+                            self.gameLogic.reset()
+                        }))
+                        return alert
                     }
                     
                     Spacer()
                     
-                    BoardView(boardLogic: self.$boardLogic)
+                    BoardView(boardLogic: self.boardLogic)
                     
                     HStack {
                         RobotButton(color: .red, isSelected: self.boardLogic.selectedRobot == Robot(.red))

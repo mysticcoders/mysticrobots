@@ -17,16 +17,15 @@ struct Square : View {
     
     @ObservedObject var logic : SquareLogic
     
-    private let backgroundColor = Color(red: 226/255, green: 206/255, blue: 170/255)
-    
     var body : some View {
         ZStack {
             
             if logic.isHighlighted {
-                backgroundColor
+                Color.Mystic.boardBackground
                 logic.hightlightColor.blendMode(.screen).opacity(0.9)
             } else {
-                backgroundColor
+                Color.Mystic.boardBackground
+
             }
             
             ForEach(wallViews(), id: \.id) { wall in

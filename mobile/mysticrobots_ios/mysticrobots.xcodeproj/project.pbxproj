@@ -111,9 +111,9 @@
 			isa = PBXGroup;
 			children = (
 				70A8E587247CEBC100F5B152 /* GameView.swift */,
+				70375BD8247BC56F00D50EED /* GameLogic.swift */,
 				702DA72924777E5A00D64E0D /* BoardView.swift */,
 				70F40190247BBCD300BB562D /* BoardLogic.swift */,
-				70375BD8247BC56F00D50EED /* GameLogic.swift */,
 				70F4018E247BBBD400BB562D /* RobotButton.swift */,
 			);
 			path = Board;
