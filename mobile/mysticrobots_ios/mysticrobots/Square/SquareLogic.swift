@@ -66,9 +66,9 @@ class SquareLogic : ObservableObject {
         }
     }
     
-    func canEnter(from side: Sides) -> Bool {
+    func canEnter(from side: Sides, roboStop: Bool = true) -> Bool {
         
-        if isRobot { return false }
+        if roboStop && isRobot { return false }
                 
         let wallsAllow = !walls[side]
         
@@ -76,7 +76,7 @@ class SquareLogic : ObservableObject {
     }
     
     func canLeave(to side: Sides) -> Bool {
-        if goal != nil { return false }
+        //if goal != nil { return false }
         
         let wallsAllow = !walls[side]
         
@@ -103,9 +103,18 @@ class SquareLogic : ObservableObject {
         
     }
     
+    
+    
+}
+
+extension SquareLogic : CustomStringConvertible {
+    var description: String {
+        return "(\(coordinate.x):\(coordinate.y))"
+    }
 }
 
 extension SquareLogic : Identifiable, Hashable {
+    
     
     //makes view iteration possible
     static func == (lhs: SquareLogic, rhs: SquareLogic) -> Bool {

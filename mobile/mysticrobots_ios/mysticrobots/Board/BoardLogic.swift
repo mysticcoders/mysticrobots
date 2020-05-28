@@ -11,7 +11,7 @@ import Combine
 
 class BoardLogic : ObservableObject {
     
-    var gameLogic : GameLogic
+    var game : GameLogic?
     
     @Published var grid : [[SquareLogic]]
     
@@ -43,13 +43,22 @@ class BoardLogic : ObservableObject {
         }
     }
     
+    func findGoal() throws -> SquareLogic  {
+        
+        if let square = allSquares().first(where: { $0.isGoal }) {
+            return square
+        } else {
+            print("Goal is missing - not possible")
+            throw LogicError.runtimeError("Goal is missing")
+        }
+    }
+    
     init(height: Int) {
         
         grid = Array<[SquareLogic]>()
         self.height = height
-        self.gameLogic = GameLogic()
         
-        resetBoard()
+        initBoard()
         
 //        gameLogicObserver = gameLogic.objectWillChange.sink {
 //            self.objectWillChange.send()
@@ -140,15 +149,10 @@ class BoardLogic : ObservableObject {
         }
     }
     
-    func path(_ side: Sides, fromSquare: SquareLogic) -> [SquareLogic] {
+    func path(_ side: Sides, fromSquare: SquareLogic, roboStop: Bool = true) -> [SquareLogic] {
         
         var fullPath : [SquareLogic] = []
         var possiblePath : [SquareLogic] = []
-        
-        guard let bot = fromSquare.robot else {
-            print("path from non-robotic square, not accounted for...")
-            return []
-        }
         
         if !fromSquare.canLeave(to: side) {
             return []
@@ -164,9 +168,9 @@ class BoardLogic : ObservableObject {
         for square in fullPath {
             
             //if can move to nextSquare - add to path
-            if square.canEnter(from: side.opposite) {
+            if square.canEnter(from: side.opposite, roboStop: roboStop) {
                 
-                if square.isGoal {
+                if square.isGoal, let bot = fromSquare.robot {
                     if square.canFinish(bot) {
                         possiblePath.append(square)
                         return possiblePath
@@ -220,9 +224,9 @@ class BoardLogic : ObservableObject {
                 
                 if destination.isGoal && destination.goal!.color == bot {
                     print("SUCCESS!! Level completed")
-                    self.gameLogic.recordGoalMove(move)
+                    self.game?.recordGoalMove(move)
                 } else {
-                    self.gameLogic.recordMove(move)
+                    self.game?.recordMove(move)
                 }
                 
                 highlightOff()
@@ -252,6 +256,11 @@ class BoardLogic : ObservableObject {
 extension BoardLogic {
     
     func resetBoard() {
+        initBoard()
+        game?.reset()
+    }
+    
+    func initBoard() {
         
         grid = Array<[SquareLogic]>()
         
@@ -269,7 +278,17 @@ extension BoardLogic {
         placeRobots()
         placeGoal()
         
-        gameLogic.reset()
+//        let root = Solver(self).solution()
+//        hightlightNodes(node: root)
+        
+        
+    }
+    
+    func hightlightNodes(node: Node) {
+        for childNode in node.children {
+            childNode.square.isHighlighted = true
+            hightlightNodes(node: childNode)
+        }
     }
     
     func squareAt(_ coordinate: BoardCoordinate) -> SquareLogic {

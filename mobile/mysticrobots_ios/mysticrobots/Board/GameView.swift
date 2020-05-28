@@ -10,11 +10,11 @@ import SwiftUI
 
 struct GameView : View {
         
-    @ObservedObject var boardLogic : BoardLogic = BoardLogic(height: 16)
+    //@ObservedObject var boardLogic : BoardLogic = BoardLogic(height: 16)
     @ObservedObject var gameLogic : GameLogic = GameLogic()
     
     init() {
-        boardLogic.gameLogic = gameLogic
+        //boardLogic.gameLogic = gameLogic
         gameLogic.reset()
     }
     
@@ -38,25 +38,31 @@ struct GameView : View {
                             Text(self.gameLogic.elapsedTime.stringFormatted()).foregroundColor(.white).font(.system(size: 30))
                             Spacer()
                             
+                            
                         }.padding()
                         
                         VStack {
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(alignment: .top, spacing: 0) {
-                                    ForEach(self.gameLogic.moveViews().reversed(), id: \.self) { moveView in
-                                        moveView.padding(.all, 5)
+                            HStack {
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack(alignment: .top, spacing: 0) {
+                                        ForEach(self.gameLogic.moveViews().reversed(), id: \.self) { moveView in
+                                            moveView.padding(.all, 5)
+                                        }
                                     }
                                 }
-                            }
-                            if self.gameLogic.moves.count > 0 {
-                                Text("\(self.gameLogic.moves.count)").foregroundColor(.white).font(.system(size: 30))
-                            }
+                                
+                                if self.gameLogic.moves.count > 0 {
+                                    Text("\(self.gameLogic.moves.count)").foregroundColor(.white).font(.system(size: 20)).padding(.trailing, 20)
+                                }
+                            }.frame(minHeight: 50)
+                            
+                            
                         }
                         
                         
                     }.alert(isPresented: self.$gameLogic.solved) {
                         let alert = Alert(title: Text("Great job!"), message: Text("Level complete"), dismissButton: .default(Text("OK"), action: {
-                            self.boardLogic.resetBoard()
+                            self.gameLogic.boardLogic.resetBoard()
                             self.gameLogic.reset()
                         }))
                         return alert
@@ -64,29 +70,29 @@ struct GameView : View {
                     
                     Spacer()
                     
-                    BoardView(boardLogic: self.boardLogic)
+                    BoardView(boardLogic: self.gameLogic.boardLogic)
                     
                     HStack {
-                        RobotButton(color: .red, isSelected: self.boardLogic.selectedRobot == Robot(.red))
+                        RobotButton(color: .red, isSelected: self.gameLogic.boardLogic.selectedRobot == Robot(.red))
                             .gesture(DragGesture(minimumDistance: 0).updating(self.$isTapped, body: { (_, isTapped, _) in
-                                self.boardLogic.select(robot: Robot(.red))
+                                self.gameLogic.boardLogic.select(robot: Robot(.red))
                             }))
                             .simultaneousGesture(self.dragGesture)
                         
-                        RobotButton(color: .green, isSelected: self.boardLogic.selectedRobot == Robot(.green))
+                        RobotButton(color: .green, isSelected: self.gameLogic.boardLogic.selectedRobot == Robot(.green))
                             .gesture(DragGesture(minimumDistance: 0).updating(self.$isTapped, body: { (_, isTapped, _) in
-                                self.boardLogic.select(robot: Robot(.green))
+                                self.gameLogic.boardLogic.select(robot: Robot(.green))
                             }))
                             .simultaneousGesture(self.dragGesture)
                         
-                        RobotButton(color: .blue, isSelected: self.boardLogic.selectedRobot == Robot(.blue))                          .gesture(DragGesture(minimumDistance: 0).updating(self.$isTapped, body: { (_, isTapped, _) in
-                            self.boardLogic.select(robot: Robot(.blue))
+                        RobotButton(color: .blue, isSelected: self.gameLogic.boardLogic.selectedRobot == Robot(.blue))                          .gesture(DragGesture(minimumDistance: 0).updating(self.$isTapped, body: { (_, isTapped, _) in
+                            self.gameLogic.boardLogic.select(robot: Robot(.blue))
                         }))
                             .simultaneousGesture(self.dragGesture)
                         
                         
-                        RobotButton(color: .yellow, isSelected: self.boardLogic.selectedRobot == Robot(.yellow))                         .gesture(DragGesture(minimumDistance: 0).updating(self.$isTapped, body: { (_, isTapped, _) in
-                            self.boardLogic.select(robot: Robot(.yellow))
+                        RobotButton(color: .yellow, isSelected: self.gameLogic.boardLogic.selectedRobot == Robot(.yellow))                         .gesture(DragGesture(minimumDistance: 0).updating(self.$isTapped, body: { (_, isTapped, _) in
+                            self.gameLogic.boardLogic.select(robot: Robot(.yellow))
                         }))
                             .simultaneousGesture(self.dragGesture)
                         
@@ -99,7 +105,7 @@ struct GameView : View {
                     HStack {
                         Spacer()
                         Button(action: {
-                            self.boardLogic.resetBoard()
+                            self.gameLogic.boardLogic.resetBoard()
                         }) {
                             Image(systemName: "arrow.clockwise.circle.fill").font(.system(size: 60)).foregroundColor(.white)
                         }
@@ -128,18 +134,18 @@ struct GameView : View {
         DragGesture()
             .onChanged { value in
                 let direction = self.dragDirection(value: value)
-                if let bot = self.boardLogic.selectedRobot?.color {
-                    let square = try! self.boardLogic.findRobot(bot)
+                if let bot = self.gameLogic.boardLogic.selectedRobot?.color {
+                    let square = try! self.gameLogic.boardLogic.findRobot(bot)
                     
-                    self.boardLogic.highlightPath(directions: [direction], for: square)
+                    self.gameLogic.boardLogic.highlightPath(directions: [direction], for: square)
                 }
                 
                 //print(direction)
         }
         .onEnded { value in
             let direction = self.dragDirection(value: value)
-            if let bot = self.boardLogic.selectedRobot?.color {
-                self.boardLogic.moveRobot(bot, direction)
+            if let bot = self.gameLogic.boardLogic.selectedRobot?.color {
+                self.gameLogic.boardLogic.moveRobot(bot, direction)
             }
             //print(direction)
         }

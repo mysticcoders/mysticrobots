@@ -32,12 +32,20 @@ struct Move : Hashable {
 
 class GameLogic : ObservableObject {
     
+    @ObservedObject var boardLogic : BoardLogic
+
     @Published var elapsedTime : TimeInterval = 0
     
     var moves : [Move] = []
     var startTime : Date = Date()
     
     var timer : Timer?
+    
+    init() {
+        self.boardLogic = BoardLogic(height: 16)
+        self.boardLogic.game = self
+        self.boardLogic.resetBoard()
+    }
     
     @Published var solved : Bool = false
     
@@ -57,8 +65,11 @@ class GameLogic : ObservableObject {
         startTime = Date()
         
         self.timer  = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-            self.elapsedTime = Date().timeIntervalSince(self.startTime)
-            self.objectWillChange.send()
+            if !self.solved {
+                self.elapsedTime = Date().timeIntervalSince(self.startTime)
+                self.objectWillChange.send()
+            }
+            
             //print(self.elapsedTime)
         }
     }

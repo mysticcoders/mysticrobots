@@ -9,7 +9,7 @@
 import Foundation
 import SwiftUI
 
-enum Sides {
+enum Sides : CustomStringConvertible {
     case east, west, north, south
     
     func isVertical() -> Bool {
@@ -39,7 +39,15 @@ enum Sides {
             case .north: return .south
             case .south: return .north
         }
-        
+    }
+    
+    var description: String {
+        switch self {
+            case .east: return "East"
+            case .west: return "West"
+            case .north: return "North"
+            case .south: return "South"
+        }
     }
 }
 

@@ -94,7 +94,8 @@ class SquareWalls {
     
 }
 
-struct BoardCoordinate {
+struct BoardCoordinate : Equatable {
+
     var x : Int
     var y : Int
     
