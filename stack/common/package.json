@@ -2,7 +2,7 @@
   "name": "common",
   "version": "0.1.3",
   "private": true,
-  "main": "lib/common.js",
+  "main": "index.js",
   "directories": {
     "lib": "lib",
     "test": "test"
@@ -16,6 +16,11 @@
     }
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "knex": "knex"
+  },
+  "dependencies": {
+    "knex": "^0.21.1",
+    "objection": "^2.1.5"
   }
 }
