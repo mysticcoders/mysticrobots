@@ -1,16 +1,16 @@
-const { pool } = require('../../server/database')
+// const { pool } = require('../../server/database')
 
 const get_scores_by_challenge_id = async ({ challengeId }) => {
-    if(!challengeId) {
-        throw new Error("Challenge ID required")
-    }
+    // if(!challengeId) {
+    //     throw new Error("Challenge ID required")
+    // }
 
-    let query = `SELECT id, challenge_id, name, ip_address, 
-                    move_count. created_at FROM score WHERE challenge_id = $1`
+    // let query = `SELECT id, challenge_id, name, ip_address, 
+    //                 move_count. created_at FROM score WHERE challenge_id = $1`
 
-    const result = await pool.query(query, [challengeId])
+    // const result = await pool.query(query, [challengeId])
 
-    return result.rows
+    // return result.rows
 }
 
 /**

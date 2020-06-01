@@ -1,4 +1,4 @@
-const scores = require('../services/scores')
+const scores = require('common').services.scores
 
 const get_scores_by_challenge_id = async (req, res) => {
     const challengeId = req.params.challengeId

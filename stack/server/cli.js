@@ -1,11 +1,12 @@
 
 const { board } = require('common')
 
-const puzzles = require('./services/puzzles')
+const puzzles = require('common').services.puzzles
 
 const main = (argv) => {
 
     if(argv.board) {
+        console.log(`--board`)
         const challengeId = argv.challengeId
     
         if(!challengeId) {
@@ -21,7 +22,11 @@ const main = (argv) => {
             const goalData = board.setupGoal({grid})
             const robotData = board.setupRobots({grid})
 
-            puzzles.save_puzzle({ 
+            console.dir(boardData)
+            console.dir(goalData)
+            console.dir(robotData)
+            
+            puzzles.savePuzzle({ 
                 challengeId, 
                 goalColor: goalData.goalColor,
                 goalIndex: goalData.goalIndex,

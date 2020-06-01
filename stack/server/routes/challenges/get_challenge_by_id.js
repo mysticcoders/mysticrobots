@@ -1,4 +1,4 @@
-const challenges = require('../../../common/services/challenges')
+const challenges = require('common').services.challenges
 
 const get_challenge_by_id = async (req, res) => {
     const challengeId = req.params.challengeId
