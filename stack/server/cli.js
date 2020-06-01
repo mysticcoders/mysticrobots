@@ -1,9 +1,20 @@
 
+const { knexSnakeCaseMappers, Model } = require('objection')
+const Knex = require('knex')
+
+const knex = Knex({
+    client: 'pg',
+    connection: process.env.PG_CONNECTION_STRING,
+    ...knexSnakeCaseMappers()
+})
+
+Model.knex(knex)
+
 const { board } = require('common')
 
-const puzzles = require('./services/puzzles')
+const puzzles = require('common').services.puzzles
 
-const main = (argv) => {
+const main = async (argv) => {
 
     if(argv.board) {
         const challengeId = argv.challengeId
@@ -21,7 +32,7 @@ const main = (argv) => {
             const goalData = board.setupGoal({grid})
             const robotData = board.setupRobots({grid})
 
-            puzzles.save_puzzle({ 
+            await puzzles.savePuzzle({ 
                 challengeId, 
                 goalColor: goalData.goalColor,
                 goalIndex: goalData.goalIndex,
@@ -31,8 +42,10 @@ const main = (argv) => {
                 yellowBot: robotData.yIndex,
                 config: boardData.config
             })
-        }        
+        }
     }
+
+    knex.destroy()
 }
 
 

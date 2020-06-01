@@ -1,0 +1,121 @@
+{
+	"info": {
+		"_postman_id": "bbc23377-b5e3-4059-841e-079c228473c6",
+		"name": "Mystic Robots API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Fetch Latest Challenges",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/challenges?latest=true",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"challenges"
+					],
+					"query": [
+						{
+							"key": "latest",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch Challenge By ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/challenges?latest=true",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"challenges"
+					],
+					"query": [
+						{
+							"key": "latest",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch Puzzles by Challenge By ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/challenges/82a55fa2-c5cd-4377-9a43-72ffee9746a6/puzzles",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"challenges",
+						"82a55fa2-c5cd-4377-9a43-72ffee9746a6",
+						"puzzles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Puzzle by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/puzzles/d32f29da-b055-49ab-9e89-bdfe323e8a69",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"puzzles",
+						"d32f29da-b055-49ab-9e89-bdfe323e8a69"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Scores by Challenge ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/scores/d32f29da-b055-49ab-9e89-bdfe323e8a69",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"scores",
+						"d32f29da-b055-49ab-9e89-bdfe323e8a69"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
