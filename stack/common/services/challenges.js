@@ -1,4 +1,4 @@
-const { pool } = require('../database')
+const Challenge = require('../models/Challenge')
 
 const moment = require('moment')
 

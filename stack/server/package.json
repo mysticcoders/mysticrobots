@@ -1,9 +1,10 @@
 {
-  "name": "server",
+  "name": "@mysticrobots/server",
   "version": "0.1.1",
   "private": true,
   "main": "index.js",
   "dependencies": {
+    "@mysticrobots/common": "file:../common",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
@@ -18,6 +19,12 @@
     "release": "standard-version",
     "start": "nodemon -q -L -e js,json,yml,yaml --exec 'node -r dotenv/config index.js'",
     "cli": "node -r dotenv/config cli.js"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   },
   "standard-version": {
     "skip": {

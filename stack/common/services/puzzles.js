@@ -1,4 +1,4 @@
-const { pool } = require('../database')
+const { pool } = require('../../server/database')
 const { GOAL } = require('common')
 
 const get_puzzles_by_challenge_id = async({ challengeId }) => {

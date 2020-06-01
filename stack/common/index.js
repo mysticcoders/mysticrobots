@@ -1,7 +1,7 @@
 const models = require('./models')
-const board = require('./common/board')
-const utils = require('./common/utils')
-const constants = require('./common/constants')
+const board = require('./lib/board')
+const utils = require('./lib/utils')
+const constants = require('./lib/constants')
 
 module.exports = {
     board,

@@ -1,4 +1,4 @@
-const { pool } = require('../database')
+const { pool } = require('../../server/database')
 
 const get_scores_by_challenge_id = async ({ challengeId }) => {
     if(!challengeId) {

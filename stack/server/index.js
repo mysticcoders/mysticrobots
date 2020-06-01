@@ -2,10 +2,15 @@
 const express = require('express');
 const morgan = require('morgan');
 const rfs = require('rotating-file-stream');
-const http = require('http');
 
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const { knexSnakeCaseMappers, Model } = require('objection')
+const Knex = require('knex')
+
+const common = require('common')
+
+console.dir(common)
 
 const { board } = require('common')
 
@@ -20,11 +25,19 @@ const STAGING_ENVIRONMENT = 'staging';
 const PRODUCTION_ENVIRONMENT = 'prod';
 const SERVER_PORT = process.env.PORT || 5000
 
-// Set up basic access logging with file rotation:
-app.use(morgan('combined', {stream: rfs.createStream('access.log', {maxFiles: 5, size: '100M'})}));
+const knex = Knex({
+    client: 'pg',
+    connection: process.env.PG_CONNECTION_STRING,
+    ...knexSnakeCaseMappers()
+})
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+Model.knex(knex)
+
+// Turn on for debug mode
+// 
+// knex.on('query', (queryData) => {
+//     console.log(queryData)
+// })
 
 const whitelist = ['localhost', 'mysticrobots.com', 'mysticrobots.netlify.com', 'mysticrobots-staging.netlify.com']
 const corsOptions = {
@@ -37,61 +50,20 @@ const corsOptions = {
             callback(null, false)
         }
     }
-};
+}
 
 app.options('*', cors(corsOptions))
 
-/**
- * Mimic the finagle lifecycle management endpoints.
- */
+// Set up basic access logging with file rotation:
+app.use(morgan('combined', {stream: rfs.createStream('access.log', {maxFiles: 5, size: '100M'})}));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/health', require('./routes/health_check'));
+app.use('/challenges', require('./routes/challenges'))
+app.use('/puzzles', require('./routes/puzzles'))
+app.use('/scores', require('./routes/scores'))
 
-app.get('/challenges', cors(corsOptions), require('./routes/get_challenges'))
+const server = app.listen(SERVER_PORT)
 
-app.get('/challenges/:id', cors(corsOptions), require('./routes/get_challenge_by_id'))
-
-app.get('/puzzles/:puzzleId', cors(corsOptions), require('./routes/get_puzzle_by_id'))
-
-app.get('/challenges/:challengeId/puzzles', cors(corsOptions), require('./routes/get_puzzles_by_challenge_id'))
-
-app.get('/scores/:challengeId', cors(corsOptions), require('./routes/get_scores_by_challenge_id'))
-
-app.post('/scores/:challengeId', cors(corsOptions), require('./routes/save_score_by_challenge_id'))
-
-const server = app.listen(SERVER_PORT, function() {
-		/**
-		 * The TFE expects keep-alive connections to remain open forever. Expressjs defaults to a
-		 * timeout of 2 minutes. This causes many ChannelClosedExceptions for the TFE.
-		 */
-    server.setTimeout(0)
-    console.log(`${APP_NAME} v${APP_VERSION} listening on ${SERVER_PORT}`)
-
-    /**
-     * Node's default behavior is to close the connection on upgrade requests. The HTTP2 spec
-     * prefers that servers that do not support HTTP2 return a normal HTTP response, without
-     * HTTP2 headers. This is another source of TFE ChannelClosedExceptions, as well as
-     * com.twitter.io.ReaderDiscardedException stream failures.
-     *
-     * See https://phabricator.twitter.biz/D188570 for a very detailed explanation.
-     *
-     * Note: This will be unneccessary if/when we upgrade to node v10.
-     */
-    server.on('upgrade', (req, sock, head) => {
-        const res = new http.ServerResponse(req);
-
-        sock.on('drain', () => {
-            res.emit('drain');
-        });
-
-        res.assignSocket(sock);
-
-        res.on('finish', () => {
-            res.detachSocket(sock);
-            sock.end();
-        });
-
-        server.emit('request', req, res);
-   });
-
-});
+module.exports = { app, server }

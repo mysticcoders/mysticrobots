@@ -2024,6 +2024,12 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
+"@mysticrobots/common@file:stack/common":
+  version "0.1.3"
+  dependencies:
+    knex "^0.21.1"
+    objection "^2.1.5"
+
 "@nodelib/fs.stat@^1.1.2":
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.stat/-/fs.stat-1.1.3.tgz#2b5a3ab3f918cca48a8c754c08168e3f03eba61b"
@@ -2990,6 +2996,7 @@ anymatch@~3.1.1:
 "api@file:stack/server":
   version "0.1.1"
   dependencies:
+    "@mysticrobots/common" "file:../../../Library/Caches/Yarn/v6/npm-api-0.1.1-fdd88206-5b93-45e4-8ec9-ae4ecdb78eed-1591030461954/node_modules/common"
     body-parser "^1.19.0"
     cors "^2.8.5"
     dotenv "^8.2.0"
@@ -4219,6 +4226,7 @@ cli-width@^2.0.0:
 "client@file:stack/client":
   version "0.1.24"
   dependencies:
+    "@mysticrobots/common" "file:../../../Library/Caches/Yarn/v6/npm-client-0.1.24-fb0399a2-a3ea-41b7-956d-a712b6cfca4e-1591030462063/node_modules/common"
     "@reduxjs/toolkit" "^1.3.5"
     "@testing-library/jest-dom" "^4.2.4"
     "@testing-library/react" "^9.5.0"
