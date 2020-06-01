@@ -1,6 +1,6 @@
 const Challenge = require('../models/Challenge')
 
-const get_challenges = async ({ latest }) => {
+const getChallenges = async ({ latest }) => {
 
     if(latest && latest === 'true') {
         return await Challenge.query().select('id', 'startTime', 'endTime', 'createdAt').first().orderBy('createdAt', 'desc')
@@ -8,7 +8,7 @@ const get_challenges = async ({ latest }) => {
     return await Challenge.query().select('id', 'startTime', 'endTime', 'createdAt')
 }
 
-const get_challenge_by_id = async({ challengeId }) => {
+const getChallengeById = async({ challengeId }) => {
     if(!challengeId) {
         throw new Error("Challenge ID required")
     }
@@ -17,6 +17,6 @@ const get_challenge_by_id = async({ challengeId }) => {
 }
 
 module.exports = {
-    get_challenges,
-    get_challenge_by_id,
+    getChallenges,
+    getChallengeById,
 }

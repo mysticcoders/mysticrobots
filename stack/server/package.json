@@ -18,7 +18,8 @@
   "scripts": {
     "release": "standard-version",
     "start": "nodemon -q -L -e js,json,yml,yaml --exec 'node -r dotenv/config index.js'",
-    "cli": "node -r dotenv/config cli.js"
+    "cli": "node -r dotenv/config cli.js",
+    "test": "NODE_ENV=test jest"
   },
   "jest": {
     "testEnvironment": "node",
@@ -30,5 +31,8 @@
     "skip": {
       "tag": true
     }
+  },
+  "devDependencies": {
+    "supertest": "^4.0.2"
   }
 }

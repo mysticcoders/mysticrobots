@@ -2,32 +2,20 @@ const ChallengePuzzle = require('../models/ChallengePuzzle')
 
 const { GOAL } = require('../lib/common')
 
-const get_puzzles_by_challenge_id = async({ challengeId }) => {
-    // if(!challengeId) {
-    //     throw new Error("Challenge ID required")
-    // }
+const getPuzzlesByChallengeId = async({ challengeId }) => {
+    if(!challengeId) {
+        throw new Error("Challenge ID required")
+    }
 
-    // let query = `SELECT id, challenge_id, goal_color, goal_index, 
-    //                 red_bot, green_bot, blue_bot, yellow_bot, config, 
-    //                 created_at FROM challenge_puzzle WHERE challenge_id = $1`
-
-    // const result = await pool.query(query, [challengeId])
-
-    // return result.rows
+    return await ChallengePuzzle.query().where('challengeId', challengeId)
 }
 
-const get_puzzle_by_id = async({ puzzleId }) => {
-    // if(!puzzleId) {
-    //     throw new Error("Puzzle ID required")
-    // }
+const getPuzzleById = async({ puzzleId }) => {
+    if(!puzzleId) {
+        throw new Error("Puzzle ID required")
+    }
 
-    // let query = `SELECT id, challenge_id, goal_color, goal_index, 
-    //                 red_bot, green_bot, blue_bot, yellow_bot, config, 
-    //                 created_at FROM challenge_puzzle WHERE id = $1`
-
-    // const result = await pool.query(query, [puzzleId])
-
-    // return result.rows[0]
+    return await ChallengePuzzle.query().findById(puzzleId).first()
 }
 
 const savePuzzle = async({ 
@@ -62,7 +50,7 @@ const savePuzzle = async({
 }
 
 module.exports = {
-    get_puzzles_by_challenge_id,
-    get_puzzle_by_id,
+    getPuzzlesByChallengeId,
+    getPuzzleById,
     savePuzzle,
 }

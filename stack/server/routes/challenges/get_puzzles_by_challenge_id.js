@@ -8,7 +8,7 @@ const get_puzzles_by_challenge_id = async (req, res) => {
         return
     }
     
-    const data = await puzzles.get_puzzles_by_challenge_id({challengeId})
+    const data = await puzzles.getPuzzlesByChallengeId({challengeId})
     res.send(data)
 }
 

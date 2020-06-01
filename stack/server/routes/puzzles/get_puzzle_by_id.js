@@ -8,7 +8,7 @@ const get_puzzle_by_id = async (req, res) => {
         return
     }
  
-    const data = await puzzles.get_puzzle_by_id({ puzzleId })
+    const data = await puzzles.getPuzzleById({ puzzleId })
 
     if(!data) {
         res.status(404).send("No puzzle found")

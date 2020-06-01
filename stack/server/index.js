@@ -10,8 +10,6 @@ const Knex = require('knex')
 
 const common = require('common')
 
-console.dir(common)
-
 const { board } = require('common')
 
 const {
@@ -21,9 +19,11 @@ const {
 
 const app = express();
 
+const TEST_ENVIRONMENT = 'test';
 const STAGING_ENVIRONMENT = 'staging';
 const PRODUCTION_ENVIRONMENT = 'prod';
-const SERVER_PORT = process.env.PORT || 5000
+
+const SERVER_PORT = process.env.NODE_ENV === 'test' ? 5001 : 5000
 
 const knex = Knex({
     client: 'pg',

@@ -8,7 +8,7 @@ const get_challenge_by_id = async (req, res) => {
         return
     }
  
-    const data = await challenges.get_challenge_by_id({ challengeId: req.params.challengeId })
+    const data = await challenges.getChallengeById({ challengeId: req.params.challengeId })
 
     if(!data) {
         res.status(404).send("No challenge found")
