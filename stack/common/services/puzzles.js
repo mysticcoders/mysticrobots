@@ -42,14 +42,14 @@ const savePuzzle = async({
 
     const goals = Object.values(GOAL)
 
-    if(goalIndex < 0 || goalIndex > goals.length - 1) {
-        console.error(`Goal index must be a value between 0 and ${goals.length - 1}`)
-        return
-    }
+    // if(goalIndex < 0 || goalIndex > goals.length - 1) {
+    //     console.error(`Goal index must be a value between 0 and ${goals.length - 1}`)
+    //     return
+    // }
 
     const goalColorIndex = goals.indexOf(goalColor)
 
-    const puzzle = await ChallengePuzzle.query().insert({
+    return await ChallengePuzzle.query().insert({
         challengeId: challengeId,
         goalColor: goalColor,
         goalIndex: goalIndex,
@@ -59,8 +59,6 @@ const savePuzzle = async({
         yellowBot: yellowBot,
         config: config,
     })
-
-    return puzzle
 }
 
 module.exports = {
