@@ -85,11 +85,18 @@ class SquareLogic : ObservableObject {
     }
     
     func onTap() {
-        if self.robot != nil {
-            boardLogic?.highlightPath(directions: Sides.all, for: self)
+        if let bot = self.robot {
+            boardLogic?.select(robot: bot)
+            //boardLogic?.highlightPath(directions: Sides.all, for: self)
+        } else {
+            //check surrounding squares for robot, perhaps it's there
+            if let botSquare = boardLogic!.surroundingSquares(for: self).first(where: { $0.robot != nil }) {
+                print("Found bot nearby")
+                boardLogic?.select(robot: botSquare.robot!)
+            }
         }
         
-        print("\(coordinate.x):\(coordinate.y) Walls: \(walls.all) \(self.robot != nil ? self.robot!.color.color().description : "")")
+        //print("\(coordinate.x):\(coordinate.y) Walls: \(walls.all) \(self.robot != nil ? self.robot!.color.color().description : "")")
         //boardLogic?.randomRange().forEach { $0.isHighlighted.toggle() }
         //boardLogic?.surroundingSquares(for: self).forEach { $0.isHighlighted.toggle() }
         

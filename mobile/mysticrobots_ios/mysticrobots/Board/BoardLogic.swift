@@ -357,8 +357,8 @@ extension BoardLogic {
         let yRange = square.coordinate.y-1...square.coordinate.y+1
         
         let surroundingSquares : [SquareLogic] = squaresFor(xRange: xRange, yRange: yRange)
-        
-        return surroundingSquares.filter { $0 != square }
+        let excludingCenter = surroundingSquares.filter { $0 != square }
+        return excludingCenter
     }
     
     func squaresFor(xRange:ClosedRange<Int>, yRange: ClosedRange<Int>) -> [SquareLogic] {

@@ -27,7 +27,7 @@ struct BoardView: View {
                     HStack(alignment: .top, spacing: 2) {
                         ForEach(row, id: \.id) { square in
                             Square(logic: square).frame(width: self.squareHeightFor(view: geo.size), height: self.squareHeightFor(view: geo.size), alignment: .center)
-                                .padding(.all, 0)
+                                .padding(.all, 0) //.simultaneousGesture(self.touchDownGesture)
                         }
                     }
                 }

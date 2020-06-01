@@ -17,6 +17,23 @@ struct Square : View {
     
     @ObservedObject var logic : SquareLogic
     
+    var dragManager : DragManager
+    
+    init(logic: SquareLogic) {
+        
+        self.logic = logic
+        
+        self.dragManager = DragManager(onTouchDown: {
+            logic.onTap()
+        }, onSwipe: { direction in
+            if let robot = logic.boardLogic?.selectedRobot {
+                logic.boardLogic?.moveRobot(robot.color, direction)
+            } else {
+                print("No selected robot")
+            }
+        })
+    }
+    
     var body : some View {
         ZStack {
             
@@ -46,9 +63,10 @@ struct Square : View {
             
             
             
-        }.onTapGesture {
-            self.logic.onTap()
-        }
+        }.simultaneousGesture(self.dragManager.dragGesture)
+//        {
+//            self.logic.onTap()
+//        }
     }
     
     /// outputs borders(walls) according to walls in the Square

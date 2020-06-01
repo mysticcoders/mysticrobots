@@ -19,6 +19,7 @@
 		706C0B692473CDFA0014FFC2 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 706C0B682473CDFA0014FFC2 /* Preview Assets.xcassets */; };
 		706C0B6C2473CDFA0014FFC2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 706C0B6A2473CDFA0014FFC2 /* LaunchScreen.storyboard */; };
 		7079B7F0247F5C0300C358EA /* Solver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7079B7EF247F5C0300C358EA /* Solver.swift */; };
+		7094DDE22484B60B00EDF71B /* DragManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7094DDE12484B60B00EDF71B /* DragManager.swift */; };
 		70A8E588247CEBC100F5B152 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70A8E587247CEBC100F5B152 /* GameView.swift */; };
 		70F4018F247BBBD400BB562D /* RobotButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F4018E247BBBD400BB562D /* RobotButton.swift */; };
 		70F40191247BBCD300BB562D /* BoardLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F40190247BBCD300BB562D /* BoardLogic.swift */; };
@@ -42,6 +43,7 @@
 		706C0B6B2473CDFA0014FFC2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		706C0B6D2473CDFA0014FFC2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7079B7EF247F5C0300C358EA /* Solver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Solver.swift; sourceTree = "<group>"; };
+		7094DDE12484B60B00EDF71B /* DragManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DragManager.swift; sourceTree = "<group>"; };
 		70A8E587247CEBC100F5B152 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
 		70F4018E247BBBD400BB562D /* RobotButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobotButton.swift; sourceTree = "<group>"; };
 		70F40190247BBCD300BB562D /* BoardLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardLogic.swift; sourceTree = "<group>"; };
@@ -126,6 +128,7 @@
 			isa = PBXGroup;
 			children = (
 				702DA7272477772700D64E0D /* SquareView.swift */,
+				7094DDE12484B60B00EDF71B /* DragManager.swift */,
 				70F40192247BBE9F00BB562D /* SquareLogic.swift */,
 				70F40194247BBF1800BB562D /* Robot.swift */,
 				70F40196247BBF3000BB562D /* Goal.swift */,
@@ -211,6 +214,7 @@
 				70F40191247BBCD300BB562D /* BoardLogic.swift in Sources */,
 				70F40193247BBE9F00BB562D /* SquareLogic.swift in Sources */,
 				70F4018F247BBBD400BB562D /* RobotButton.swift in Sources */,
+				7094DDE22484B60B00EDF71B /* DragManager.swift in Sources */,
 				7079B7F0247F5C0300C358EA /* Solver.swift in Sources */,
 				706C0B622473CDF90014FFC2 /* ARBoardView.swift in Sources */,
 				70A8E588247CEBC100F5B152 /* GameView.swift in Sources */,
@@ -356,8 +360,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1.0.03;
 				DEVELOPMENT_ASSET_PATHS = "\"mysticrobots/Preview Content\"";
 				DEVELOPMENT_TEAM = REMBT6JY4N;
@@ -370,7 +374,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mysticcoders.mysticrobots;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "Mystic App Store";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -380,8 +384,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1.0.03;
 				DEVELOPMENT_ASSET_PATHS = "\"mysticrobots/Preview Content\"";
 				DEVELOPMENT_TEAM = REMBT6JY4N;
@@ -394,7 +398,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mysticcoders.mysticrobots;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "Mystic App Store";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
