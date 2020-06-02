@@ -49,8 +49,15 @@ class GameLogic : ObservableObject {
     
     @Published var solved : Bool = false
     
+    
+    func simpleSuccess() {
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.success)
+    }
+    
     func recordMove(_ move: Move) {
         self.moves.append(move)
+        simpleSuccess()
     }
     
     func recordGoalMove(_ move: Move) {

@@ -62,7 +62,7 @@ struct WallView : View, Hashable {
     
     var body : some View {
         ZStack {
-            EdgeBorder(width: 3, edge: edge).foregroundColor(Color.black)
+            EdgeBorder(width: 2, edge: edge).foregroundColor(Color.black)
         }
     }
 }
@@ -74,7 +74,7 @@ struct GoalView : View, Hashable {
     
     var body : some View {
         ZStack {
-            Image("star").resizable().padding(3).foregroundColor(color.color())
+            Image("star").resizable().padding(3).foregroundColor(color.color()).shadow(color: Color.black.opacity(0.4), radius: 3, x: 0, y: 0)
         }
     }
     
@@ -115,7 +115,7 @@ struct RobotView : View, Hashable {
     
     var body : some View {
         ZStack {
-            Image("robot").resizable().foregroundColor(robot.color.color()).padding(3)
+            Image("robot").resizable().foregroundColor(robot.color.color()).padding(3).shadow(color: Color.black.opacity(0.4), radius: 5, x: 1, y: 1)
         }
     }
     

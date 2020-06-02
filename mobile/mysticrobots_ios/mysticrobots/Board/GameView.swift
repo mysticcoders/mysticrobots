@@ -22,7 +22,7 @@ struct GameView : View {
     
     @GestureState private var dragging = false
     @GestureState private var isTapped = false
-    
+
     var body : some View {
         
         GeometryReader { geo in
@@ -34,9 +34,22 @@ struct GameView : View {
                     
                     VStack {
                         HStack {
+                            
+                            Button(action: {
+                                self.gameLogic.boardLogic.restartBoard()
+                            }) {
+                                Image(systemName: "arrow.clockwise.circle.fill").font(.system(size: 60)).foregroundColor(.white)
+                            }.padding(.trailing, 20)
+                            
                             Spacer()
                             Text(self.gameLogic.elapsedTime.stringFormatted()).foregroundColor(.white).font(.system(size: 30))
                             Spacer()
+                            
+                            Button(action: {
+                                self.gameLogic.boardLogic.randomBoard()
+                            }) {
+                                Image(systemName: "shuffle").font(.system(size: 30)).foregroundColor(.white)
+                            }
                             
                             
                         }.padding()
@@ -54,9 +67,7 @@ struct GameView : View {
                                 if self.gameLogic.moves.count > 0 {
                                     Text("\(self.gameLogic.moves.count)").foregroundColor(.white).font(.system(size: 20)).padding(.trailing, 20)
                                 }
-                            }.frame(minHeight: 50)
-                            
-                            
+                            }.frame(minHeight: 30)
                         }
                         
                         
@@ -67,8 +78,6 @@ struct GameView : View {
                         }))
                         return alert
                     }
-                    
-                    Spacer()
                     
                     BoardView(boardLogic: self.gameLogic.boardLogic)
                     
@@ -98,27 +107,9 @@ struct GameView : View {
                         
                         
                         
-                    }.padding()
+                        }.padding(.top, 0).padding(.bottom, 20)
                     
-                    Spacer()
-                    
-                    HStack {
-                        Spacer()
-                        Button(action: {
-                            self.gameLogic.boardLogic.restartBoard()
-                        }) {
-                            Image(systemName: "arrow.clockwise.circle.fill").font(.system(size: 60)).foregroundColor(.white)
-                        }.padding(.trailing, 20)
-                        
-                        Button(action: {
-                            self.gameLogic.boardLogic.randomBoard()
-                            //self.gameLogic..loadBoard()
-                        }) {
-                            Image(systemName: "shuffle").font(.system(size: 30)).foregroundColor(.white)
-                        }
-                        Spacer()
-                        
-                    }
+                   
                 }
             }
         }

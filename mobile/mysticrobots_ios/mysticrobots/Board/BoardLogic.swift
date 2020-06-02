@@ -246,7 +246,34 @@ class BoardLogic : ObservableObject {
                 let move = Move(start: robotSquare.coordinate, end: destination.coordinate, direction: direction, bot: Robot(bot), date: Date())
                 
                 robotSquare.robot = nil
-                destination.robot = Robot(bot)
+                withAnimation(.easeIn(duration: 0.5)) {
+                    destination.robot = Robot(bot)
+                }
+                
+                for (index, step) in botPath.enumerated() {
+                    
+                    if index == botPath.count-1 {
+                        break
+                    }
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(20 * index)) {
+                        withAnimation {
+                            step.robot = Robot(bot)
+                        }
+                    }
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(40 * index)) {
+                        withAnimation {
+                            step.robot = nil
+                        }
+                            
+                    }
+                    
+                    
+                    
+                }
+                
+                
                 print("Moved robot from \(robotSquare.coordinate.stringValue()) to \(destination.coordinate.stringValue())")
                 
                 if destination.isGoal && destination.goal!.color == bot {

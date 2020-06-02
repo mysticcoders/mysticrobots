@@ -53,7 +53,7 @@ struct Square : View {
                 GoalView(color: logic.goal!.color)
             } else {
                 if logic.robot != nil {
-                    RobotView(robot: logic.robot!)
+                    RobotView(robot: logic.robot!).transition(.opacity)
                 }
                 
                 if logic.goal != nil {
