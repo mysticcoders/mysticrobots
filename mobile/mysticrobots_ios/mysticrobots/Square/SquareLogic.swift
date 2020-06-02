@@ -9,7 +9,7 @@
 import SwiftUI
 
 /// Logic for each square of the board
-class SquareLogic : ObservableObject {
+class SquareLogic : ObservableObject, Codable {
     
     var id = UUID()
     
@@ -24,9 +24,40 @@ class SquareLogic : ObservableObject {
     
     weak var boardLogic : BoardLogic?
     
-    init(_ coordinate: BoardCoordinate, boardLogic: BoardLogic) {
+    enum CodingKeys: String, CodingKey {
+        case coordinate, walls, robot, goal
+    }
+    
+    init(_ coordinate: BoardCoordinate, boardLogic: BoardLogic?) {
         self.coordinate = coordinate
         self.boardLogic = boardLogic
+    }
+    
+    required init(from decoder: Decoder) throws {
+        
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        coordinate = try container.decode(BoardCoordinate.self, forKey: .coordinate)
+        walls = try container.decode(SquareWalls.self, forKey: .walls)
+        if container.contains(.robot) {
+            robot = try container.decode(Robot.self, forKey: .robot)
+        }
+        if container.contains(.goal) {
+            goal = try container.decode(Goal.self, forKey: .goal)
+        }
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(coordinate, forKey: .coordinate)
+        try container.encode(walls, forKey: .walls)
+        
+        if let robot = robot {
+            try container.encode(robot, forKey: .robot)
+        }
+        if let goal = goal {
+            try container.encode(goal, forKey: .goal)
+        }
+
     }
     
     var isEmpty : Bool {

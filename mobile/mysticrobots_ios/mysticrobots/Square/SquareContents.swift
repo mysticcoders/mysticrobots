@@ -9,7 +9,7 @@
 import Foundation
 import SwiftUI
 
-enum Sides : CustomStringConvertible {
+enum Sides : Int, CustomStringConvertible, Codable {
     case east, west, north, south
     
     func isVertical() -> Bool {
@@ -87,7 +87,7 @@ struct GoalView : View, Hashable {
     }
 }
 
-enum RobotColor : CaseIterable {
+enum RobotColor : Int, CaseIterable, Codable {
     case green, red, blue, yellow
     
     static func random() -> RobotColor {

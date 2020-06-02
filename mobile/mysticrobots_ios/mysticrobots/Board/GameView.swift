@@ -61,8 +61,8 @@ struct GameView : View {
                         
                         
                     }.alert(isPresented: self.$gameLogic.solved) {
-                        let alert = Alert(title: Text("Great job!"), message: Text("Level complete"), dismissButton: .default(Text("OK"), action: {
-                            self.gameLogic.boardLogic.resetBoard()
+                        let alert = Alert(title: Text("Great job!"), message: Text("Level complete in \(self.gameLogic.moves.count) moves and it took you \(self.gameLogic.elapsedTime.stringFromTimeInterval())"), dismissButton: .default(Text("OK"), action: {
+                            self.gameLogic.boardLogic.randomBoard()
                             self.gameLogic.reset()
                         }))
                         return alert
@@ -105,9 +105,16 @@ struct GameView : View {
                     HStack {
                         Spacer()
                         Button(action: {
-                            self.gameLogic.boardLogic.resetBoard()
+                            self.gameLogic.boardLogic.restartBoard()
                         }) {
                             Image(systemName: "arrow.clockwise.circle.fill").font(.system(size: 60)).foregroundColor(.white)
+                        }.padding(.trailing, 20)
+                        
+                        Button(action: {
+                            self.gameLogic.boardLogic.randomBoard()
+                            //self.gameLogic..loadBoard()
+                        }) {
+                            Image(systemName: "shuffle").font(.system(size: 30)).foregroundColor(.white)
                         }
                         Spacer()
                         

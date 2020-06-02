@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct Goal {
+struct Goal : Codable {
     var color : RobotColor
     
     init(_ color: RobotColor) {

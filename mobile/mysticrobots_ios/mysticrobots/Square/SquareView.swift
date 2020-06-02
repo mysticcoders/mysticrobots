@@ -80,7 +80,7 @@ struct Square : View {
     
 }
 
-class SquareWalls {
+class SquareWalls : Codable {
     
     var sides: Dictionary<Sides,Bool>
     
@@ -112,7 +112,7 @@ class SquareWalls {
     
 }
 
-struct BoardCoordinate : Equatable {
+struct BoardCoordinate : Equatable, Codable {
 
     var x : Int
     var y : Int

@@ -14,11 +14,8 @@ class BoardLogic : ObservableObject {
     var game : GameLogic?
     
     @Published var grid : [[SquareLogic]]
-    
     @Published var selectedRobot : Robot?
-    
-    //var gameLogicObserver : AnyCancellable?
-            
+                
     func select(robot: Robot) {
         if let square = try? self.findRobot(robot.color) {
             self.selectedRobot = square.robot
@@ -50,6 +47,36 @@ class BoardLogic : ObservableObject {
         } else {
             print("Goal is missing - not possible")
             throw LogicError.runtimeError("Goal is missing")
+        }
+    }
+    
+    func saveBoard() {
+        
+        let encoder = JSONEncoder()
+        
+        do {
+            let encodedGrid = try encoder.encode(grid)
+            UserDefaults.standard.set(encodedGrid, forKey: "SavedGrid")
+            
+        } catch {
+            print("Error Encoding grid: \(error)")
+
+        }
+       
+    }
+    
+    func loadBoard() {
+        if let savedGrid = UserDefaults.standard.object(forKey: "SavedGrid") as? Data {
+            let decoder = JSONDecoder()
+
+            do {
+                let decodedGrid = try decoder.decode([[SquareLogic]].self, from: savedGrid)
+                self.grid = decodedGrid
+
+            } catch {
+                print("Error decoding grid: \(error)")
+            }
+           
         }
     }
     
@@ -255,8 +282,12 @@ class BoardLogic : ObservableObject {
 
 extension BoardLogic {
     
-    func resetBoard() {
+    func randomBoard() {
         initBoard()
+        game?.reset()
+    }
+    func restartBoard() {
+        loadBoard()
         game?.reset()
     }
     
@@ -277,6 +308,8 @@ extension BoardLogic {
         placeWalls()
         placeRobots()
         placeGoal()
+        
+        saveBoard()
         
 //        let root = Solver(self).solution()
 //        hightlightNodes(node: root)

@@ -44,7 +44,7 @@ class GameLogic : ObservableObject {
     init() {
         self.boardLogic = BoardLogic(height: 16)
         self.boardLogic.game = self
-        self.boardLogic.resetBoard()
+        self.boardLogic.randomBoard()
     }
     
     @Published var solved : Bool = false

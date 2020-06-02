@@ -8,13 +8,22 @@
 
 import SwiftUI
 
-struct Robot : Comparable {
+struct Robot : Comparable, Codable {
     
     var color : RobotColor
     var square : SquareLogic?
     
     init(_ color: RobotColor) {
         self.color = color
+    }
+    
+    enum CodingKeys : CodingKey {
+        case color
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(color, forKey: .color)
     }
     
     static func < (lhs: Robot, rhs: Robot) -> Bool {
