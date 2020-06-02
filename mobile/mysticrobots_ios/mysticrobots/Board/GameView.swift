@@ -15,7 +15,7 @@ struct GameView : View {
     
     init() {
         //boardLogic.gameLogic = gameLogic
-        gameLogic.reset()
+        gameLogic.startNewBoard()
     }
     
     var isDragging = false
@@ -36,7 +36,7 @@ struct GameView : View {
                         HStack {
                             
                             Button(action: {
-                                self.gameLogic.boardLogic.restartBoard()
+                                self.gameLogic.restart()
                             }) {
                                 Image(systemName: "arrow.clockwise.circle.fill").font(.system(size: 60)).foregroundColor(.white)
                             }.padding(.trailing, 20)
@@ -46,7 +46,7 @@ struct GameView : View {
                             Spacer()
                             
                             Button(action: {
-                                self.gameLogic.boardLogic.randomBoard()
+                                self.gameLogic.startNewBoard()
                             }) {
                                 Image(systemName: "shuffle").font(.system(size: 30)).foregroundColor(.white)
                             }
@@ -72,9 +72,8 @@ struct GameView : View {
                         
                         
                     }.alert(isPresented: self.$gameLogic.solved) {
-                        let alert = Alert(title: Text("Great job!"), message: Text("Level complete in \(self.gameLogic.moves.count) moves and it took you \(self.gameLogic.elapsedTime.stringFromTimeInterval())"), dismissButton: .default(Text("OK"), action: {
-                            self.gameLogic.boardLogic.randomBoard()
-                            self.gameLogic.reset()
+                        let alert = Alert(title: Text("Great job!"), message: Text("Level complete in \(self.gameLogic.moves.count) moves and it took you \(self.gameLogic.elapsedTime.stringFromTimeInterval()) and \(self.gameLogic.attempts) attempts"), dismissButton: .default(Text("OK"), action: {
+                            self.gameLogic.startNewBoard()
                         }))
                         return alert
                     }
@@ -88,7 +87,7 @@ struct GameView : View {
                             }))
                             .simultaneousGesture(self.dragGesture)
                         
-                        RobotButton(color: .green, isSelected: self.gameLogic.boardLogic.selectedRobot == Robot(.green))
+                        RobotButton(color: .green, isSelected: (self.gameLogic.boardLogic.selectedRobot == Robot(.green)))
                             .gesture(DragGesture(minimumDistance: 0).updating(self.$isTapped, body: { (_, isTapped, _) in
                                 self.gameLogic.boardLogic.select(robot: Robot(.green))
                             }))

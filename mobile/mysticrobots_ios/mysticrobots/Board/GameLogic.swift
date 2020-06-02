@@ -38,6 +38,7 @@ class GameLogic : ObservableObject {
     
     var moves : [Move] = []
     var startTime : Date = Date()
+    var attempts : Int = 1
     
     var timer : Timer?
     
@@ -66,19 +67,32 @@ class GameLogic : ObservableObject {
         self.solved = true
     }
     
-    func reset() {
-        
-        self.moves = []
+    func resetTimer() {
         startTime = Date()
-        
         self.timer  = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
             if !self.solved {
                 self.elapsedTime = Date().timeIntervalSince(self.startTime)
                 self.objectWillChange.send()
             }
-            
-            //print(self.elapsedTime)
         }
+    }
+    
+    func startNewBoard() {
+        boardLogic.randomBoard()
+        self.moves = []
+        attempts = 1
+        resetTimer()
+    }
+    
+    func restart() {
+        
+        if moves.count > 0 {
+            attempts += 1
+        }
+        self.moves = []
+        
+        resetTimer()
+        
     }
     
     func moveViews() -> [MoveView] {

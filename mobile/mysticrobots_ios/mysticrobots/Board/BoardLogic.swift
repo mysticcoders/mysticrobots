@@ -268,11 +268,7 @@ class BoardLogic : ObservableObject {
                         }
                             
                     }
-                    
-                    
-                    
                 }
-                
                 
                 print("Moved robot from \(robotSquare.coordinate.stringValue()) to \(destination.coordinate.stringValue())")
                 
@@ -311,11 +307,10 @@ extension BoardLogic {
     
     func randomBoard() {
         initBoard()
-        game?.reset()
     }
+    
     func restartBoard() {
         loadBoard()
-        game?.reset()
     }
     
     func initBoard() {
@@ -332,9 +327,12 @@ extension BoardLogic {
             
         }
         
-        placeWalls()
-        placeRobots()
-        placeGoal()
+        withAnimation(.easeOut(duration: 2.0)) {
+            placeWalls()
+            placeRobots()
+            placeGoal()
+        }
+        
         
         saveBoard()
         
@@ -359,7 +357,7 @@ extension BoardLogic {
         var square : SquareLogic
         repeat {
             square = randomRange().randomElement()!
-        } while surroundingSquares(for: square).filter { return $0.isEmpty && !$0.isGoal }.isEmpty
+        } while surroundingSquares(for: square).filter { return $0.isEmpty && !$0.isGoal && !$0.isRobot }.isEmpty
         return square
     }
     

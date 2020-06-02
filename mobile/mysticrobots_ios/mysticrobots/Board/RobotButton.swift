@@ -17,7 +17,7 @@ struct RobotButton : View {
         ZStack {
             Image("robot").resizable().scaledToFit()
                 .foregroundColor(color.color())
-                .shadow(color: isSelected ? .white : .clear, radius: 5, x: 0, y: 0)
+                .shadow(color: isSelected ? .white : .clear, radius: 20, x: 0, y: 0)
         }
     }
     
