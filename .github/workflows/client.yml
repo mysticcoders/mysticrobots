@@ -37,10 +37,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Push to staging
-      uses: actions/checkout@v2
-      with:
+      # uses: actions/checkout@v2
+      # with:
         # persist-credentials: false
-        token: ${{ secrets.MysticRobots_Access }}
+        # token: ${{ secrets.MysticRobots_Access }}
+    - run: echo ${{ secrets.MysticRobots_Access }}
+    - run: echo ${{ secrets.TOKEN_Actions_CI }}
     - run: |
         git fetch --all --prune
         git checkout master
