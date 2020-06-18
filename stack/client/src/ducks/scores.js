@@ -27,14 +27,13 @@ import { Status } from '../constants'
 // /////////////////////////////////////////////////////////////////////////////
 
 export const types = {
-
-
     FETCH_HIGH_SCORES: 'FETCH_HIGH_SCORES',
+    FETCH_HIGH_SCORES_ERROR: 'FETCH_HIGH_SCORES_ERROR',
     FETCH_HIGH_SCORES_SUCCESS: 'FETCH_HIGH_SCORES_SUCCESS',
 
     SUBMIT_SCORE: 'SUBMIT_SCORE',
+    SUBMIT_SCORE_ERROR: 'SUBMIT_SCORE_ERROR',
     SUBMIT_SCORE_SUCCESS: 'SUBMIT_SCORE_SUCCESS',
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -44,7 +43,6 @@ export const types = {
 export const actions = {
     fetchHighScores: createAction(types.FETCH_HIGH_SCORES),
     submitScore: createAction(types.SUBMIT_SCORE),
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -52,7 +50,7 @@ export const actions = {
 ////////////////////////////////////////////////////////////////////////////////
 
 export const initialState = {
-    status: Status.PLAYING, //!!! ?
+
     high_scores: []
 }
 
