@@ -39,14 +39,14 @@ jobs:
     - name: Push to staging
       uses: actions/checkout@v2
       with:
-        persist-credentials: false
+        # persist-credentials: false
         token: ${{ secrets.MysticRobots_Access }}
     - run: |
         git fetch --all --prune
         git checkout master
         git push origin master:staging --force
-      env:
-        GITHUB_TOKEN: ${{ secrets.MysticRobots_Access }}
+      # env:
+        # GITHUB_TOKEN: ${{ secrets.MysticRobots_Access }}
 
 
   staging:
