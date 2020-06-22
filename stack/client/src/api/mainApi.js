@@ -73,4 +73,38 @@ export default class RasamApi {
             })
             .catch(handleAxiosError);
     }
+
+    static fetchHighScores(challengeId, sort = [{ score: 'desc' }, { date: 'desc' }], limit=100) {
+        const options = {
+            params: {
+                sort,
+                limit
+            },
+            ...defaultHeaders
+        }
+        return axios
+            .get(`${apiUrl()}/scores/${challengeId}`, options)
+            .then(response => {
+                const { data } = response;
+
+                return {
+                    ...data
+                }
+            })
+            .catch(handleAxiosError);
+    }
+
+    static saveScore(challengeId) {
+        return axios
+            .post(`${apiUrl()}/scores/${challengeId}`, defaultHeaders)
+            .then(response => {
+                const { data } = response;
+
+                return {
+                    ...data
+                }
+            })
+            .catch(handleAxiosError);
+    }
+
 }

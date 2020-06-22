@@ -3,25 +3,6 @@ import { call, put, select, takeEvery } from 'redux-saga/effects'
 import { createAction } from '@reduxjs/toolkit'
 import { Status } from '../constants'
 
-// -----------------------------------------------------------------------------
-// !!! Notes:
-// ? - Add to "MainApi.js"
-/* 
-    static fetchHighScores() {
-        return axios
-            .get(`${apiUrl()}/high_scores?latest=true`, defaultHeaders)
-            .then(response => {
-                const { data } = response;
-
-                return {
-                    ...data
-                }
-            })
-            .catch(handleAxiosError);
-    }
-*/
-
-
 // /////////////////////////////////////////////////////////////////////////////
 // Action Types
 // /////////////////////////////////////////////////////////////////////////////
@@ -50,7 +31,6 @@ export const actions = {
 ////////////////////////////////////////////////////////////////////////////////
 
 export const initialState = {
-
     high_scores: []
 }
 
@@ -61,6 +41,10 @@ export default function (state = initialState, action) {
         return {
             ...state,
             high_scores,
+        }
+    case types.SUBMIT_SCORE_SUCCESS:
+        return {
+            ...state,
         }
     default:
       return state
@@ -77,9 +61,9 @@ export default function (state = initialState, action) {
 // Sagas
 ////////////////////////////////////////////////////////////////////////////////
 
-export function* fetchHighScores() {
+export function* fetchHighScores(challengeId) {
     try {
-        const highScores = yield call(api.fetchHighScores)
+        const highScores = yield call(api.fetchHighScores, challengeId)
         
         yield put({ 
             type: types.FETCH_HIGH_SCORES_SUCCESS, 
@@ -90,8 +74,22 @@ export function* fetchHighScores() {
         console.error(error)
     }
 }
- 
+
+export function* saveScore(challengeId) {
+    try {
+        const payload = yield call(api.saveScore, challengeId)
+
+        yield put({
+            type: types.SUBMIT_SCORE_SUCCESS,
+            payload
+        })
+
+    } catch (error) {
+        console.error(error)
+    }
+}
 
 export const sagas = [
-    takeEvery(types.FETCH_HIGH_SCORES,fetchHighScores)
+    takeEvery(types.FETCH_HIGH_SCORES, fetchHighScores),
+    takeEvery(types.SUBMIT_SCORE, saveScore)
 ]
