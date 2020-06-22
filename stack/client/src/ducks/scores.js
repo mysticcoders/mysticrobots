@@ -1,7 +1,6 @@
 import api from '../api/mainApi'
-import { call, put, select, takeEvery } from 'redux-saga/effects'
+import { call, put, takeEvery } from 'redux-saga/effects'
 import { createAction } from '@reduxjs/toolkit'
-import { Status } from '../constants'
 
 // /////////////////////////////////////////////////////////////////////////////
 // Action Types
