@@ -94,9 +94,14 @@ export default class RasamApi {
             .catch(handleAxiosError);
     }
 
-    static saveScore(challengeId) {
+    static saveScore(challengeId, score) {
+        const options = {
+            score,
+            ...defaultHeaders
+        }
+
         return axios
-            .post(`${apiUrl()}/scores/${challengeId}`, defaultHeaders)
+            .post(`${apiUrl()}/scores/${challengeId}`, options)
             .then(response => {
                 const { data } = response;
 
