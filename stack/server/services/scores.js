@@ -18,9 +18,13 @@ const get_scores_by_challenge_id = async ({ challengeId }) => {
  * 
  * @param {*} param0 
  */
-const save_score = async({ challengeId }) => {
+const save_score = async({ challengeId, score }) => {
     if(!challengeId) {
         throw new Error("Challenge ID required")
+    }
+
+    if(!score) {
+        throw new Error("score required")
     }
 
 }
