@@ -14,6 +14,9 @@ The largest problem to solve which may enable us to offer varying levels of comp
 
 ## Contributing
 
+### Backing services
+PostgreSQL is provided by Docker Compose. Run `docker-compose up -d` start from scratch and `docker-compose down` to destroy. If you are starting and stopping for day to day development use `docker-compose start` and `docker-compose stop`.
+
 ### Lerna Monorepo
 You'll need Yarn and Lerna installed to manage packages and shared modules.
 
