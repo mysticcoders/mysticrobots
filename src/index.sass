@@ -62,3 +62,12 @@ body
 
 .navbar-menu
   background-color: var(--color-navbar-bg)
+
+@keyframes timer-pulse
+  0%, 100%
+    text-shadow: 0 0 0 transparent
+  50%
+    text-shadow: 0 0 10px currentColor
+
+.timer-active
+  animation: timer-pulse 2s ease-in-out infinite

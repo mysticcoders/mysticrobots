@@ -71,11 +71,11 @@ export const GamePiece = ({ gridCell, isInRobotPath = false, isHoveringInRobotPa
     const wallColor = 'var(--color-board-cell-wall)'
     const borderColorStyle = `${wallTop ? wallColor : gridLine} ${wallRight ? wallColor : gridLine} ${wallBottom ? wallColor : gridLine} ${wallLeft ? wallColor : gridLine}`
 
-    const wallShadows = []
-    if(wallTop) wallShadows.push('inset 0 2px 4px rgba(255,255,255,0.08)')
-    if(wallBottom) wallShadows.push('inset 0 -2px 4px rgba(255,255,255,0.08)')
-    if(wallLeft) wallShadows.push('inset 2px 0 4px rgba(255,255,255,0.08)')
-    if(wallRight) wallShadows.push('inset -2px 0 4px rgba(255,255,255,0.08)')
+    const cellShadows = ['inset 0 1px 2px rgba(0,0,0,0.2)', 'inset 0 -1px 1px rgba(255,255,255,0.03)']
+    if(wallTop) cellShadows.push('inset 0 3px 6px rgba(0,0,0,0.3)')
+    if(wallBottom) cellShadows.push('inset 0 -2px 4px rgba(0,0,0,0.2)')
+    if(wallLeft) cellShadows.push('inset 3px 0 6px rgba(0,0,0,0.3)')
+    if(wallRight) cellShadows.push('inset -2px 0 4px rgba(0,0,0,0.2)')
 
     const handleClick = () => {
         if(gridCell.robot) {
@@ -107,7 +107,7 @@ export const GamePiece = ({ gridCell, isInRobotPath = false, isHoveringInRobotPa
         borderStyle: "solid",
         borderColor: borderColorStyle,
         backgroundColor: backgroundColor,
-        boxShadow: wallShadows.length > 0 ? wallShadows.join(', ') : 'none',
+        boxShadow: cellShadows.join(', '),
     }
 
     if(gridCell.robot && gridCell.robot === selectedRobot) {

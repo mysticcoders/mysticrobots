@@ -39,6 +39,9 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
     const currentHint = useSelector(getCurrentHint)
     const hintIndex = useSelector(state => state.boards.hintIndex)
     const completedRobots = useSelector(getCompletedRobots)
+    const selectedRobot = useSelector(state => state.boards.selectedRobot)
+
+    const accentColor = selectedRobot ? ROBOT_COLOR_MAP[selectedRobot] : 'var(--color-text-muted)'
 
     const [timerOn, setTimerOn] = useState(true)
     const [startTime, setStartTime] = useState(new Date().valueOf())
@@ -185,7 +188,15 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
                     </button>
                 )}
 
-                <div className="columns is-multiline" style={{ backgroundColor: 'var(--color-move-history-bg)', padding: '0.25rem', margin: '0.50rem', paddingBottom: '0'}}>
+                <div className="columns is-multiline" style={{
+                    backgroundColor: 'var(--color-move-history-bg)',
+                    padding: '0.5rem',
+                    margin: '0.50rem',
+                    borderRadius: '8px',
+                    borderLeft: `3px solid ${accentColor}`,
+                    transition: 'border-color 0.3s ease',
+                    minHeight: '2.5rem',
+                }}>
                     <div className="column has-text-left">
                         { moveHistory.map((entry, idx) => (
                             <React.Fragment key={idx}>
@@ -209,16 +220,16 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
                 <nav className="level">
                     <div className="level-left">
                         <div className="level-item">
-                            <button className="button" onClick={() => { dispatch(actions.moveUp()) }}><span className="icon is-medium"><FaArrowAltCircleUp /></span></button>
+                            <button className="button" style={{ borderColor: accentColor, color: accentColor, transition: 'border-color 0.3s ease, color 0.3s ease' }} onClick={() => { dispatch(actions.moveUp()) }}><span className="icon is-medium"><FaArrowAltCircleUp /></span></button>
                         </div>
                         <div className="level-item">
-                            <button className="button" onClick={() => { dispatch(actions.moveDown()) }}><span className="icon is-medium"><FaArrowAltCircleDown /></span></button>
+                            <button className="button" style={{ borderColor: accentColor, color: accentColor, transition: 'border-color 0.3s ease, color 0.3s ease' }} onClick={() => { dispatch(actions.moveDown()) }}><span className="icon is-medium"><FaArrowAltCircleDown /></span></button>
                         </div>
                         <div className="level-item">
-                            <button className="button" onClick={() => { dispatch(actions.moveLeft()) }}><span className="icon is-medium"><FaArrowAltCircleLeft /></span></button>
+                            <button className="button" style={{ borderColor: accentColor, color: accentColor, transition: 'border-color 0.3s ease, color 0.3s ease' }} onClick={() => { dispatch(actions.moveLeft()) }}><span className="icon is-medium"><FaArrowAltCircleLeft /></span></button>
                         </div>
                         <div className="level-item">
-                            <button className="button" onClick={() => { dispatch(actions.moveRight()) }}><span className="icon is-medium"><FaArrowAltCircleRight /></span></button>
+                            <button className="button" style={{ borderColor: accentColor, color: accentColor, transition: 'border-color 0.3s ease, color 0.3s ease' }} onClick={() => { dispatch(actions.moveRight()) }}><span className="icon is-medium"><FaArrowAltCircleRight /></span></button>
                         </div>
                         <div className="level-item">
                             <button className="button" onClick={() => { resetGameBoard() }}>Reset Board</button>
@@ -228,11 +239,13 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
 
                 <nav className="level">
                     <div className="level-item">
-                        <h2 className="title" style={{
+                        <h2 className={`title${timerOn ? ' timer-active' : ''}`} style={{
                             fontSize: '3rem',
                             fontWeight: 700,
                             letterSpacing: '0.15em',
                             fontVariantNumeric: 'tabular-nums',
+                            color: accentColor,
+                            transition: 'color 0.3s ease',
                         }}>{renderElapsedTime()}</h2>
                     </div>
                 </nav>
