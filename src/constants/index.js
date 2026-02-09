@@ -1,4 +1,4 @@
-export const GOOGLE_ANALYTICS_KEY = 'UA-254925-15'
+export const GOOGLE_ANALYTICS_KEY = 'G-XXXXXXXXXX'
 
 
 export const WALL = {

@@ -350,7 +350,7 @@ export function* setupBoard({payload}) {
         return [randomIntFromInterval(0,3), randomIntFromInterval(0,3), randomIntFromInterval(0,3), randomIntFromInterval(0,3)].join('')
     }
 
-    console.log(payload.config)
+    // console.log(payload.config)
     
     let boardPayload = payload.config && payload.config.length === 4 ? payload.config : randomBoard()
     let boardSplit = boardPayload.split('').map(entry => Number(entry))
@@ -436,7 +436,12 @@ export function* setupBoard({payload}) {
         }
     }
 
-    const corners = Object.values(grid).filter(element => element.walls === WALL.NORTH_WEST || element.walls === WALL.NORTH_EAST || element.walls === WALL.SOUTH_WEST || element === WALL.SOUTH_EAST)
+    const corners = Object.values(grid).filter(element => 
+        element.walls === WALL.NORTH_WEST || 
+        element.walls === WALL.NORTH_EAST || 
+        element.walls === WALL.SOUTH_WEST || 
+        element.walls === WALL.SOUTH_EAST
+    )
 
     const goalIndex = payload.goalIndex >= 0 && payload.goalIndex < corners.length ? payload.goalIndex : randomIntFromInterval(0, corners.length - 1)
     const randomCorner = corners[goalIndex]

@@ -4,33 +4,21 @@ import { PuzzlePage } from './PuzzlePage'
 import { AboutPage } from './AboutPage'
 
 import {
-    Switch,
+    Routes,
     Route,
-    Redirect,
+    Navigate,
 } from 'react-router-dom'
 import { NotFoundPage } from './NotFoundPage'
 
 const App = () => (
-    <Switch>
-        <Redirect exact from="/" to="/random" />
-
-        <Route path="/puzzle/:shareKey">
-            <PuzzlePage />
-        </Route>
-
-        <Route path="/puzzle">
-            <PuzzlePage />
-        </Route>
-
-        <Redirect from="/random" to="/puzzle?reset=true" />
-
-        <Route path="/about">
-            <AboutPage />
-        </Route>
-        <Route>
-            <NotFoundPage />
-        </Route>
-    </Switch>
+    <Routes>
+        <Route path="/" element={<Navigate to="/random" replace />} />
+        <Route path="/puzzle/:shareKey" element={<PuzzlePage />} />
+        <Route path="/puzzle" element={<PuzzlePage />} />
+        <Route path="/random" element={<Navigate to="/puzzle?reset=true" replace />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+    </Routes>
 )
 
 export default App
