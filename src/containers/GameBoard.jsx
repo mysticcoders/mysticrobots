@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { GamePiece } from '../components/GamePiece'
 
 import { actions } from '../ducks/boards'
+import { useSwipe } from '../hooks/utils'
 
 /**
  * Will contain the Retro Rockets gameboard
@@ -11,8 +12,16 @@ import { actions } from '../ducks/boards'
 export const GameBoard = ({goalIndex, goalColor, r, g, b, y, config}) => {
 
     const dispatch = useDispatch()
+    const boardRef = useRef(null)
 
     const [displayGrid, setDisplayGrid] = useState(null)
+
+    useSwipe(boardRef, {
+        onUp: () => dispatch(actions.moveUp()),
+        onDown: () => dispatch(actions.moveDown()),
+        onLeft: () => dispatch(actions.moveLeft()),
+        onRight: () => dispatch(actions.moveRight()),
+    })
 
     useEffect(() => {
         dispatch(actions.setupBoard({goalIndex, goalColor, r, g, b, y, config}))
@@ -79,7 +88,7 @@ export const GameBoard = ({goalIndex, goalColor, r, g, b, y, config}) => {
     }
 
     return (
-        <div style={{ marginLeft: '0', border: '10px solid var(--color-board-padding)', background: 'var(--color-board-outer-border)', padding: '5px', width: 'calc(100 * var(--vmin-minus-header) )', height: 'calc(100 * var(--vmin-minus-header) )', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 8px 32px var(--color-board-shadow, transparent), 0 2px 8px var(--color-board-shadow, transparent), inset 0 1px 0 rgba(255,255,255,0.05)'}}>
+        <div ref={boardRef} style={{ marginLeft: '0', border: '10px solid var(--color-board-padding)', background: 'var(--color-board-outer-border)', padding: '5px', width: 'calc(100 * var(--vmin-minus-header) )', height: 'calc(100 * var(--vmin-minus-header) )', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 8px 32px var(--color-board-shadow, transparent), 0 2px 8px var(--color-board-shadow, transparent), inset 0 1px 0 rgba(255,255,255,0.05)', touchAction: 'none'}}>
         { displayGrid.map((row, y) => (
             <nav key={y} className="level" style={{margin: 0, background: 'var(--color-board-padding)'}}>
                 <div className="level-item">

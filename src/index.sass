@@ -63,6 +63,15 @@ body
 .navbar-menu
   background-color: var(--color-navbar-bg)
 
+.game-sidebar
+  display: flex
+  flex-direction: column
+
+@media screen and (max-width: 768px)
+  .game-sidebar .game-controls
+    order: -1
+    margin-bottom: 0.75rem
+
 @keyframes timer-pulse
   0%, 100%
     text-shadow: 0 0 0 transparent

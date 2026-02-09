@@ -138,7 +138,7 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
             <div className="column" style={{padding: 0, margin: 0}}>
                 <GameBoard goalIndex={goalIndex} goalColor={goalColor} r={r} g={g} b={b} y={y} config={config} />
             </div>
-            <div className="column">
+            <div className="column game-sidebar">
                 <RobotPanel />
 
                 {status === 'WIN' &&
@@ -209,7 +209,7 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
                     </div>
                 </div>
 
-                <nav className="level">
+                <nav className="level is-mobile game-controls">
                     <div className="level-left">
                         <div className="level-item">
                             <button className="button" style={{ borderColor: accentColor, color: accentColor, transition: 'border-color 0.3s ease, color 0.3s ease' }} onClick={() => { dispatch(actions.moveUp()) }}><span className="icon is-medium"><FaArrowAltCircleUp /></span></button>
