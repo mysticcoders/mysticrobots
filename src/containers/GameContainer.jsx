@@ -125,7 +125,7 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
                         Move {ROBOT_NAME_MAP[currentHint.robot]} {currentHint.direction.charAt(0) + currentHint.direction.slice(1).toLowerCase()}
                     </span>
                     <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
-                        (Step {hintIndex + 1} of {solution.length})
+                        ({solution.length - hintIndex} {solution.length - hintIndex === 1 ? 'move' : 'moves'} to goal)
                     </span>
                 </div>
             </div>
@@ -165,7 +165,7 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
                         style={{ marginBottom: '0.5rem' }}
                     >
                         <span className="icon"><FaLightbulb /></span>
-                        <span>Hint</span>
+                        <span>Hint (H)</span>
                     </button>
                 )}
 
@@ -176,7 +176,7 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
                         style={{ marginBottom: '0.5rem' }}
                     >
                         <span className="icon"><FaLightbulb /></span>
-                        <span>Next Hint</span>
+                        <span>Next Hint (H)</span>
                     </button>
                 )}
 

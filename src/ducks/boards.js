@@ -138,7 +138,13 @@ export default function (state = initialState, action) {
             hintIndex: -1,
             completedRobots: [],
         }
-    case types.MOVE_SUCCESS:
+    case types.MOVE_SUCCESS: {
+        const expectedMove = state.solution && state.hintIndex >= 0 && state.solution[state.hintIndex]
+        const followedHint = expectedMove &&
+            action.payload.robot === expectedMove.robot &&
+            action.payload.direction === expectedMove.direction
+        const isLastStep = followedHint && state.hintIndex >= state.solution.length - 1
+
         return {
             ...state,
             grid: {
@@ -167,11 +173,12 @@ export default function (state = initialState, action) {
                 }
             },
             history: state.history.concat({ direction: action.payload.direction, robot: action.payload.robot}),
-            solution: null,
-            optimalMoves: -1,
-            solverStatus: 'idle',
-            hintIndex: -1,
+            solution: followedHint && !isLastStep ? state.solution : null,
+            optimalMoves: followedHint && !isLastStep ? state.optimalMoves : -1,
+            solverStatus: followedHint && !isLastStep ? state.solverStatus : 'idle',
+            hintIndex: followedHint ? (isLastStep ? -1 : state.hintIndex + 1) : -1,
         }
+    }
     case types.SET_ROBOT:
         return {
             ...state,
@@ -188,10 +195,6 @@ export default function (state = initialState, action) {
         return {
             ...state,
             selectedRobot: action.payload,
-            solution: null,
-            optimalMoves: -1,
-            solverStatus: 'idle',
-            hintIndex: -1,
         }
     case types.SETUP_BOARD_SUCCESS:
         return {
@@ -267,20 +270,32 @@ export default function (state = initialState, action) {
             hintIndex: -1,
         }
     case types.COMPLETE_ROBOT: {
+        const CENTER_CELLS = {
+            [ROBOT.RED]: '7,7',
+            [ROBOT.GREEN]: '8,7',
+            [ROBOT.BLUE]: '7,8',
+            [ROBOT.YELLOW]: '8,8',
+        }
+
         const robotName = action.payload
         const robotData = state.robots[robotName]
         const newRobots = { ...state.robots }
         delete newRobots[robotName]
 
-        let newGrid = state.grid
+        let newGrid = { ...state.grid }
         if (robotData) {
             const cellKey = `${robotData.x},${robotData.y}`
-            newGrid = {
-                ...state.grid,
-                [cellKey]: {
-                    ...state.grid[cellKey],
-                    robot: null,
-                },
+            newGrid[cellKey] = {
+                ...newGrid[cellKey],
+                robot: null,
+            }
+        }
+
+        const centerKey = CENTER_CELLS[robotName]
+        if (centerKey) {
+            newGrid[centerKey] = {
+                ...newGrid[centerKey],
+                robot: robotName,
             }
         }
 
@@ -890,6 +905,7 @@ export function* checkRobotCompletion() {
             }
         }
     }
+
 }
 
 export const sagas = [
