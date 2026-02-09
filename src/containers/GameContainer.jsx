@@ -8,6 +8,7 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import { GameBoard } from '../containers/GameBoard'
 
 import { actions, getCurrentHint, getCompletedRobots } from '../ducks/boards'
+import { encodeShareKey } from '../utils/shareKey'
 
 import { FaArrowUp, FaArrowDown, FaArrowLeft, FaArrowRight, FaLightbulb } from 'react-icons/fa'
 import { FaArrowAltCircleUp, FaArrowAltCircleDown, FaArrowAltCircleLeft, FaArrowAltCircleRight } from 'react-icons/fa'
@@ -62,17 +63,8 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
 
     useEffect(() => {
 
-        const params = new URLSearchParams({
-            goalIndex: metadata.goalIndex,
-            goalColor: metadata.goalColor,
-            r: metadata.r,
-            g: metadata.g,
-            b: metadata.b,
-            y: metadata.y,
-            config: metadata.config,
-        })
-
-        navigate(`/puzzle?${params.toString()}`, { replace: true })
+        const shareKey = encodeShareKey(metadata)
+        navigate(`/puzzle/${shareKey}`, { replace: true })
     }, [metadata, navigate])
 
     useEffect(()=> {

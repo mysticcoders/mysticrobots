@@ -8,6 +8,7 @@ import ReactGA from 'react-ga4'
 import { FaSun, FaMoon } from 'react-icons/fa'
 
 import { useTheme } from '../hooks/useTheme'
+import { encodeShareKey } from '../utils/shareKey'
 import { RollieIcon, GumballIcon, BlubberIcon, YoloIcon } from '../components/RobotIcons'
 
 export const HeaderContainer = () => {
@@ -24,7 +25,8 @@ export const HeaderContainer = () => {
 
     const homepageOrPuzzle = () => {
         if(metadata) {
-            navigate(`/puzzle?goalIndex=${metadata.goalIndex}&goalColor=${metadata.goalColor}&r=${metadata.r}&g=${metadata.g}&b=${metadata.b}&y=${metadata.y}`)
+            const shareKey = encodeShareKey(metadata)
+            navigate(`/puzzle/${shareKey}`)
         } else {
             navigate(`/random`)
         }
