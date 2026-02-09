@@ -55,6 +55,8 @@ export const types = {
     DISMISS_HINT: 'DISMISS_HINT',
 
     COMPLETE_ROBOT: 'COMPLETE_ROBOT',
+
+    SET_UNSOLVABLE_ROBOTS: 'SET_UNSOLVABLE_ROBOTS',
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -118,6 +120,7 @@ export const initialState = {
     solverStatus: 'idle',
     hintIndex: -1,
     completedRobots: [],
+    unsolvableRobots: [],
 }
 
 export default function (state = initialState, action) {
@@ -137,6 +140,12 @@ export default function (state = initialState, action) {
             solverStatus: 'idle',
             hintIndex: -1,
             completedRobots: [],
+            unsolvableRobots: [],
+        }
+    case types.SET_UNSOLVABLE_ROBOTS:
+        return {
+            ...state,
+            unsolvableRobots: action.payload,
         }
     case types.MOVE_SUCCESS: {
         const expectedMove = state.solution && state.hintIndex >= 0 && state.solution[state.hintIndex]
@@ -334,6 +343,7 @@ export const getSelectedRobot = state => state.boards.robots[state.boards.select
 export const getRobotPath = state => state.boards.selectedRobotPath
 export const getRobots = state => state.boards.robots
 export const getCompletedRobots = state => state.boards.completedRobots
+export const getUnsolvableRobots = state => state.boards.unsolvableRobots
 
 export const getCurrentHint = state => {
     const { solution, hintIndex } = state.boards
@@ -451,10 +461,70 @@ const X_MAX = 15
 const Y_MAX = 15
 
 /**
+ * Generate random robot positions from available spots without mutating the input
+ */
+function generateRobotPositions(availableSpots) {
+    const spots = [...availableSpots]
+
+    const rIndex = randomIntFromInterval(0, spots.length - 1)
+    const red = spots[rIndex]
+    spots.splice(rIndex, 1)
+
+    const gIndex = randomIntFromInterval(0, spots.length - 1)
+    const green = spots[gIndex]
+    spots.splice(gIndex, 1)
+
+    const bIndex = randomIntFromInterval(0, spots.length - 1)
+    const blue = spots[bIndex]
+    spots.splice(bIndex, 1)
+
+    const yIndex = randomIntFromInterval(0, spots.length - 1)
+    const yellow = spots[yIndex]
+
+    return {
+        positions: { RED: red, GREEN: green, BLUE: blue, YELLOW: yellow },
+        indices: { r: rIndex, g: gIndex, b: bIndex, y: yIndex },
+    }
+}
+
+/**
+ * Check that all 4 robots can reach the goal within the solver's depth limit
+ */
+function validateAllRobotsSolvable(grid, robotPositions, goalX, goalY) {
+    const robots = {
+        [ROBOT.RED]: { x: robotPositions.RED.x, y: robotPositions.RED.y, robot: ROBOT.RED },
+        [ROBOT.GREEN]: { x: robotPositions.GREEN.x, y: robotPositions.GREEN.y, robot: ROBOT.GREEN },
+        [ROBOT.BLUE]: { x: robotPositions.BLUE.x, y: robotPositions.BLUE.y, robot: ROBOT.BLUE },
+        [ROBOT.YELLOW]: { x: robotPositions.YELLOW.x, y: robotPositions.YELLOW.y, robot: ROBOT.YELLOW },
+    }
+
+    for (const robotName of [ROBOT.RED, ROBOT.GREEN, ROBOT.BLUE, ROBOT.YELLOW]) {
+        const result = solve(grid, robots, goalX, goalY, robotName)
+        if (!result.solution && result.optimalMoves === -1) return false
+    }
+    return true
+}
+
+/**
+ * Return list of robot names that cannot reach the goal
+ */
+function findUnsolvableRobots(grid, robots, goalX, goalY) {
+    const unsolvable = []
+    for (const robotName of [ROBOT.RED, ROBOT.GREEN, ROBOT.BLUE, ROBOT.YELLOW]) {
+        if (!robots[robotName]) continue
+        const result = solve(grid, robots, goalX, goalY, robotName)
+        if (!result.solution && result.optimalMoves === -1) {
+            unsolvable.push(robotName)
+        }
+    }
+    return unsolvable
+}
+
+/**
  * Set up the game board by assembling 4 rotated quadrants, placing goal and robots
  */
-export function* setupBoard({payload}) {
-    let boardKeys = Object.keys(board)
+export function* setupBoard(action) {
+    const payload = (action && action.payload) || {}
 
     const randomBoard = () => {
         return [randomIntFromInterval(0,3), randomIntFromInterval(0,3), randomIntFromInterval(0,3), randomIntFromInterval(0,3)].join('')
@@ -536,60 +606,151 @@ export function* setupBoard({payload}) {
         element.walls === WALL.SOUTH_EAST
     )
 
-    const goalIndex = payload.goalIndex >= 0 && payload.goalIndex < corners.length ? payload.goalIndex : randomIntFromInterval(0, corners.length - 1)
-    const randomCorner = corners[goalIndex]
-
     const goals = Object.values(GOAL)
+    const isSharedPuzzle = payload.r >= 0
 
-    const goalColorIndex = payload.goalColor >= 0 && payload.goalColor < goals.length ? payload.goalColor : randomIntFromInterval(0, goals.length - 1)
-    const randomGoalColor = goals[goalColorIndex]
+    if (isSharedPuzzle) {
+        const goalIndex = payload.goalIndex >= 0 && payload.goalIndex < corners.length ? payload.goalIndex : randomIntFromInterval(0, corners.length - 1)
+        const randomCorner = corners[goalIndex]
+        const goalColorIndex = payload.goalColor >= 0 && payload.goalColor < goals.length ? payload.goalColor : randomIntFromInterval(0, goals.length - 1)
+        setGoal(grid, randomCorner.x, randomCorner.y, goals[goalColorIndex])
 
-    setGoal(grid, randomCorner.x, randomCorner.y, randomGoalColor)
+        let availableSpots = Object.values(grid).filter(element => element.walls !== WALL.ALL && !element.goal && !element.robot)
 
-    let availableSpots = Object.values(grid).filter(element => element.walls !== WALL.ALL && !element.goal && !element.robot)
+        const rIndex = payload.r < availableSpots.length ? payload.r : randomIntFromInterval(0, availableSpots.length - 1)
+        const redLocation = availableSpots[rIndex]
+        setRobot(grid, redLocation.x, redLocation.y, ROBOT.RED)
+        yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.RED, x: redLocation.x, y: redLocation.y}})
+        availableSpots.splice(rIndex, 1)
 
-    const rIndex = payload.r >= 0 && payload.r < availableSpots.length ? payload.r : randomIntFromInterval(0, availableSpots.length - 1)
-    const redLocation = availableSpots[rIndex]
-    setRobot(grid, redLocation.x, redLocation.y, ROBOT.RED)
-    yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.RED, x: redLocation.x, y: redLocation.y}})
-    availableSpots.splice(rIndex, 1)
+        const gIndex = payload.g >= 0 && payload.g < availableSpots.length ? payload.g : randomIntFromInterval(0, availableSpots.length - 1)
+        const greenLocation = availableSpots[gIndex]
+        setRobot(grid, greenLocation.x, greenLocation.y, ROBOT.GREEN)
+        yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.GREEN, x: greenLocation.x, y: greenLocation.y}})
+        availableSpots.splice(gIndex, 1)
 
-    const gIndex = payload.g >= 0 && payload.g < availableSpots.length ? payload.g : randomIntFromInterval(0, availableSpots.length - 1)
-    const greenLocation = availableSpots[gIndex]
-    setRobot(grid, greenLocation.x, greenLocation.y, ROBOT.GREEN)
-    yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.GREEN, x: greenLocation.x, y: greenLocation.y}})
-    availableSpots.splice(gIndex, 1)
+        const bIndex = payload.b >= 0 && payload.b < availableSpots.length ? payload.b : randomIntFromInterval(0, availableSpots.length - 1)
+        const blueLocation = availableSpots[bIndex]
+        setRobot(grid, blueLocation.x, blueLocation.y, ROBOT.BLUE)
+        yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.BLUE, x: blueLocation.x, y: blueLocation.y}})
+        availableSpots.splice(bIndex, 1)
 
-    const bIndex = payload.b >= 0 && payload.b < availableSpots.length ? payload.b : randomIntFromInterval(0, availableSpots.length - 1)
-    const blueLocation = availableSpots[bIndex]
-    setRobot(grid, blueLocation.x, blueLocation.y, ROBOT.BLUE)
-    yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.BLUE, x: blueLocation.x, y: blueLocation.y}})
-    availableSpots.splice(bIndex, 1)
+        const yIndex = payload.y >= 0 && payload.y < availableSpots.length ? payload.y : randomIntFromInterval(0, availableSpots.length - 1)
+        const yellowLocation = availableSpots[yIndex]
+        setRobot(grid, yellowLocation.x, yellowLocation.y, ROBOT.YELLOW)
+        yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.YELLOW, x: yellowLocation.x, y: yellowLocation.y}})
 
-    const yIndex = payload.y >= 0 && payload.y < availableSpots.length ? payload.y : randomIntFromInterval(0, availableSpots.length - 1)
-    const yellowLocation = availableSpots[yIndex]
-    setRobot(grid, yellowLocation.x, yellowLocation.y, ROBOT.YELLOW)
-    yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.YELLOW, x: yellowLocation.x, y: yellowLocation.y}})
-    availableSpots.splice(yIndex, 1)
+        yield put({ type: types.UPDATE_METADATA, payload: {
+                goalIndex,
+                goalColor: goalColorIndex,
+                r: rIndex,
+                g: gIndex,
+                b: bIndex,
+                y: yIndex,
+                config: boardPayload,
+            }})
+
+        yield put({ type: types.SETUP_BOARD_SUCCESS, payload: grid})
+        yield put({ type: types.SELECT_ROBOT, payload: ROBOT.RED })
+
+        const sharedRobots = {
+            [ROBOT.RED]: { x: redLocation.x, y: redLocation.y, robot: ROBOT.RED },
+            [ROBOT.GREEN]: { x: greenLocation.x, y: greenLocation.y, robot: ROBOT.GREEN },
+            [ROBOT.BLUE]: { x: blueLocation.x, y: blueLocation.y, robot: ROBOT.BLUE },
+            [ROBOT.YELLOW]: { x: yellowLocation.x, y: yellowLocation.y, robot: ROBOT.YELLOW },
+        }
+        const unsolvable = findUnsolvableRobots(grid, sharedRobots, randomCorner.x, randomCorner.y)
+        yield put({ type: types.SET_UNSOLVABLE_ROBOTS, payload: unsolvable })
+        return
+    }
+
+    const MAX_GOAL_ATTEMPTS = 3
+    const MAX_PLACEMENT_ATTEMPTS = 20
+    let foundValid = false
+    let finalGoalIndex, finalGoalColorIndex, finalPositions, finalIndices
+
+    for (let goalAttempt = 0; goalAttempt < MAX_GOAL_ATTEMPTS && !foundValid; goalAttempt++) {
+        const goalIndex = payload.goalIndex >= 0 && payload.goalIndex < corners.length
+            ? payload.goalIndex
+            : randomIntFromInterval(0, corners.length - 1)
+        const goalColorIndex = payload.goalColor >= 0 && payload.goalColor < goals.length
+            ? payload.goalColor
+            : randomIntFromInterval(0, goals.length - 1)
+
+        const goalCorner = corners[goalIndex]
+
+        const testGrid = { ...grid }
+        for (const key of Object.keys(testGrid)) {
+            testGrid[key] = { ...testGrid[key], goal: null }
+        }
+        setGoal(testGrid, goalCorner.x, goalCorner.y, goals[goalColorIndex])
+
+        const availableSpots = Object.values(testGrid).filter(element => element.walls !== WALL.ALL && !element.goal && !element.robot)
+
+        for (let placementAttempt = 0; placementAttempt < MAX_PLACEMENT_ATTEMPTS; placementAttempt++) {
+            const { positions, indices } = generateRobotPositions(availableSpots)
+
+            if (validateAllRobotsSolvable(testGrid, positions, goalCorner.x, goalCorner.y)) {
+                foundValid = true
+                finalGoalIndex = goalIndex
+                finalGoalColorIndex = goalColorIndex
+                finalPositions = positions
+                finalIndices = indices
+                break
+            }
+        }
+
+        if (!foundValid) {
+            const { positions, indices } = generateRobotPositions(availableSpots)
+            finalGoalIndex = goalIndex
+            finalGoalColorIndex = goalColorIndex
+            finalPositions = positions
+            finalIndices = indices
+        }
+    }
+
+    setGoal(grid, corners[finalGoalIndex].x, corners[finalGoalIndex].y, goals[finalGoalColorIndex])
+
+    setRobot(grid, finalPositions.RED.x, finalPositions.RED.y, ROBOT.RED)
+    yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.RED, x: finalPositions.RED.x, y: finalPositions.RED.y}})
+
+    setRobot(grid, finalPositions.GREEN.x, finalPositions.GREEN.y, ROBOT.GREEN)
+    yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.GREEN, x: finalPositions.GREEN.x, y: finalPositions.GREEN.y}})
+
+    setRobot(grid, finalPositions.BLUE.x, finalPositions.BLUE.y, ROBOT.BLUE)
+    yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.BLUE, x: finalPositions.BLUE.x, y: finalPositions.BLUE.y}})
+
+    setRobot(grid, finalPositions.YELLOW.x, finalPositions.YELLOW.y, ROBOT.YELLOW)
+    yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.YELLOW, x: finalPositions.YELLOW.x, y: finalPositions.YELLOW.y}})
 
     yield put({ type: types.UPDATE_METADATA, payload: {
-            goalIndex,
-            goalColor: goalColorIndex,
-            r: rIndex,
-            g: gIndex,
-            b: bIndex,
-            y: yIndex,
+            goalIndex: finalGoalIndex,
+            goalColor: finalGoalColorIndex,
+            r: finalIndices.r,
+            g: finalIndices.g,
+            b: finalIndices.b,
+            y: finalIndices.y,
             config: boardPayload,
         }})
 
     yield put({ type: types.SETUP_BOARD_SUCCESS, payload: grid})
     yield put({ type: types.SELECT_ROBOT, payload: ROBOT.RED })
 
+    if (!foundValid) {
+        const goalCorner = corners[finalGoalIndex]
+        const unsolvable = findUnsolvableRobots(grid, {
+            [ROBOT.RED]: { x: finalPositions.RED.x, y: finalPositions.RED.y, robot: ROBOT.RED },
+            [ROBOT.GREEN]: { x: finalPositions.GREEN.x, y: finalPositions.GREEN.y, robot: ROBOT.GREEN },
+            [ROBOT.BLUE]: { x: finalPositions.BLUE.x, y: finalPositions.BLUE.y, robot: ROBOT.BLUE },
+            [ROBOT.YELLOW]: { x: finalPositions.YELLOW.x, y: finalPositions.YELLOW.y, robot: ROBOT.YELLOW },
+        }, goalCorner.x, goalCorner.y)
+        yield put({ type: types.SET_UNSOLVABLE_ROBOTS, payload: unsolvable })
+    }
 }
 
 export function* refreshBoard() {
     yield put({type: types.CLEAR_BOARD})
-    yield call(setupBoard)
+    yield call(setupBoard, { payload: {} })
     yield put({type: types.SET_STATUS, payload: Status.PLAYING})
 }
 
@@ -899,6 +1060,14 @@ export function* checkRobotCompletion() {
         if (newCompleted.length === 4) {
             yield put({ type: types.SET_STATUS, payload: Status.WIN })
         } else {
+            const updatedGrid = yield select(getGrid)
+            const updatedRobots = yield select(getRobots)
+            const updatedGoal = Object.values(updatedGrid).find(cell => cell.goal)
+            if (updatedGoal) {
+                const unsolvable = findUnsolvableRobots(updatedGrid, updatedRobots, updatedGoal.x, updatedGoal.y)
+                yield put({ type: types.SET_UNSOLVABLE_ROBOTS, payload: unsolvable })
+            }
+
             const nextRobot = ROBOT_ORDER.find(r => !newCompleted.includes(r))
             if (nextRobot) {
                 yield put({ type: types.SELECT_ROBOT, payload: nextRobot })

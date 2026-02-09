@@ -1,7 +1,7 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { ROBOT, Status } from '../constants'
-import { actions, getCompletedRobots } from '../ducks/boards'
+import { actions, getCompletedRobots, getUnsolvableRobots } from '../ducks/boards'
 import { ROBOT_ICON_MAP, ROBOT_NAME_MAP, ROBOT_COLOR_MAP } from './RobotIcons'
 
 const ROBOT_KEYS = [
@@ -19,6 +19,7 @@ export const RobotPanel = () => {
     const status = useSelector(state => state.boards.status)
     const selectedRobot = useSelector(state => state.boards.selectedRobot)
     const completedRobots = useSelector(getCompletedRobots)
+    const unsolvableRobots = useSelector(getUnsolvableRobots)
 
     const isWin = status === Status.WIN
 
@@ -39,6 +40,7 @@ export const RobotPanel = () => {
             {ROBOT_KEYS.map(({ key, shortcut }) => {
                 const IconComponent = ROBOT_ICON_MAP[key]
                 const isCompleted = completedRobots.includes(key)
+                const isUnsolvable = unsolvableRobots.includes(key)
                 const isSelected = selectedRobot === key
 
                 let itemStyle = {
@@ -85,8 +87,11 @@ export const RobotPanel = () => {
                                 </div>
                             )}
                         </div>
-                        {!isCompleted && (
+                        {!isCompleted && !isUnsolvable && (
                             <span style={{ fontSize: '0.7rem', fontWeight: 700, color: ROBOT_COLOR_MAP[key], textTransform: 'uppercase' }}>Target</span>
+                        )}
+                        {!isCompleted && isUnsolvable && (
+                            <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#b5430e', textTransform: 'uppercase' }}>No path</span>
                         )}
                         {isCompleted && (
                             <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--color-win-bg)', textTransform: 'uppercase' }}>Done</span>
