@@ -79,9 +79,9 @@ export const GameBoard = ({goalIndex, goalColor, r, g, b, y, config}) => {
     }
 
     return (
-        <div style={{ marginLeft: '0', border: '10px solid white', background: 'black',  padding: '5px', width: 'calc(100 * var(--vmin-minus-header) )', height: 'calc(100 * var(--vmin-minus-header) )'}}>
+        <div style={{ marginLeft: '0', border: '10px solid var(--color-board-padding)', background: 'var(--color-board-outer-border)',  padding: '5px', width: 'calc(100 * var(--vmin-minus-header) )', height: 'calc(100 * var(--vmin-minus-header) )', boxShadow: '0 4px 24px var(--color-board-shadow, transparent), 0 0 0 1px var(--color-board-outer-border, transparent)'}}>
         { displayGrid.map((row, y) => (
-            <nav key={y} className="level" style={{margin: 0, background: 'white'}}>
+            <nav key={y} className="level" style={{margin: 0, background: 'var(--color-board-padding)'}}>
                 <div className="level-item">
                 { row.map((cell, x) => (
                     <GamePiece key={`${x}-${y}`} gridCell={displayGrid[x][y]} isInRobotPath={isInRobotPath(x, y)} isHoveringInRobotPath={isHoveringInRobotPath(x, y)} />

@@ -6,6 +6,8 @@ import { WALL, ROBOT, GOAL, Status } from '../constants'
 
 import board from '../constants/board'
 
+import { solve } from '../solver/solver'
+
 // /////////////////////////////////////////////////////////////////////////////
 // Action Types
 // /////////////////////////////////////////////////////////////////////////////
@@ -44,6 +46,15 @@ export const types = {
     UPDATE_HOVER_ROBOT_PATH: 'UPDATE_HOVER_ROBOT_PATH',
     UPDATE_HOVER_ROBOT_PATH_SUCCESS: 'UPDATE_HOVER_ROBOT_PATH_SUCCESS',
     CLEAR_HOVER_ROBOT_PATH: 'CLEAR_HOVER_ROBOT_PATH',
+
+    SOLVE_PUZZLE: 'SOLVE_PUZZLE',
+    SOLVE_PUZZLE_SUCCESS: 'SOLVE_PUZZLE_SUCCESS',
+    SOLVE_PUZZLE_ERROR: 'SOLVE_PUZZLE_ERROR',
+    REQUEST_HINT: 'REQUEST_HINT',
+    SHOW_NEXT_HINT: 'SHOW_NEXT_HINT',
+    DISMISS_HINT: 'DISMISS_HINT',
+
+    COMPLETE_ROBOT: 'COMPLETE_ROBOT',
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -80,6 +91,11 @@ export const actions = {
 
     clearHoverRobotPath: createAction(types.CLEAR_HOVER_ROBOT_PATH),
 
+    requestHint: createAction(types.REQUEST_HINT),
+    dismissHint: createAction(types.DISMISS_HINT),
+
+    completeRobot: createAction(types.COMPLETE_ROBOT),
+
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -97,6 +113,11 @@ export const initialState = {
     selectedRobot: undefined,
     robotTabOrder: [ROBOT.BLUE, ROBOT.GREEN, ROBOT.YELLOW, ROBOT.RED],
     metadata: {},
+    solution: null,
+    optimalMoves: -1,
+    solverStatus: 'idle',
+    hintIndex: -1,
+    completedRobots: [],
 }
 
 export default function (state = initialState, action) {
@@ -111,11 +132,13 @@ export default function (state = initialState, action) {
             hoverRobot: undefined,
             selectedRobot: undefined,
             metadata: {},
+            solution: null,
+            optimalMoves: -1,
+            solverStatus: 'idle',
+            hintIndex: -1,
+            completedRobots: [],
         }
     case types.MOVE_SUCCESS:
-
-        // console.dir(state.grid[`${action.payload.oldX},${action.payload.oldY}`].walls)
-        // console.dir(state.grid[`${action.payload.newX},${action.payload.newY}`].walls)
         return {
             ...state,
             grid: {
@@ -126,7 +149,7 @@ export default function (state = initialState, action) {
                     walls: state.grid[`${action.payload.oldX},${action.payload.oldY}`].walls,
                     robot: null,
                     goal: state.grid[`${action.payload.oldX},${action.payload.oldY}`].goal,
-                },                
+                },
                 [`${action.payload.newX},${action.payload.newY}`]: {
                     x: action.payload.newX,
                     y: action.payload.newY,
@@ -141,9 +164,13 @@ export default function (state = initialState, action) {
                     x: action.payload.newX,
                     y: action.payload.newY,
                     robot: action.payload.robot,
-                }                
+                }
             },
-            history: state.history.concat({ direction: action.payload.direction, robot: action.payload.robot})
+            history: state.history.concat({ direction: action.payload.direction, robot: action.payload.robot}),
+            solution: null,
+            optimalMoves: -1,
+            solverStatus: 'idle',
+            hintIndex: -1,
         }
     case types.SET_ROBOT:
         return {
@@ -160,7 +187,11 @@ export default function (state = initialState, action) {
     case types.SELECT_ROBOT:
         return {
             ...state,
-            selectedRobot: action.payload
+            selectedRobot: action.payload,
+            solution: null,
+            optimalMoves: -1,
+            solverStatus: 'idle',
+            hintIndex: -1,
         }
     case types.SETUP_BOARD_SUCCESS:
         return {
@@ -168,7 +199,6 @@ export default function (state = initialState, action) {
             grid: action.payload
         }
     case types.SELECT_NEXT_ROBOT:
-        // TODO defunct, this doesn't work ... perhaps if we have a "tab" functionality        
         return {
             ...state
         }
@@ -209,6 +239,62 @@ export default function (state = initialState, action) {
             ...state,
             metadata: action.payload,
         }
+    case types.SOLVE_PUZZLE:
+        return {
+            ...state,
+            solverStatus: 'solving',
+        }
+    case types.SOLVE_PUZZLE_SUCCESS:
+        return {
+            ...state,
+            solution: action.payload.solution,
+            optimalMoves: action.payload.optimalMoves,
+            solverStatus: action.payload.solution ? 'solved' : 'unsolvable',
+        }
+    case types.SOLVE_PUZZLE_ERROR:
+        return {
+            ...state,
+            solverStatus: 'error',
+        }
+    case types.SHOW_NEXT_HINT:
+        return {
+            ...state,
+            hintIndex: state.hintIndex + 1,
+        }
+    case types.DISMISS_HINT:
+        return {
+            ...state,
+            hintIndex: -1,
+        }
+    case types.COMPLETE_ROBOT: {
+        const robotName = action.payload
+        const robotData = state.robots[robotName]
+        const newRobots = { ...state.robots }
+        delete newRobots[robotName]
+
+        let newGrid = state.grid
+        if (robotData) {
+            const cellKey = `${robotData.x},${robotData.y}`
+            newGrid = {
+                ...state.grid,
+                [cellKey]: {
+                    ...state.grid[cellKey],
+                    robot: null,
+                },
+            }
+        }
+
+        return {
+            ...state,
+            completedRobots: [...state.completedRobots, robotName],
+            robots: newRobots,
+            grid: newGrid,
+            solution: null,
+            optimalMoves: -1,
+            solverStatus: 'idle',
+            hintIndex: -1,
+        }
+    }
     default:
       return state
   }
@@ -218,11 +304,26 @@ export default function (state = initialState, action) {
 // Utils
 // /////////////////////////////////////////////////////////////////////////////
 const setRobot = (grid, x, y, robot) => grid[`${x},${y}`] = {...grid[`${x},${y}`], robot}
-// const setWalls = (grid, x, y, walls) => grid[`${x},${y}`] = {...grid[`${x},${y}`], walls}
 const setGoal = (grid, x, y, goal) => grid[`${x},${y}`] = {...grid[`${x},${y}`], goal}
 
 function randomIntFromInterval(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+// /////////////////////////////////////////////////////////////////////////////
+// Selectors
+// /////////////////////////////////////////////////////////////////////////////
+
+export const getGrid = state => state.boards.grid
+export const getSelectedRobot = state => state.boards.robots[state.boards.selectedRobot]
+export const getRobotPath = state => state.boards.selectedRobotPath
+export const getRobots = state => state.boards.robots
+export const getCompletedRobots = state => state.boards.completedRobots
+
+export const getCurrentHint = state => {
+    const { solution, hintIndex } = state.boards
+    if (!solution || hintIndex < 0 || hintIndex >= solution.length) return null
+    return solution[hintIndex]
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -289,7 +390,7 @@ function processBoard(board, location) {
             newBoard = rotate(newBoard, 3)
         } else if(location === 'BL') {
             newBoard = rotate(newBoard)
-        } 
+        }
     } else if(centerSquare === 2) {
         if(location === 'TL') {
             newBoard = rotate(newBoard)
@@ -309,7 +410,7 @@ function processBoard(board, location) {
     } else if(centerSquare === 4) {
         if(location === 'TR') {
             newBoard = rotate(newBoard)
-        } else if(location === 'BL') {  
+        } else if(location === 'BL') {
             newBoard = rotate(newBoard, 3)
         } else if(location === 'BR') {
             newBoard = rotate(newBoard, 2)
@@ -317,17 +418,6 @@ function processBoard(board, location) {
     }
 
     return newBoard
-}
-
-/**
- * Debug print the board
- * 
- * @param {*} board 
- */
-const printBoard = (board) => {
-    for(let y=0; y<board.length; y++) {
-        console.log(board[y].join(','))
-    }
 }
 
 function processBoards(boardTL, boardTR, boardBL, boardBR) {
@@ -340,8 +430,13 @@ function processBoards(boardTL, boardTR, boardBL, boardBR) {
     }
 }
 
+const X_MIN = 0
+const Y_MIN = 0
+const X_MAX = 15
+const Y_MAX = 15
+
 /**
- * Convert this to set up the board using Redux actions instead
+ * Set up the game board by assembling 4 rotated quadrants, placing goal and robots
  */
 export function* setupBoard({payload}) {
     let boardKeys = Object.keys(board)
@@ -350,8 +445,6 @@ export function* setupBoard({payload}) {
         return [randomIntFromInterval(0,3), randomIntFromInterval(0,3), randomIntFromInterval(0,3), randomIntFromInterval(0,3)].join('')
     }
 
-    // console.log(payload.config)
-    
     let boardPayload = payload.config && payload.config.length === 4 ? payload.config : randomBoard()
     let boardSplit = boardPayload.split('').map(entry => Number(entry))
 
@@ -359,30 +452,15 @@ export function* setupBoard({payload}) {
         boardSplit[1] < 0 || boardSplit[1] > 3 ||
         boardSplit[2] < 0 || boardSplit[2] > 3 ||
         boardSplit[3] < 0 || boardSplit[3] > 3) {
-        
-        console.log("received bad payload")
+
         boardPayload = randomBoard()
         boardSplit = boardPayload.split('').map(entry => Number(entry))
     }
 
-    // let boardTLKey = Object.prototype.hasOwnProperty.call(board, payload.tl) ? payload.tl : boardKeys[randomIntFromInterval(0, boardKeys.length - 1)]
     let boardTL = board['classic']['RED'][boardSplit[0]]
-    // let boardTL = board[boardTLKey]
-
-    // let boardTRKey = Object.prototype.hasOwnProperty.call(board, payload.tr) ? payload.tr : boardKeys[randomIntFromInterval(0, boardKeys.length - 1)]
-    // let boardTR = board[boardTRKey]
     let boardTR = board['classic']['GREEN'][boardSplit[1]]
-
-    // let boardBLKey = Object.prototype.hasOwnProperty.call(board, payload.bl) ? payload.bl : boardKeys[randomIntFromInterval(0, boardKeys.length - 1)]
-    // let boardBL = board[boardBLKey]
     let boardBL = board['classic']['YELLOW'][boardSplit[2]]
-
-    // let boardBRKey = Object.prototype.hasOwnProperty.call(board, payload.br) ? payload.br : boardKeys[randomIntFromInterval(0, boardKeys.length - 1)]
-    // let boardBR = board[boardBRKey]
     let boardBR = board['classic']['BLUE'][boardSplit[3]]
-
-    // console.log(`TL: (${boardTLKey}) TR: (${boardTRKey})`)
-    // console.log(`BL: (${boardBLKey}) BR: (${boardBRKey})`)
 
     const { TL, TR, BL, BR } = processBoards(boardTL, boardTR, boardBL, boardBR)
 
@@ -436,10 +514,10 @@ export function* setupBoard({payload}) {
         }
     }
 
-    const corners = Object.values(grid).filter(element => 
-        element.walls === WALL.NORTH_WEST || 
-        element.walls === WALL.NORTH_EAST || 
-        element.walls === WALL.SOUTH_WEST || 
+    const corners = Object.values(grid).filter(element =>
+        element.walls === WALL.NORTH_WEST ||
+        element.walls === WALL.NORTH_EAST ||
+        element.walls === WALL.SOUTH_WEST ||
         element.walls === WALL.SOUTH_EAST
     )
 
@@ -450,10 +528,9 @@ export function* setupBoard({payload}) {
 
     const goalColorIndex = payload.goalColor >= 0 && payload.goalColor < goals.length ? payload.goalColor : randomIntFromInterval(0, goals.length - 1)
     const randomGoalColor = goals[goalColorIndex]
-    
+
     setGoal(grid, randomCorner.x, randomCorner.y, randomGoalColor)
 
-    // ROBOTS!
     let availableSpots = Object.values(grid).filter(element => element.walls !== WALL.ALL && !element.goal && !element.robot)
 
     const rIndex = payload.r >= 0 && payload.r < availableSpots.length ? payload.r : randomIntFromInterval(0, availableSpots.length - 1)
@@ -480,18 +557,14 @@ export function* setupBoard({payload}) {
     yield put({ type: types.SET_ROBOT, payload: { robot: ROBOT.YELLOW, x: yellowLocation.x, y: yellowLocation.y}})
     availableSpots.splice(yIndex, 1)
 
-    yield put({ type: types.UPDATE_METADATA, payload: { 
-            goalIndex, 
-            goalColor: goalColorIndex, 
-            r: rIndex, 
-            g: gIndex, 
-            b: bIndex, 
+    yield put({ type: types.UPDATE_METADATA, payload: {
+            goalIndex,
+            goalColor: goalColorIndex,
+            r: rIndex,
+            g: gIndex,
+            b: bIndex,
             y: yIndex,
             config: boardPayload,
-            // tl: boardTLKey,
-            // tr: boardTRKey,
-            // bl: boardTLKey,
-            // br: boardBRKey
         }})
 
     yield put({ type: types.SETUP_BOARD_SUCCESS, payload: grid})
@@ -505,25 +578,62 @@ export function* refreshBoard() {
     yield put({type: types.SET_STATUS, payload: Status.PLAYING})
 }
 
-export const getGrid = state => state.boards.grid
-export const getSelectedRobot = state => state.boards.robots[state.boards.selectedRobot]
+/**
+ * Run the BFS solver for the currently selected robot
+ */
+export function* solvePuzzleSaga() {
+    yield put({ type: types.SOLVE_PUZZLE })
 
-export const getRobotPath = state => state.boards.selectedRobotPath
+    try {
+        const grid = yield select(getGrid)
+        const robots = yield select(getRobots)
+        const selectedRobotName = yield select(state => state.boards.selectedRobot)
 
-export const getRobots = state => state.boards.robots
+        const goalCell = Object.values(grid).find(cell => cell.goal)
+        if (!goalCell) {
+            yield put({ type: types.SOLVE_PUZZLE_ERROR })
+            return
+        }
 
-const X_MIN = 0
-const Y_MIN = 0
-const X_MAX = 15
-const Y_MAX = 15
+        if (!selectedRobotName || !robots[selectedRobotName]) {
+            yield put({ type: types.SOLVE_PUZZLE_ERROR })
+            return
+        }
+
+        const result = solve(grid, robots, goalCell.x, goalCell.y, selectedRobotName)
+
+        yield put({ type: types.SOLVE_PUZZLE_SUCCESS, payload: result })
+    } catch (e) {
+        console.error('Solver error:', e)
+        yield put({ type: types.SOLVE_PUZZLE_ERROR })
+    }
+}
+
+/**
+ * Handle hint requests: solve on demand if needed, then show next hint
+ */
+export function* requestHintSaga() {
+    const solverStatus = yield select(state => state.boards.solverStatus)
+
+    if (solverStatus !== 'solved') {
+        yield call(solvePuzzleSaga)
+    }
+
+    const solution = yield select(state => state.boards.solution)
+    const hintIndex = yield select(state => state.boards.hintIndex)
+
+    if (solution && hintIndex < solution.length - 1) {
+        yield put({ type: types.SHOW_NEXT_HINT })
+    }
+}
 
 export function* updateRobotPath({payload}) {
-    // console.dir(payload)
-
     const grid = yield select(getGrid)
 
     const robots = yield select(getRobots)
     const selectedRobot = robots[payload]
+
+    if (!selectedRobot) return
 
     const { up, down, left, right } = illuminateThePath(grid, selectedRobot)
 
@@ -542,7 +652,6 @@ export function* updateHoverRobotPath({payload}) {
         yield put({ type: types.UPDATE_HOVER_ROBOT_PATH_SUCCESS, payload: { up, down, left, right, robot: payload }})
     }
 }
-//  takeEvery(types.HOVER_ROBOT, updateHoverRobotPath),
 
 const illuminateThePath = (grid, selectedRobot) => {
     const {x, y} = selectedRobot
@@ -557,27 +666,21 @@ const illuminateThePath = (grid, selectedRobot) => {
         let done = false
         let newY = y
 
-        // console.log("Processing UP")
         while(newY >= 0) {
-            // console.log(`newY: ${newY}`)
             const newCell = grid[`${x},${newY}`]
-            
+
             if(!done && y !== newY && newCell.robot) {
                 up = up.slice(1)
                 done = true
             }
 
-            // console.log(newCell)
             if(!done && (newCell.walls === WALL.NORTH || newCell.walls === WALL.NORTH_WEST || newCell.walls === WALL.NORTH_EAST)) {
                 up.push({x, y: newY})
                 done = true
             }
-            
+
             if((!done && y !== newY) && (newCell.walls === WALL.SOUTH || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.SOUTH_WEST || newCell.walls === WALL.ALL)) {
-                // console.log(up)
-                // console.log(`up.length: ${up.length}`)
-                up = up.slice(1)  // we hit a wall prior
-                // console.log(up)
+                up = up.slice(1)
                 done = true
             }
 
@@ -593,7 +696,6 @@ const illuminateThePath = (grid, selectedRobot) => {
         let done = false
         let newY = y
 
-        // console.log("Processing DOWN")
         while(newY <= Y_MAX) {
             const newCell = grid[`${x},${newY}`]
 
@@ -602,14 +704,10 @@ const illuminateThePath = (grid, selectedRobot) => {
                 done = true
             }
 
-            // console.log(newCell)
             if((!done && y !== newY) && (newCell.walls === WALL.NORTH || newCell.walls === WALL.NORTH_EAST || newCell.walls === WALL.NORTH_WEST || newCell.walls === WALL.ALL)) {
-                // console.log(`if.DOWN: ${down.map(obj => `(${obj.x}, ${obj.y})`)}`)
-                // console.log(`down.length: ${down.length}`)
-                down = down.slice(0, down.length > 1 ? down.length : 0)  // we hit a wall prior
-                // console.log(`if.after.slice.DOWN: ${down.map(obj => `(${obj.x}, ${obj.y})`)}`)
+                down = down.slice(0, down.length > 1 ? down.length : 0)
                 done = true
-            } 
+            }
 
             if(!done && newY === y && (newCell.walls === WALL.SOUTH || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.SOUTH_WEST)) {
                 done = true
@@ -624,7 +722,7 @@ const illuminateThePath = (grid, selectedRobot) => {
                 down.push({x, y: newY})
             }
 
-            ++newY            
+            ++newY
         }
     }
 
@@ -633,31 +731,23 @@ const illuminateThePath = (grid, selectedRobot) => {
         let done = false
         let newX = x
 
-        // console.log("Processing LEFT")
         while(newX >= 0) {
             const newCell = grid[`${newX},${y}`]
 
             if(!done && x !== newX && newCell.robot) {
-                // console.log(`if.ROBOT.LEFT: ${left.map(obj => `(${obj.x}, ${obj.y})`)}`)
                 left = left.slice(1)
-                // console.log(`if.ROBOT.after.slice.LEFT: ${left.map(obj => `(${obj.x}, ${obj.y})`)}`)
                 done = true
             }
-            
-            // console.log(newCell)
+
             if(!done && (newCell.walls === WALL.WEST || newCell.walls === WALL.NORTH_WEST || newCell.walls === WALL.SOUTH_WEST)) {
                 if(x !== newX) {
                     left.push({x: newX, y})
                 }
                 done = true
             }
-            
-            // console.log(`x: ${x} newX: ${newX} newCell.walls: ${newCell.walls} done: ${done}`)
+
             if((!done && x !== newX) && (newCell.walls === WALL.EAST || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.NORTH_EAST || newCell.walls === WALL.ALL)) {
-                // console.dir(newCell)
-                // console.log(`if.LEFT: ${left.map(obj => `(${obj.x}, ${obj.y})`)}`)
-                left = left.slice(1)  // we hit a wall prior
-                // console.log(`if.after.slice.LEFT: ${left.map(obj => `(${obj.x}, ${obj.y})`)}`)
+                left = left.slice(1)
                 done = true
             }
 
@@ -673,24 +763,18 @@ const illuminateThePath = (grid, selectedRobot) => {
         let done = false
         let newX = x
 
-        // console.log("Processing RIGHT")
         while(newX <= X_MAX) {
             const newCell = grid[`${newX},${y}`]
 
             if(!done && x !== newX && (newCell.robot || newCell.walls === WALL.ALL)) {
-                // console.log(`2.if.RIGHT: ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
                 right = right.slice(0, right.length > 1 ? right.length : 0)
-                // console.log(`2.after.slice.if.RIGHT: ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
                 done = true
             }
 
-            // console.log(newCell)
             if((!done && x !== newX) && (newCell.walls === WALL.WEST || newCell.walls === WALL.SOUTH_WEST || newCell.walls === WALL.NORTH_WEST)) {
-                // console.log(`if.RIGHT: ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
-                right = right.slice(0, right.length > 1 ? right.length : 0)  // we hit a wall prior
+                right = right.slice(0, right.length > 1 ? right.length : 0)
                 done = true
-                // console.log(`if.after.slice.RIGHT: ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
-            } 
+            }
 
             if(!done && (newCell.walls === WALL.EAST || newCell.walls === WALL.SOUTH_EAST || newCell.walls === WALL.NORTH_EAST)) {
                 if(x !== newX) {
@@ -703,14 +787,9 @@ const illuminateThePath = (grid, selectedRobot) => {
                 right.push({x: newX, y})
             }
 
-            ++newX            
+            ++newX
         }
-    }    
-
-    // console.log(`UP ${up.map(obj => `(${obj.x}, ${obj.y})`)}`)
-    // console.log(`DOWN ${down.map(obj => `(${obj.x}, ${obj.y})`)}`)
-    // console.log(`LEFT ${left.map(obj => `(${obj.x}, ${obj.y})`)}`)
-    // console.log(`RIGHT ${right.map(obj => `(${obj.x}, ${obj.y})`)}`)
+    }
 
     return {
         up,
@@ -722,6 +801,7 @@ const illuminateThePath = (grid, selectedRobot) => {
 
 export function* moveUp() {
     const selectedRobot = yield select(getSelectedRobot)
+    if (!selectedRobot) return
 
     const {robot, x, y} = selectedRobot
     const { up } = yield select(getRobotPath)
@@ -736,6 +816,7 @@ export function* moveUp() {
 
 export function* moveDown() {
     const selectedRobot = yield select(getSelectedRobot)
+    if (!selectedRobot) return
 
     const {robot, x, y} = selectedRobot
     const { down } = yield select(getRobotPath)
@@ -743,13 +824,14 @@ export function* moveDown() {
     if(down && down.length > 0) {
         const moveCoord = down[down.length-1]
 
-        yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: moveCoord.x, newY: moveCoord.y, robot: robot, direction: 'DOWN'}})        
+        yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: moveCoord.x, newY: moveCoord.y, robot: robot, direction: 'DOWN'}})
         yield call(updateRobotPath, { payload: robot})
-    }  
+    }
 }
 
 export function* moveLeft() {
     const selectedRobot = yield select(getSelectedRobot)
+    if (!selectedRobot) return
 
     const {robot, x, y} = selectedRobot
     const { left } = yield select(getRobotPath)
@@ -757,13 +839,14 @@ export function* moveLeft() {
     if(left && left.length > 0) {
         const moveCoord = left[left.length-1]
 
-        yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: moveCoord.x, newY: moveCoord.y, robot: robot, direction: 'LEFT'}})        
+        yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: moveCoord.x, newY: moveCoord.y, robot: robot, direction: 'LEFT'}})
         yield call(updateRobotPath, { payload: robot})
-    }  
+    }
 }
 
 export function* moveRight() {
     const selectedRobot = yield select(getSelectedRobot)
+    if (!selectedRobot) return
 
     const {robot, x, y} = selectedRobot
     const { right } = yield select(getRobotPath)
@@ -771,21 +854,41 @@ export function* moveRight() {
     if(right && right.length > 0) {
         const moveCoord = right[right.length-1]
 
-        yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: moveCoord.x, newY: moveCoord.y, robot: robot, direction: 'RIGHT'}})        
+        yield put({type: types.MOVE_SUCCESS, payload: { oldX: x, oldY: y, newX: moveCoord.x, newY: moveCoord.y, robot: robot, direction: 'RIGHT'}})
         yield call(updateRobotPath, { payload: robot})
-    }  
+    }
 }
 
-export function* checkGoal() {
+const ROBOT_ORDER = [ROBOT.RED, ROBOT.GREEN, ROBOT.BLUE, ROBOT.YELLOW]
+
+/**
+ * After each move, check if any robot is on the goal cell and handle completion
+ */
+export function* checkRobotCompletion() {
     const grid = yield select(getGrid)
     const robots = yield select(getRobots)
+    const completedRobots = yield select(getCompletedRobots)
 
-    const goal = Object.values(grid).filter(element => element.goal)[0]
+    const goalCell = Object.values(grid).find(cell => cell.goal)
+    if (!goalCell) return
 
-    const winningRobot = Object.values(robots).filter(robot => robot.x === goal.x && robot.y === goal.y && robot.robot === goal.goal)
+    const robotOnGoal = Object.values(robots).find(
+        robot => robot.x === goalCell.x && robot.y === goalCell.y
+    )
 
-    if(winningRobot && winningRobot.length === 1) {
-        yield put({type: types.SET_STATUS, payload: Status.WIN})
+    if (robotOnGoal) {
+        yield put({ type: types.COMPLETE_ROBOT, payload: robotOnGoal.robot })
+
+        const newCompleted = [...completedRobots, robotOnGoal.robot]
+
+        if (newCompleted.length === 4) {
+            yield put({ type: types.SET_STATUS, payload: Status.WIN })
+        } else {
+            const nextRobot = ROBOT_ORDER.find(r => !newCompleted.includes(r))
+            if (nextRobot) {
+                yield put({ type: types.SELECT_ROBOT, payload: nextRobot })
+            }
+        }
     }
 }
 
@@ -800,5 +903,7 @@ export const sagas = [
   takeEvery(types.MOVE_DOWN, moveDown),
   takeEvery(types.MOVE_LEFT, moveLeft),
   takeEvery(types.MOVE_RIGHT, moveRight),
-  takeEvery(types.MOVE_SUCCESS, checkGoal),
+  takeEvery(types.MOVE_SUCCESS, checkRobotCompletion),
+
+  takeEvery(types.REQUEST_HINT, requestHintSaga),
 ]

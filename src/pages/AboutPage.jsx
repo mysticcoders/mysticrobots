@@ -1,9 +1,10 @@
 import React from 'react'
 
-import { FaRobot, FaStar } from 'react-icons/fa'
+import { FaStar } from 'react-icons/fa'
 
 import { HeaderContainer } from '../containers/HeaderContainer'
 import { FooterContainer } from '../containers/FooterContainer'
+import { RollieIcon, GumballIcon, BlubberIcon, YoloIcon } from '../components/RobotIcons'
 
 export const AboutPage = () => {
   return (
@@ -24,20 +25,20 @@ export const AboutPage = () => {
                     There are 4 robots:
 
                     <ul>
-                        <li>
-                            <FaRobot size="2em" style={{ color: 'red'}} /> &mdash; Rollie
+                        <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <RollieIcon size={32} /> &mdash; Rollie
                         </li>
 
-                        <li>
-                            <FaRobot size="2em" style={{ color: 'green'}} /> &mdash; Gumball
+                        <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <GumballIcon size={32} /> &mdash; Gumball
                         </li>
 
-                        <li>
-                            <FaRobot size="2em" style={{ color: 'blue'}} /> &mdash; Blubber
+                        <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <BlubberIcon size={32} /> &mdash; Blubber
                         </li>
 
-                        <li>
-                            <FaRobot size="2em" style={{ color: 'yellow'}} /> &mdash; Yolo
+                        <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <YoloIcon size={32} /> &mdash; Yolo
                         </li>
 
                     </ul>
@@ -48,10 +49,10 @@ export const AboutPage = () => {
                     </p>
 
                     <p>
-                        <FaStar size="2em" style={{ color: 'red' }} />
-                        <FaStar size="2em" style={{ color: 'green' }} />
-                        <FaStar size="2em" style={{ color: 'blue' }} />
-                        <FaStar size="2em" style={{ color: 'yellow' }} />
+                        <FaStar size="2em" style={{ color: 'var(--color-robot-red)' }} />
+                        <FaStar size="2em" style={{ color: 'var(--color-robot-green)' }} />
+                        <FaStar size="2em" style={{ color: 'var(--color-robot-blue)' }} />
+                        <FaStar size="2em" style={{ color: 'var(--color-robot-yellow)' }} />
                     </p>
 
                     <p>
@@ -74,7 +75,7 @@ export const AboutPage = () => {
                         4 directional buttons are also given to your right (on desktop) and below (on mobile) so you can control with just mouse that way.
                     </p>
                     <p>
-                        Swipe will be added soon.
+                        Press <strong>H</strong> to get a hint from the solver showing the optimal next move.
                     </p>
                 </div>
                 <h2 className="title">Who built this?</h2>

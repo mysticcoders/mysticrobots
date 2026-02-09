@@ -7,20 +7,22 @@ import { useHotkeys } from 'react-hotkeys-hook'
 
 import { GameBoard } from '../containers/GameBoard'
 
-import { actions } from '../ducks/boards'
+import { actions, getCurrentHint, getCompletedRobots } from '../ducks/boards'
 
-import { FaArrowUp, FaArrowDown, FaArrowLeft, FaArrowRight } from 'react-icons/fa'
+import { FaArrowUp, FaArrowDown, FaArrowLeft, FaArrowRight, FaLightbulb } from 'react-icons/fa'
 import { FaArrowAltCircleUp, FaArrowAltCircleDown, FaArrowAltCircleLeft, FaArrowAltCircleRight } from 'react-icons/fa'
 
 import { ROBOT, Status } from '../constants'
+import { ROBOT_COLOR_MAP, ROBOT_NAME_MAP, ROBOT_ICON_MAP } from '../components/RobotIcons'
 
 import { useInterval } from '../hooks/utils'
-import ShareButtons from '../components/ShareButtons'
+import { getCompletionMessage } from '../solver/messages'
+import RobotPanel from '../components/RobotPanel'
 
 import numeral from 'numeral'
 
 /**
- * Will contain the Retro Rockets gameboard
+ * Main game container with board, controls, hints, robot panel, and win feedback
  */
 export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
     const dispatch = useDispatch()
@@ -31,6 +33,12 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
     const status = useSelector(state => state.boards.status)
 
     const metadata = useSelector(state => state.boards.metadata)
+
+    const solverStatus = useSelector(state => state.boards.solverStatus)
+    const solution = useSelector(state => state.boards.solution)
+    const currentHint = useSelector(getCurrentHint)
+    const hintIndex = useSelector(state => state.boards.hintIndex)
+    const completedRobots = useSelector(getCompletedRobots)
 
     const [timerOn, setTimerOn] = useState(true)
     const [startTime, setStartTime] = useState(new Date().valueOf())
@@ -84,15 +92,21 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
         setTimerOn(true)
     }
 
-    useHotkeys('1', () => status !== Status.WIN && dispatch(actions.selectRobot(ROBOT.RED)), {}, [status] )
-    useHotkeys('2', () => status !== Status.WIN && dispatch(actions.selectRobot(ROBOT.GREEN)), {}, [status] )
-    useHotkeys('3', () => status !== Status.WIN && dispatch(actions.selectRobot(ROBOT.BLUE)), {}, [status] )
-    useHotkeys('4', () => status !== Status.WIN && dispatch(actions.selectRobot(ROBOT.YELLOW)), {}, [status] )
+    useHotkeys('1', () => status !== Status.WIN && !completedRobots.includes(ROBOT.RED) && dispatch(actions.selectRobot(ROBOT.RED)), {}, [status, completedRobots] )
+    useHotkeys('2', () => status !== Status.WIN && !completedRobots.includes(ROBOT.GREEN) && dispatch(actions.selectRobot(ROBOT.GREEN)), {}, [status, completedRobots] )
+    useHotkeys('3', () => status !== Status.WIN && !completedRobots.includes(ROBOT.BLUE) && dispatch(actions.selectRobot(ROBOT.BLUE)), {}, [status, completedRobots] )
+    useHotkeys('4', () => status !== Status.WIN && !completedRobots.includes(ROBOT.YELLOW) && dispatch(actions.selectRobot(ROBOT.YELLOW)), {}, [status, completedRobots] )
 
     useHotkeys('up', () => status !== Status.WIN && dispatch(actions.moveUp()), {}, [status])
     useHotkeys('down', () => status !== Status.WIN && dispatch(actions.moveDown()), {}, [status])
     useHotkeys('left', () => status !== Status.WIN && dispatch(actions.moveLeft()), {}, [status])
     useHotkeys('right', () => status !== Status.WIN && dispatch(actions.moveRight()), {}, [status])
+
+    useHotkeys('h', () => {
+        if (status !== Status.WIN) {
+            dispatch(actions.requestHint())
+        }
+    }, {}, [status])
 
     const renderElapsedTime = () => {
         const inSeconds = elapsedTime / 1000
@@ -104,6 +118,25 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
         )
     }
 
+    const renderHint = () => {
+        if (!currentHint || status === Status.WIN) return null
+        const HintIcon = ROBOT_ICON_MAP[currentHint.robot]
+        return (
+            <div className="notification is-warning" style={{ padding: '0.75rem 1rem', marginBottom: '0.5rem' }}>
+                <button className="delete" onClick={() => dispatch(actions.dismissHint())}></button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {HintIcon && <HintIcon size={24} />}
+                    <span style={{ fontWeight: 600 }}>
+                        Move {ROBOT_NAME_MAP[currentHint.robot]} {currentHint.direction.charAt(0) + currentHint.direction.slice(1).toLowerCase()}
+                    </span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+                        (Step {hintIndex + 1} of {solution.length})
+                    </span>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className="columns" style={{margin: 0}}>
 
@@ -111,31 +144,62 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
                 <GameBoard goalIndex={goalIndex} goalColor={goalColor} r={r} g={g} b={b} y={y} config={config} />
             </div>
             <div className="column">
-                {status === 'WIN' &&
-                    <div className="notification is-success">
-                        Congratulations! You solved the grid in {moveHistory.length} moves! and it took you {renderElapsedTime()} to complete.
-                        Share on <ShareButtons
-                            title={`I solved this puzzle in ${moveHistory.length} moves, can you do better? `}
-                            shareUrl={document.location}
-                        />
+                <RobotPanel />
 
+                {status === 'WIN' &&
+                    <div className="notification is-success" style={{ marginBottom: '0.75rem' }}>
+                        <p style={{ fontWeight: 700 }}>
+                            All 4 robots home in {moveHistory.length} moves ({renderElapsedTime()}).
+                        </p>
+                        <p style={{ fontStyle: 'italic', fontSize: '0.95rem' }}>
+                            {getCompletionMessage(moveHistory.length)}
+                        </p>
                     </div>
                 }
-                <div className="columns is-multiline" style={{ backgroundColor: 'black', padding: '0.25rem', margin: '0.50rem', paddingBottom: '0'}}>
+
+                {status !== Status.WIN && solverStatus === 'solving' && (
+                    <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: '0.5rem' }}>Solving...</p>
+                )}
+
+                {currentHint && status !== Status.WIN && renderHint()}
+
+                {status !== Status.WIN && hintIndex < 0 && (
+                    <button
+                        className="button is-warning is-small"
+                        onClick={() => dispatch(actions.requestHint())}
+                        style={{ marginBottom: '0.5rem' }}
+                    >
+                        <span className="icon"><FaLightbulb /></span>
+                        <span>Hint</span>
+                    </button>
+                )}
+
+                {status !== Status.WIN && hintIndex >= 0 && solution && hintIndex < solution.length - 1 && (
+                    <button
+                        className="button is-warning is-small"
+                        onClick={() => dispatch(actions.requestHint())}
+                        style={{ marginBottom: '0.5rem' }}
+                    >
+                        <span className="icon"><FaLightbulb /></span>
+                        <span>Next Hint</span>
+                    </button>
+                )}
+
+                <div className="columns is-multiline" style={{ backgroundColor: 'var(--color-move-history-bg)', padding: '0.25rem', margin: '0.50rem', paddingBottom: '0'}}>
                     <div className="column has-text-left">
                         { moveHistory.map((entry, idx) => (
                             <React.Fragment key={idx}>
                             { entry.direction === 'UP' && (
-                                <FaArrowUp size="1.5em" style={{ color: entry.robot.toLowerCase() }} />
+                                <FaArrowUp size="1.5em" style={{ color: ROBOT_COLOR_MAP[entry.robot] || entry.robot.toLowerCase() }} />
                             )}
                             { entry.direction === 'DOWN' && (
-                                <FaArrowDown size="1.5em" style={{ color: entry.robot.toLowerCase() }} />
+                                <FaArrowDown size="1.5em" style={{ color: ROBOT_COLOR_MAP[entry.robot] || entry.robot.toLowerCase() }} />
                             )}
                             { entry.direction === 'LEFT' && (
-                                <FaArrowLeft size="1.5em" style={{ color: entry.robot.toLowerCase() }} />
+                                <FaArrowLeft size="1.5em" style={{ color: ROBOT_COLOR_MAP[entry.robot] || entry.robot.toLowerCase() }} />
                             )}
                             { entry.direction === 'RIGHT' && (
-                                <FaArrowRight size="1.5em" style={{ color: entry.robot.toLowerCase() }} />
+                                <FaArrowRight size="1.5em" style={{ color: ROBOT_COLOR_MAP[entry.robot] || entry.robot.toLowerCase() }} />
                             )}
                             </React.Fragment>
                         ))}
@@ -164,15 +228,13 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
 
                 <nav className="level">
                     <div className="level-item">
-                        <h2 className="title">{renderElapsedTime()}</h2>
+                        <h2 className="title" style={{
+                            fontSize: '3rem',
+                            fontWeight: 700,
+                            letterSpacing: '0.15em',
+                            fontVariantNumeric: 'tabular-nums',
+                        }}>{renderElapsedTime()}</h2>
                     </div>
-                    <div className="level-item">
-                    <ShareButtons
-                            title="Challenge me to mystic robots"
-                            shareUrl={document.location}
-                        />
-                    </div>
-
                 </nav>
             </div>
         </div>

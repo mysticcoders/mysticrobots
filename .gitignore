@@ -26,3 +26,6 @@ yarn-error.log*
 
 .playwright-mcp
 .idea
+
+# Claude
+CLAUDE.md

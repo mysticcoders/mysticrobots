@@ -1,11 +1,64 @@
-@import 'bulma/css/bulma.css'
+@use './styles/theme'
+@use 'bulma/css/bulma.css'
 
-html 
+html
   overflow-y: auto
 
-body 
+body
   --padding: 10px
   --borderwidth: 5px
   --totalspace: calc( 2 * calc(var(--padding) + var(--borderwidth)) )
   --vmin-minus-padding: calc( calc(var(--vmin-source) - var(--totalspace)) / 100)
-  
+  background-color: var(--color-bg-primary)
+  color: var(--color-text-primary)
+  transition: background-color 0.3s ease, color 0.3s ease
+
+.navbar
+  background-color: var(--color-navbar-bg)
+  transition: background-color 0.3s ease
+
+.navbar-item, .navbar-link
+  color: var(--color-navbar-text)
+
+.navbar-item:hover, .navbar-link:hover
+  background-color: var(--color-panel-item-hover)
+  color: var(--color-navbar-text)
+
+.navbar-burger
+  color: var(--color-navbar-text)
+
+.title, .subtitle
+  color: var(--color-text-primary)
+
+.button
+  background-color: var(--color-button-bg)
+  border-color: var(--color-button-border)
+  color: var(--color-button-text)
+  transition: background-color 0.3s ease
+
+.button:hover
+  border-color: var(--color-text-muted)
+
+.footer
+  background-color: var(--color-footer-bg)
+  color: var(--color-footer-text)
+  transition: background-color 0.3s ease
+
+.content a, a.navbar-item
+  color: var(--color-link)
+
+.content a:hover
+  color: var(--color-link-hover)
+
+.notification.is-success
+  background-color: var(--color-win-bg)
+  color: var(--color-win-text)
+
+.section
+  background-color: var(--color-bg-primary)
+
+.content
+  color: var(--color-text-secondary)
+
+.navbar-menu
+  background-color: var(--color-navbar-bg)
