@@ -66,8 +66,6 @@ export const GameBoard = ({goalIndex, goalColor, r, g, b, y, config}) => {
             }
 
             setDisplayGrid(g)
-        } else {
-            console.log("uh oh, grid is screwy")
         }
 
     }, [grid])
