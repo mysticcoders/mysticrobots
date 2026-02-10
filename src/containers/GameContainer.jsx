@@ -14,6 +14,7 @@ import { FaArrowUp, FaArrowDown, FaArrowLeft, FaArrowRight, FaLightbulb } from '
 import { FaArrowAltCircleUp, FaArrowAltCircleDown, FaArrowAltCircleLeft, FaArrowAltCircleRight } from 'react-icons/fa'
 
 import { ROBOT, Status } from '../constants'
+import { trackPuzzleReset } from '../analytics'
 import { ROBOT_COLOR_MAP, ROBOT_NAME_MAP, ROBOT_ICON_MAP } from '../components/RobotIcons'
 
 import { useInterval } from '../hooks/utils'
@@ -81,6 +82,7 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
     }, [])
 
     const resetGameBoard = () => {
+        trackPuzzleReset({ movesBeforeReset: moveHistory.length, robotsCompleted: completedRobots.length })
         dispatch(actions.clearBoard({}))
         dispatch(actions.setupBoard(metadata))
 

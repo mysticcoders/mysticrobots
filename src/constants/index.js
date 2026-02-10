@@ -1,4 +1,4 @@
-export const GOOGLE_ANALYTICS_KEY = 'G-XXXXXXXXXX'
+export const GOOGLE_ANALYTICS_KEY = 'G-1SVC6SKCLJ'
 
 
 export const WALL = {

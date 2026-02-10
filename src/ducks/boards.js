@@ -7,6 +7,7 @@ import { WALL, ROBOT, GOAL, Status } from '../constants'
 import board from '../constants/board'
 
 import { solve } from '../solver/solver'
+import { trackPuzzleStart, trackPuzzleComplete, trackRobotComplete, trackHintUsed, trackUnsolvableDetected } from '../analytics'
 
 // /////////////////////////////////////////////////////////////////////////////
 // Action Types
@@ -58,6 +59,7 @@ export const types = {
 
     SET_UNSOLVABLE_ROBOTS: 'SET_UNSOLVABLE_ROBOTS',
     SET_TOTAL_OPTIMAL_MOVES: 'SET_TOTAL_OPTIMAL_MOVES',
+    SET_PUZZLE_START_TIME: 'SET_PUZZLE_START_TIME',
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -123,6 +125,7 @@ export const initialState = {
     completedRobots: [],
     unsolvableRobots: [],
     totalOptimalMoves: 0,
+    puzzleStartTime: null,
 }
 
 export default function (state = initialState, action) {
@@ -144,6 +147,12 @@ export default function (state = initialState, action) {
             completedRobots: [],
             unsolvableRobots: [],
             totalOptimalMoves: 0,
+            puzzleStartTime: null,
+        }
+    case types.SET_PUZZLE_START_TIME:
+        return {
+            ...state,
+            puzzleStartTime: action.payload,
         }
     case types.SET_TOTAL_OPTIMAL_MOVES:
         return {
@@ -497,9 +506,10 @@ function generateRobotPositions(availableSpots) {
 }
 
 /**
- * Check that all 4 robots can reach the goal within the solver's depth limit
+ * Check that all 4 robots can reach the goal when completed sequentially (RED, GREEN, BLUE, YELLOW).
+ * Each completed robot is removed from the board, matching actual gameplay where robots move to center.
  */
-function validateAllRobotsSolvable(grid, robotPositions, goalX, goalY) {
+function validateSequentialSolvability(grid, robotPositions, goalX, goalY) {
     const robots = {
         [ROBOT.RED]: { x: robotPositions.RED.x, y: robotPositions.RED.y, robot: ROBOT.RED },
         [ROBOT.GREEN]: { x: robotPositions.GREEN.x, y: robotPositions.GREEN.y, robot: ROBOT.GREEN },
@@ -510,6 +520,7 @@ function validateAllRobotsSolvable(grid, robotPositions, goalX, goalY) {
     for (const robotName of [ROBOT.RED, ROBOT.GREEN, ROBOT.BLUE, ROBOT.YELLOW]) {
         const result = solve(grid, robots, goalX, goalY, robotName)
         if (!result.solution && result.optimalMoves === -1) return false
+        delete robots[robotName]
     }
     return true
 }
@@ -674,6 +685,11 @@ export function* setupBoard(action) {
         const analysis = analyzeSolvability(grid, sharedRobots, randomCorner.x, randomCorner.y)
         yield put({ type: types.SET_UNSOLVABLE_ROBOTS, payload: analysis.unsolvable })
         yield put({ type: types.SET_TOTAL_OPTIMAL_MOVES, payload: analysis.totalOptimal })
+        yield put({ type: types.SET_PUZZLE_START_TIME, payload: Date.now() })
+        trackPuzzleStart({ puzzleType: 'shared', boardConfig: boardPayload, hasUnsolvable: analysis.unsolvable.length > 0 })
+        if (analysis.unsolvable.length > 0) {
+            trackUnsolvableDetected({ robots: analysis.unsolvable, when: 'setup', puzzleType: 'shared' })
+        }
         return
     }
 
@@ -703,7 +719,7 @@ export function* setupBoard(action) {
         for (let placementAttempt = 0; placementAttempt < MAX_PLACEMENT_ATTEMPTS; placementAttempt++) {
             const { positions, indices } = generateRobotPositions(availableSpots)
 
-            if (validateAllRobotsSolvable(testGrid, positions, goalCorner.x, goalCorner.y)) {
+            if (validateSequentialSolvability(testGrid, positions, goalCorner.x, goalCorner.y)) {
                 foundValid = true
                 finalGoalIndex = goalIndex
                 finalGoalColorIndex = goalColorIndex
@@ -758,6 +774,11 @@ export function* setupBoard(action) {
     }, goalCorner.x, goalCorner.y)
     yield put({ type: types.SET_UNSOLVABLE_ROBOTS, payload: analysis.unsolvable })
     yield put({ type: types.SET_TOTAL_OPTIMAL_MOVES, payload: analysis.totalOptimal })
+    yield put({ type: types.SET_PUZZLE_START_TIME, payload: Date.now() })
+    trackPuzzleStart({ puzzleType: 'random', boardConfig: boardPayload, hasUnsolvable: analysis.unsolvable.length > 0 })
+    if (analysis.unsolvable.length > 0) {
+        trackUnsolvableDetected({ robots: analysis.unsolvable, when: 'setup', puzzleType: 'random' })
+    }
 }
 
 export function* refreshBoard() {
@@ -812,6 +833,8 @@ export function* requestHintSaga() {
 
     if (solution && hintIndex < solution.length - 1) {
         yield put({ type: types.SHOW_NEXT_HINT })
+        const selectedRobotName = yield select(state => state.boards.selectedRobot)
+        trackHintUsed({ robot: selectedRobotName, hintNumber: hintIndex + 2 })
     }
 }
 
@@ -1068,9 +1091,25 @@ export function* checkRobotCompletion() {
         yield put({ type: types.COMPLETE_ROBOT, payload: robotOnGoal.robot })
 
         const newCompleted = [...completedRobots, robotOnGoal.robot]
+        const history = yield select(state => state.boards.history)
+
+        trackRobotComplete({
+            robot: robotOnGoal.robot,
+            totalMovesSoFar: history.length,
+            robotsCompleted: newCompleted.length,
+        })
 
         if (newCompleted.length === 4) {
             yield put({ type: types.SET_STATUS, payload: Status.WIN })
+            const puzzleStartTime = yield select(state => state.boards.puzzleStartTime)
+            const totalOptimal = yield select(getTotalOptimalMoves)
+            const elapsedSeconds = puzzleStartTime ? Math.round((Date.now() - puzzleStartTime) / 1000) : 0
+            trackPuzzleComplete({
+                totalMoves: history.length,
+                optimalMoves: totalOptimal,
+                efficiencyRatio: totalOptimal > 0 ? +(history.length / totalOptimal).toFixed(2) : 0,
+                elapsedSeconds,
+            })
         } else {
             const updatedGrid = yield select(getGrid)
             const updatedRobots = yield select(getRobots)
@@ -1078,6 +1117,9 @@ export function* checkRobotCompletion() {
             if (updatedGoal) {
                 const { unsolvable } = analyzeSolvability(updatedGrid, updatedRobots, updatedGoal.x, updatedGoal.y)
                 yield put({ type: types.SET_UNSOLVABLE_ROBOTS, payload: unsolvable })
+                if (unsolvable.length > 0) {
+                    trackUnsolvableDetected({ robots: unsolvable, when: 'mid_game', puzzleType: 'unknown' })
+                }
             }
 
             const nextRobot = ROBOT_ORDER.find(r => !newCompleted.includes(r))

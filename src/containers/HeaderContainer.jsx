@@ -8,6 +8,7 @@ import ReactGA from 'react-ga4'
 import { FaSun, FaMoon } from 'react-icons/fa'
 
 import { useTheme } from '../hooks/useTheme'
+import { trackThemeToggle, trackNewPuzzle } from '../analytics'
 import { encodeShareKey } from '../utils/shareKey'
 import { RollieIcon, GumballIcon, BlubberIcon, YoloIcon } from '../components/RobotIcons'
 
@@ -57,7 +58,7 @@ export const HeaderContainer = () => {
             </div>
             <div className={`navbar-menu ${burgerActive ? 'is-active' : ''}`}>
                 <div className="navbar-start">
-                    <a className="navbar-item" onClick={() => { navigate('/random'); setBurgerActive(false) }}>
+                    <a className="navbar-item" onClick={() => { trackNewPuzzle(); navigate('/random'); setBurgerActive(false) }}>
                         Random Challenge
                     </a>
                     <a className="navbar-item" onClick={() => { navigate('/about'); setBurgerActive(false) }}>
@@ -68,7 +69,7 @@ export const HeaderContainer = () => {
                     <div className="navbar-item">
                         <button
                             className="button"
-                            onClick={toggleTheme}
+                            onClick={() => { const newTheme = theme === 'light' ? 'dark' : 'light'; toggleTheme(); trackThemeToggle({ newTheme }) }}
                             aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
                             style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--color-navbar-text)', fontSize: '1.2rem' }}
                         >
