@@ -7,7 +7,7 @@ import { useHotkeys } from 'react-hotkeys-hook'
 
 import { GameBoard } from '../containers/GameBoard'
 
-import { actions, getCurrentHint, getCompletedRobots } from '../ducks/boards'
+import { actions, getCurrentHint, getCompletedRobots, getTotalOptimalMoves } from '../ducks/boards'
 import { encodeShareKey } from '../utils/shareKey'
 
 import { FaArrowUp, FaArrowDown, FaArrowLeft, FaArrowRight, FaLightbulb } from 'react-icons/fa'
@@ -40,6 +40,7 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
     const currentHint = useSelector(getCurrentHint)
     const hintIndex = useSelector(state => state.boards.hintIndex)
     const completedRobots = useSelector(getCompletedRobots)
+    const totalOptimalMoves = useSelector(getTotalOptimalMoves)
     const selectedRobot = useSelector(state => state.boards.selectedRobot)
 
     const accentColor = selectedRobot ? ROBOT_COLOR_MAP[selectedRobot] : 'var(--color-text-muted)'
@@ -147,7 +148,7 @@ export const GameContainer = ({goalIndex, goalColor, r, g, b, y, config}) => {
                             All 4 robots home in {moveHistory.length} moves ({renderElapsedTime()}).
                         </p>
                         <p style={{ fontStyle: 'italic', fontSize: '0.95rem' }}>
-                            {getCompletionMessage(moveHistory.length)}
+                            {getCompletionMessage(moveHistory.length, totalOptimalMoves, elapsedTime)}
                         </p>
                     </div>
                 }

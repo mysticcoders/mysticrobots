@@ -57,6 +57,7 @@ export const types = {
     COMPLETE_ROBOT: 'COMPLETE_ROBOT',
 
     SET_UNSOLVABLE_ROBOTS: 'SET_UNSOLVABLE_ROBOTS',
+    SET_TOTAL_OPTIMAL_MOVES: 'SET_TOTAL_OPTIMAL_MOVES',
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -121,6 +122,7 @@ export const initialState = {
     hintIndex: -1,
     completedRobots: [],
     unsolvableRobots: [],
+    totalOptimalMoves: 0,
 }
 
 export default function (state = initialState, action) {
@@ -141,6 +143,12 @@ export default function (state = initialState, action) {
             hintIndex: -1,
             completedRobots: [],
             unsolvableRobots: [],
+            totalOptimalMoves: 0,
+        }
+    case types.SET_TOTAL_OPTIMAL_MOVES:
+        return {
+            ...state,
+            totalOptimalMoves: action.payload,
         }
     case types.SET_UNSOLVABLE_ROBOTS:
         return {
@@ -344,6 +352,7 @@ export const getRobotPath = state => state.boards.selectedRobotPath
 export const getRobots = state => state.boards.robots
 export const getCompletedRobots = state => state.boards.completedRobots
 export const getUnsolvableRobots = state => state.boards.unsolvableRobots
+export const getTotalOptimalMoves = state => state.boards.totalOptimalMoves
 
 export const getCurrentHint = state => {
     const { solution, hintIndex } = state.boards
@@ -506,18 +515,21 @@ function validateAllRobotsSolvable(grid, robotPositions, goalX, goalY) {
 }
 
 /**
- * Return list of robot names that cannot reach the goal
+ * Analyze solvability for all active robots and compute combined optimal move count
  */
-function findUnsolvableRobots(grid, robots, goalX, goalY) {
+function analyzeSolvability(grid, robots, goalX, goalY) {
     const unsolvable = []
+    let totalOptimal = 0
     for (const robotName of [ROBOT.RED, ROBOT.GREEN, ROBOT.BLUE, ROBOT.YELLOW]) {
         if (!robots[robotName]) continue
         const result = solve(grid, robots, goalX, goalY, robotName)
         if (!result.solution && result.optimalMoves === -1) {
             unsolvable.push(robotName)
+        } else {
+            totalOptimal += result.optimalMoves
         }
     }
-    return unsolvable
+    return { unsolvable, totalOptimal }
 }
 
 /**
@@ -659,8 +671,9 @@ export function* setupBoard(action) {
             [ROBOT.BLUE]: { x: blueLocation.x, y: blueLocation.y, robot: ROBOT.BLUE },
             [ROBOT.YELLOW]: { x: yellowLocation.x, y: yellowLocation.y, robot: ROBOT.YELLOW },
         }
-        const unsolvable = findUnsolvableRobots(grid, sharedRobots, randomCorner.x, randomCorner.y)
-        yield put({ type: types.SET_UNSOLVABLE_ROBOTS, payload: unsolvable })
+        const analysis = analyzeSolvability(grid, sharedRobots, randomCorner.x, randomCorner.y)
+        yield put({ type: types.SET_UNSOLVABLE_ROBOTS, payload: analysis.unsolvable })
+        yield put({ type: types.SET_TOTAL_OPTIMAL_MOVES, payload: analysis.totalOptimal })
         return
     }
 
@@ -736,16 +749,15 @@ export function* setupBoard(action) {
     yield put({ type: types.SETUP_BOARD_SUCCESS, payload: grid})
     yield put({ type: types.SELECT_ROBOT, payload: ROBOT.RED })
 
-    if (!foundValid) {
-        const goalCorner = corners[finalGoalIndex]
-        const unsolvable = findUnsolvableRobots(grid, {
-            [ROBOT.RED]: { x: finalPositions.RED.x, y: finalPositions.RED.y, robot: ROBOT.RED },
-            [ROBOT.GREEN]: { x: finalPositions.GREEN.x, y: finalPositions.GREEN.y, robot: ROBOT.GREEN },
-            [ROBOT.BLUE]: { x: finalPositions.BLUE.x, y: finalPositions.BLUE.y, robot: ROBOT.BLUE },
-            [ROBOT.YELLOW]: { x: finalPositions.YELLOW.x, y: finalPositions.YELLOW.y, robot: ROBOT.YELLOW },
-        }, goalCorner.x, goalCorner.y)
-        yield put({ type: types.SET_UNSOLVABLE_ROBOTS, payload: unsolvable })
-    }
+    const goalCorner = corners[finalGoalIndex]
+    const analysis = analyzeSolvability(grid, {
+        [ROBOT.RED]: { x: finalPositions.RED.x, y: finalPositions.RED.y, robot: ROBOT.RED },
+        [ROBOT.GREEN]: { x: finalPositions.GREEN.x, y: finalPositions.GREEN.y, robot: ROBOT.GREEN },
+        [ROBOT.BLUE]: { x: finalPositions.BLUE.x, y: finalPositions.BLUE.y, robot: ROBOT.BLUE },
+        [ROBOT.YELLOW]: { x: finalPositions.YELLOW.x, y: finalPositions.YELLOW.y, robot: ROBOT.YELLOW },
+    }, goalCorner.x, goalCorner.y)
+    yield put({ type: types.SET_UNSOLVABLE_ROBOTS, payload: analysis.unsolvable })
+    yield put({ type: types.SET_TOTAL_OPTIMAL_MOVES, payload: analysis.totalOptimal })
 }
 
 export function* refreshBoard() {
@@ -1064,7 +1076,7 @@ export function* checkRobotCompletion() {
             const updatedRobots = yield select(getRobots)
             const updatedGoal = Object.values(updatedGrid).find(cell => cell.goal)
             if (updatedGoal) {
-                const unsolvable = findUnsolvableRobots(updatedGrid, updatedRobots, updatedGoal.x, updatedGoal.y)
+                const { unsolvable } = analyzeSolvability(updatedGrid, updatedRobots, updatedGoal.x, updatedGoal.y)
                 yield put({ type: types.SET_UNSOLVABLE_ROBOTS, payload: unsolvable })
             }
 
